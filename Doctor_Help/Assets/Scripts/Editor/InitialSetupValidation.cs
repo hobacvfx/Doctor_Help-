@@ -11,6 +11,9 @@ namespace DoctorHelp.Editor
         public static void Run()
         {
             int sessionChecks = DailyProfileSessionValidation.Run();
+            int flowChecks = DayFlowValidation.Run();
+            int uiChecks = UiPrefabValidation.Run();
+            int medicalChecks = MedicalDataValidation.Run();
             Require(PlayerSettings.GetApplicationIdentifier(UnityEditor.Build.NamedBuildTarget.Android)
                 == "com.doctorhelp.game", "Android package name");
             Require(PlayerSettings.defaultInterfaceOrientation == UIOrientation.Portrait, "Portrait orientation");
@@ -71,7 +74,7 @@ namespace DoctorHelp.Editor
             Require(popupPrefab != null && popupPrefab.GetComponent<SelectPillPopup>() != null &&
                 popupPrefab.GetComponent<SelectPillPopup>().IsConfigured, "Nested popup button references");
             Require(Resources.Load<GameObject>("UI/ResultsPopup") != null, "Results popup prefab");
-            Debug.Log($"INITIAL_SETUP_VALIDATION_PASSED: {18 + sessionChecks} checks. Test files: " + directory);
+            Debug.Log($"INITIAL_SETUP_VALIDATION_PASSED: {18 + sessionChecks + flowChecks + uiChecks + medicalChecks} checks. Test files: " + directory);
         }
 
         private static void Require(bool condition, string description)

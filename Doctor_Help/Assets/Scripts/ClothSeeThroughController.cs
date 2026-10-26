@@ -137,6 +137,8 @@ public class ClothSeeThroughController : MonoBehaviour
 
     void Apply(bool hold, Vector2 screenUv)
     {
+        // Managed helper objects are recreated after a Play Mode script reload.
+        _propertyBlock ??= new MaterialPropertyBlock();
         _renderer.GetPropertyBlock(_propertyBlock);
         _propertyBlock.SetFloat(HoldId, hold ? 1f : 0f);
         _propertyBlock.SetVector(CutoutPositionId, new Vector4(screenUv.x, screenUv.y, 0f, 0f));
@@ -145,6 +147,7 @@ public class ClothSeeThroughController : MonoBehaviour
 
     void ApplyHold(bool hold)
     {
+        _propertyBlock ??= new MaterialPropertyBlock();
         _renderer.GetPropertyBlock(_propertyBlock);
         _propertyBlock.SetFloat(HoldId, hold ? 1f : 0f);
         _renderer.SetPropertyBlock(_propertyBlock);

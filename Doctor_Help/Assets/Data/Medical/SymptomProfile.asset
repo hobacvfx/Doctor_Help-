@@ -1,0 +1,45 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0976ed9584152754ea4f449088f6c96b, type: 3}
+  m_Name: SymptomProfile
+  m_EditorClassIdentifier: Assembly-CSharp::DoctorHelp.SymptomProfile
+  symptoms:
+  - id: 3faa1f876c2a48f783d453e90ad80866
+    displayName: Bone Fracture
+  - id: bc866d1df5cc48cba1fbe4dcaa873633
+    displayName: Incoherent Speech
+  - id: d3a6ab2e13704c59b818be21248e9a2e
+    displayName: Worm Infestation
+  - id: 868f3555805749b391b6641bd163f651
+    displayName: Internal Organ Abnormality
+  - id: e40ba4b660b94711a7935deae8b2602c
+    displayName: Heart Abnormality
+  - id: ba01540c62484c209e3ec60d8200cd10
+    displayName: High Temperature
+  - id: d0b701a64ef14b1b891b7163abb92c71
+    displayName: Brain Abnormality
+  - id: 99740cad57794442b282b9c1caddbbe0
+    displayName: Rapid Heartbeat
+  - id: 642f83d862cb41cc8d242ec08a901cd2
+    displayName: Shortness of Breath
+  - id: 0856d09d9e1a480ea6b6e272e92cff3b
+    displayName: Brain Abnormality (Tung Tung Tung)
+  - id: ec557b40a6ed406fbb270e751a04cb18
+    displayName: Slow Heartbeat
+  - id: eedde69cc36140329b7308ccdeb34f92
+    displayName: Headache
+  - id: dc3b1e5abee94c1d9b4c5a184fd22ada
+    displayName: Nausea
+  - id: 22eaad3867e2482cb6baaf07d3a04bd3
+    displayName: No Heartbeat
+  - id: 81086fbd9e514e13b5674857847a7ead
+    displayName: Low Temperature

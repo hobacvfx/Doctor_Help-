@@ -1,0 +1,33 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3d36fd7ff5a16364c9ad66befe113a78, type: 3}
+  m_Name: PillProfile
+  m_EditorClassIdentifier: Assembly-CSharp::DoctorHelp.PillProfile
+  pills:
+  - id: 9dd8971170f5435fbc2ec9d6f5e67d5e
+    displayName: Bone Growth Medicine
+  - id: cd848fd4d4304e0f99d6903dfa56dbcf
+    displayName: Sedative
+  - id: 7bc8b2b6c8d04eb1a087ea2e3d20088c
+    displayName: Deworming Medicine
+  - id: f28b5d916b004668917d979c81c16845
+    displayName: Heart Medicine
+  - id: 4ee993c1be3f451e8182c7b5b1738c5c
+    displayName: Antibiotics
+  - id: 805ed576a42147a9abc3e1db7a95846b
+    displayName: Brain Medicine
+  - id: e1cee539c6534c3282c542886a04ed50
+    displayName: Vaccine
+  - id: fc01649f4eb642c6a83cf02f10de4b02
+    displayName: Science Book
+  - id: 57f7fce15a1440d0b6ca9262d504f77d
+    displayName: Calcium

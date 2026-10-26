@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace DoctorHelp
 {
-    public sealed class PlayerProfileService : MonoBehaviour
+    public sealed class PlayerProfileService : MonoBehaviour, IDayProfile
     {
         public static PlayerProfileService Instance { get; private set; }
         public event Action Changed;
@@ -83,11 +83,20 @@ namespace DoctorHelp
             if (!IsLoaded) return false;
             try { session.CompleteDay(); }
             catch (Exception ex) { Debug.LogError($"Player profile save failed: {ex}"); return false; }
-            Changed?.Invoke();
+            NotifyChanged();
             return true;
         }
 
-        private void Commit() => Changed?.Invoke();
+        private void Commit() => NotifyChanged();
+        private void NotifyChanged()
+        {
+            if (Changed == null) return;
+            foreach (Action listener in Changed.GetInvocationList())
+            {
+                try { listener(); }
+                catch (Exception error) { Debug.LogException(error); }
+            }
+        }
         private static void ValidateId(string id)
         {
             if (string.IsNullOrWhiteSpace(id)) throw new ArgumentException("Medicine ID is required.", nameof(id));

@@ -1,118 +1,86 @@
-using System.Collections;
+using System;
+using System.Threading;
+using System.Threading.Tasks;
 using UnityEngine;
-using UnityEngine.SceneManagement;
 
 namespace DoctorHelp
 {
-    public enum DayStep { Preparation, Examination, SelectingPill, Results }
-
-    // Persistent flow state only. All UI and EventSystems belong to scenes.
+    // Composition root: builds services/states and forwards requests; UI remains scene-owned.
     public sealed class DailyGameLoop : MonoBehaviour
     {
-        private const string Home = "Home";
-        private const string Office = "Office";
-        public DayStep Step { get; private set; } = DayStep.Preparation;
-        public string SelectedPill { get; private set; }
-        private bool transitioning;
-        private SceneGameplayUI ui;
-        private PlayerProfileService Profile => PlayerProfileService.Instance;
+        public DayStep? Step => machine?.CurrentStep;
+        public bool IsTransitioning => machine != null && machine.IsTransitioning;
+        public string SelectedPill => treatment?.SelectedMedicineId;
+        private readonly CancellationTokenSource lifetime = new CancellationTokenSource();
+        private DayFlowMachine machine;
+        private UnityDaySceneService scenes;
+        private TreatmentDecisionState treatment;
+        private IDayFlowView retryView;
 
-        private IEnumerator Start()
+        private async void Start()
         {
-            SceneManager.sceneLoaded += OnSceneLoaded;
-            if (SceneManager.GetActiveScene().name != Home)
+            try
             {
-                transitioning = true;
-                yield return SceneManager.LoadSceneAsync(Home);
-                transitioning = false;
+                var profile = PlayerProfileService.Instance;
+                scenes = new UnityDaySceneService();
+                if (profile == null || !profile.IsLoaded)
+                {
+                    var home = await scenes.LoadAsync(GameScene.Home, lifetime.Token);
+                    home.ShowFlowError("Không thể tải profile. Dữ liệu cũ được giữ nguyên. Kiểm tra Console và mở lại game.");
+                    return;
+                }
+                // Explicit order; changing enum numeric values does not change the flow.
+                var plan = new DayFlowPlan(DayStep.Preparation, DayStep.Examination,
+                    DayStep.TreatmentDecision, DayStep.DayResults);
+                var patients = new PatientService(scenes, Resources.Load<NpcCatalog>("NpcCatalog"));
+                treatment = new TreatmentDecisionState(scenes, profile, RequestAdvance);
+                machine = new DayFlowMachine(plan,
+                    new PreparationState(scenes, profile, RequestAdvance),
+                    new ExaminationState(scenes, profile, patients, RequestAdvance), treatment,
+                    new DayResultsState(scenes, profile, new DayCompletionService(profile), RequestAdvance));
+                await RunAsync(() => machine.StartAsync(lifetime.Token));
             }
-            else BindSceneUI();
-            if (!Profile.IsLoaded)
+            catch (OperationCanceledException) when (lifetime.IsCancellationRequested) { }
+            catch (Exception error) { Debug.LogException(error); }
+        }
+
+        private async void RequestAdvance()
+        {
+            if (machine == null || machine.IsTransitioning || lifetime.IsCancellationRequested) return;
+            await RunAsync(() => machine.AdvanceAsync(lifetime.Token));
+        }
+        private async void RequestRetry()
+        {
+            if (machine == null || machine.IsTransitioning || lifetime.IsCancellationRequested) return;
+            await RunAsync(() => machine.RetryAsync(lifetime.Token));
+        }
+        private async Task RunAsync(Func<Task<bool>> operation)
+        {
+            DetachRetry();
+            try
             {
-                ui.ShowError("Không thể tải profile. Kiểm tra Console; dữ liệu cũ được giữ nguyên.");
-                yield break;
+                bool success = await operation();
+                if (lifetime.IsCancellationRequested || success || machine.LastError == null) return;
+                Debug.LogException(machine.LastError);
+                retryView = scenes.CurrentView;
+                if (retryView == null) return;
+                retryView.RetryRequested += RequestRetry;
+                retryView.ShowFlowError("Không thể chuyển bước: " + machine.LastError.Message);
             }
-            ShowPreparation();
+            catch (OperationCanceledException) when (lifetime.IsCancellationRequested) { }
+            catch (Exception error) { Debug.LogException(error); }
         }
-
-        private void OnSceneLoaded(Scene scene, LoadSceneMode mode) => BindSceneUI();
-
-        private void BindSceneUI()
+        private void DetachRetry()
         {
-            ui = FindFirstObjectByType<SceneGameplayUI>();
-            if (ui == null) throw new System.InvalidOperationException("Scene is missing its Gameplay Canvas UI.");
-            ui.HideAll();
-            if (ui.OpenButton != null)
-                ui.OpenButton.onClick.AddListener(() => { if (!transitioning) StartCoroutine(OpenOffice()); });
-            if (ui.GivePillsButton != null) ui.GivePillsButton.onClick.AddListener(ShowPillSelection);
+            if (retryView != null) retryView.RetryRequested -= RequestRetry;
+            retryView = null;
         }
-
-        private void ShowPreparation()
+        private void OnDestroy()
         {
-            Step = DayStep.Preparation;
-            SelectedPill = null;
-            ui.ShowPreparation(Profile.CurrentDay);
+            lifetime.Cancel();
+            DetachRetry();
+            try { machine?.Stop(); }
+            finally { lifetime.Dispose(); }
         }
-
-        private IEnumerator OpenOffice()
-        {
-            if (Step != DayStep.Preparation) yield break;
-            transitioning = true;
-            ui.HideAll();
-            yield return SceneManager.LoadSceneAsync(Office);
-            Step = DayStep.Examination;
-            if (SpawnPatient()) ui.ShowExamination(Profile.CurrentDay);
-            else ui.ShowError("Không thể tạo NPC. Kiểm tra NPC_Position và NpcCatalog.");
-            transitioning = false;
-        }
-
-        private bool SpawnPatient()
-        {
-            var anchor = GameObject.Find("NPC_Position");
-            var catalog = Resources.Load<NpcCatalog>("NpcCatalog");
-            if (anchor == null || catalog == null || catalog.prefabs == null || catalog.prefabs.Length == 0)
-            {
-                Debug.LogError("Missing NPC_Position or Resources/NpcCatalog.");
-                return false;
-            }
-            var prefab = catalog.prefabs[Random.Range(0, catalog.prefabs.Length)];
-            if (prefab == null) { Debug.LogError("NpcCatalog contains an empty prefab reference."); return false; }
-            var patient = Instantiate(prefab, anchor.transform, false);
-            patient.transform.localPosition = Vector3.zero;
-            patient.transform.localRotation = Quaternion.identity;
-            patient.name = prefab.name;
-            return true;
-        }
-
-        private void ShowPillSelection()
-        {
-            if (transitioning || Step != DayStep.Examination) return;
-            Step = DayStep.SelectingPill;
-            ui.ShowPillSelection(Profile.CurrentDay);
-            ui.PillPopup.Bind(id => SelectedPill = id,
-                () => { if (!transitioning && SelectedPill != null) StartCoroutine(FinishDay()); });
-        }
-
-        private IEnumerator FinishDay()
-        {
-            if (Step != DayStep.SelectingPill) yield break;
-            transitioning = true;
-            if (!Profile.CompleteDay())
-            {
-                transitioning = false;
-                Debug.LogError("Day could not be saved. Press Give again to retry.");
-                ui.PillPopup.ShowSaveError();
-                yield break;
-            }
-            Step = DayStep.Results;
-            ui.HideAll();
-            yield return SceneManager.LoadSceneAsync(Home);
-            ui.ShowResults();
-            yield return new WaitForSecondsRealtime(3f);
-            ShowPreparation();
-            transitioning = false;
-        }
-
-        private void OnDestroy() => SceneManager.sceneLoaded -= OnSceneLoaded;
     }
 }

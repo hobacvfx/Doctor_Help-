@@ -1,0 +1,108 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8b22233af609efa4aa2dbef0b1db2eda, type: 3}
+  m_Name: AllSickness
+  m_EditorClassIdentifier: Assembly-CSharp::DoctorHelp.AllSickness
+  symptomProfile: {fileID: 11400000, guid: fd6823cbade36444ab4130a73f177fd6, type: 2}
+  pillProfile: {fileID: 11400000, guid: bf93b046ff584a34fa0bf877db704af4, type: 2}
+  sicknesses:
+  - id: e5c336e89c4145a7a647c6813adbbb2e
+    displayName: Trauma
+    treatment: 0
+    symptomIds:
+    - 3faa1f876c2a48f783d453e90ad80866
+    pillIds:
+    - 9dd8971170f5435fbc2ec9d6f5e67d5e
+  - id: 779507f7a91843d8bbe143a5a2400021
+    displayName: Delusional Disorder
+    treatment: 0
+    symptomIds:
+    - bc866d1df5cc48cba1fbe4dcaa873633
+    pillIds:
+    - cd848fd4d4304e0f99d6903dfa56dbcf
+  - id: 811bcfba402245e7b53ea5c5a6938fc9
+    displayName: Worm Infestation
+    treatment: 0
+    symptomIds:
+    - d3a6ab2e13704c59b818be21248e9a2e
+    pillIds:
+    - 7bc8b2b6c8d04eb1a087ea2e3d20088c
+  - id: ab5cf45d3497440c8483faf8d964c7af
+    displayName: Internal Organ Disease
+    treatment: 0
+    symptomIds:
+    - 868f3555805749b391b6641bd163f651
+    pillIds:
+    - 7bc8b2b6c8d04eb1a087ea2e3d20088c
+  - id: 051fba9345c84e7488e692592100bb6d
+    displayName: Heart Disease
+    treatment: 0
+    symptomIds:
+    - e40ba4b660b94711a7935deae8b2602c
+    pillIds:
+    - f28b5d916b004668917d979c81c16845
+  - id: b5e06d1d7b2e459380ace3a0fe06b3d3
+    displayName: Flu
+    treatment: 0
+    symptomIds:
+    - ba01540c62484c209e3ec60d8200cd10
+    pillIds:
+    - 4ee993c1be3f451e8182c7b5b1738c5c
+  - id: 43e85a3e33844988b968395fcb46a51e
+    displayName: Brain Disease
+    treatment: 0
+    symptomIds:
+    - d0b701a64ef14b1b891b7163abb92c71
+    pillIds:
+    - 805ed576a42147a9abc3e1db7a95846b
+  - id: 25be672cbb8c4af5ba855e99d8f8133b
+    displayName: CoroNONO Virus Infection
+    treatment: 0
+    symptomIds:
+    - 99740cad57794442b282b9c1caddbbe0
+    - 642f83d862cb41cc8d242ec08a901cd2
+    - ba01540c62484c209e3ec60d8200cd10
+    pillIds:
+    - e1cee539c6534c3282c542886a04ed50
+  - id: 42ee7a9a38694d838b495736ea12cb20
+    displayName: Brain Rot
+    treatment: 0
+    symptomIds:
+    - 0856d09d9e1a480ea6b6e272e92cff3b
+    - ec557b40a6ed406fbb270e751a04cb18
+    - eedde69cc36140329b7308ccdeb34f92
+    pillIds:
+    - fc01649f4eb642c6a83cf02f10de4b02
+  - id: 7f12a9d40bea47f5b5284f48762375b1
+    displayName: Brittle Bone Disease
+    treatment: 0
+    symptomIds:
+    - 3faa1f876c2a48f783d453e90ad80866
+    - ba01540c62484c209e3ec60d8200cd10
+    pillIds:
+    - 57f7fce15a1440d0b6ca9262d504f77d
+  - id: b09d50f81fe14efab382c302f5b19ef0
+    displayName: Zombie Infection
+    treatment: 1
+    symptomIds:
+    - d3a6ab2e13704c59b818be21248e9a2e
+    - ba01540c62484c209e3ec60d8200cd10
+    - dc3b1e5abee94c1d9b4c5a184fd22ada
+    pillIds: []
+  - id: e659156e77fa4a84b852a36f23090055
+    displayName: Vampire Infection
+    treatment: 1
+    symptomIds:
+    - e40ba4b660b94711a7935deae8b2602c
+    - 22eaad3867e2482cb6baaf07d3a04bd3
+    - 81086fbd9e514e13b5674857847a7ead
+    pillIds: []

@@ -835,6 +835,8 @@ MonoBehaviour:
   givePillsButton: {fileID: 76098240}
   pillPopup: {fileID: 354389958}
   resultsPopup: {fileID: 0}
+  usePlaceholderResultsTimer: 1
+  placeholderResultsSeconds: 3
 --- !u!114 &459509182
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1107,6 +1109,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 998351451}
+  - component: {fileID: 998351452}
   m_Layer: 0
   m_Name: NPC_Position
   m_TagString: Untagged
@@ -1129,6 +1132,18 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &998351452
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 998351450}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0d3e081217fe41d0a530d5d0e52ecb8b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::DoctorHelp.PatientSpawnPoint
 --- !u!1 &1064982658
 GameObject:
   m_ObjectHideFlags: 0
