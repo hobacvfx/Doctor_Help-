@@ -1,0 +1,6 @@
+PASS: NPC_0; identity/prefab retained; assigned sickness=b09d50f81fe14efab382c302f5b19ef0
+PASS: NPC_1; identity/prefab retained; assigned sickness=b09d50f81fe14efab382c302f5b19ef0
+PASS: NPC_2; identity/prefab retained; assigned sickness=b09d50f81fe14efab382c302f5b19ef0
+PASS: NPC_3; identity/prefab retained; assigned sickness=b09d50f81fe14efab382c302f5b19ef0
+PASS: NPC_4; identity/prefab retained; assigned sickness=b09d50f81fe14efab382c302f5b19ef0
+PASS: NPC_Ashley; identity/prefab retained; assigned sickness=b09d50f81fe14efab382c302f5b19ef0

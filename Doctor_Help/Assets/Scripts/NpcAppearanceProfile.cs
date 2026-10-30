@@ -186,22 +186,22 @@ public class NpcAppearanceProfile : MonoBehaviour
         BindMissingAttachPoints();
     }
 
-    public void ConfirmAndApply()
+    public void ConfirmAndApply(bool recordUndo = true)
     {
         BindMissingAttachPoints();
         confirmedSeed = seed;
 
-        Undo.RegisterCompleteObjectUndo(this, "Apply NPC Appearance");
+        if (recordUndo) Undo.RegisterCompleteObjectUndo(this, "Apply NPC Appearance");
 
         foreach (Slot slot in slots)
-            ApplySlot(slot);
+            ApplySlot(slot, recordUndo);
 
         EditorUtility.SetDirty(this);
         if (gameObject.scene.IsValid())
             UnityEditor.SceneManagement.EditorSceneManager.MarkSceneDirty(gameObject.scene);
     }
 
-    void ApplySlot(Slot slot)
+    void ApplySlot(Slot slot, bool recordUndo)
     {
         if (slot == null)
             return;
@@ -216,7 +216,7 @@ public class NpcAppearanceProfile : MonoBehaviour
             : ChoosePrefab(slot);
 
         slot.prefab = chosen;
-        ReplaceChildren(slot.attachPoint, chosen);
+        ReplaceChildren(slot.attachPoint, chosen, recordUndo);
     }
 
     GameObject ChoosePrefab(Slot slot)
@@ -272,16 +272,17 @@ public class NpcAppearanceProfile : MonoBehaviour
         return source != null ? source : prefabOrInstance;
     }
 
-    static void ReplaceChildren(Transform parent, GameObject prefab)
+    static void ReplaceChildren(Transform parent, GameObject prefab, bool recordUndo)
     {
         for (int i = parent.childCount - 1; i >= 0; i--)
-            Undo.DestroyObjectImmediate(parent.GetChild(i).gameObject);
+            if (recordUndo) Undo.DestroyObjectImmediate(parent.GetChild(i).gameObject);
+            else UnityEngine.Object.DestroyImmediate(parent.GetChild(i).gameObject);
 
         if (prefab == null)
             return;
 
         var instance = (GameObject)PrefabUtility.InstantiatePrefab(prefab, parent);
-        Undo.RegisterCreatedObjectUndo(instance, "Spawn NPC Part");
+        if (recordUndo) Undo.RegisterCreatedObjectUndo(instance, "Spawn NPC Part");
         instance.transform.SetLocalPositionAndRotation(
             prefab.transform.localPosition,
             prefab.transform.localRotation);
@@ -289,3 +290,4 @@ public class NpcAppearanceProfile : MonoBehaviour
     }
 #endif
 }
+

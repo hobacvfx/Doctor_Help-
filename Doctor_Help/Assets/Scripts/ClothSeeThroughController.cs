@@ -1,5 +1,5 @@
 using UnityEngine;
-using UnityEngine.InputSystem;
+using DoctorHelp;
 
 /// <summary>
 /// Feeds pointer hold state and screen UV into the cloth see-through material,
@@ -12,7 +12,7 @@ public class ClothSeeThroughController : MonoBehaviour
     static readonly int HoldId = Shader.PropertyToID("_Hold");
     static readonly int CutoutPositionId = Shader.PropertyToID("_Cutout_Position");
 
-    [Tooltip("Magnifier object (KinhLup). Shown only while Hold is on.")]
+    [Tooltip("Pointer magnifier, resolved from the scene examination selection service.")]
     [SerializeField] Transform magnifier;
 
     [Tooltip("World-space offset from the pointer, used when the sprite pivot is not the lens center.")]
@@ -21,6 +21,7 @@ public class ClothSeeThroughController : MonoBehaviour
     [Tooltip("Camera rendering the scene. Falls back to Camera.main.")]
     [SerializeField] Camera targetCamera;
 
+    ExaminationToolSelection _selection;
     Renderer _renderer;
     MaterialPropertyBlock _propertyBlock;
     bool _isHolding;
@@ -37,8 +38,9 @@ public class ClothSeeThroughController : MonoBehaviour
 
     void Update()
     {
-        if (TryGetPressedScreenPosition(out Vector2 screenPos))
+        if (_selection != null && _selection.IsUsingXray)
         {
+            Vector2 screenPos = _selection.ScreenPosition;
             float w = Screen.width;
             float h = Screen.height;
             if (w <= 0f || h <= 0f)
@@ -68,54 +70,19 @@ public class ClothSeeThroughController : MonoBehaviour
         _isHolding = false;
     }
 
-    /// <summary>
-    /// Touch on mobile, left mouse on PC. Prefers an active touch when both exist.
-    /// </summary>
-    static bool TryGetPressedScreenPosition(out Vector2 screenPosition)
-    {
-        var touchscreen = Touchscreen.current;
-        if (touchscreen != null && touchscreen.primaryTouch.press.isPressed)
-        {
-            screenPosition = touchscreen.primaryTouch.position.ReadValue();
-            return true;
-        }
-
-        var mouse = Mouse.current;
-        if (mouse != null && mouse.leftButton.isPressed)
-        {
-            screenPosition = mouse.position.ReadValue();
-            return true;
-        }
-
-        screenPosition = default;
-        return false;
-    }
-
     void ResolveReferences()
     {
-        if (targetCamera == null)
-            targetCamera = Camera.main;
-
-        if (magnifier == null)
-            magnifier = FindMagnifierInScene();
-
-        if (magnifier != null)
-            _magnifierWorldZ = magnifier.position.z;
-    }
-
-    static Transform FindMagnifierInScene()
-    {
-        Transform[] transforms = FindObjectsByType<Transform>(FindObjectsInactive.Include, FindObjectsSortMode.None);
-        for (int i = 0; i < transforms.Length; i++)
+        if (targetCamera == null) targetCamera = Camera.main;
+        var selections = FindObjectsByType<ExaminationToolSelection>(FindObjectsSortMode.None);
+        foreach (var selection in selections)
         {
-            Transform candidate = transforms[i];
-            if (candidate != null && candidate.name == "KinhLup")
-                return candidate;
+            if (selection.gameObject.scene != gameObject.scene) continue;
+            _selection = selection;
+            magnifier = selection.Magnifier;
+            break;
         }
-
-        return null;
+        if (magnifier != null) _magnifierWorldZ = magnifier.position.z;
     }
-
     void MoveMagnifier(Vector2 screenPos)
     {
         if (magnifier == null || targetCamera == null)
@@ -153,3 +120,6 @@ public class ClothSeeThroughController : MonoBehaviour
         _renderer.SetPropertyBlock(_propertyBlock);
     }
 }
+
+
+

@@ -51,7 +51,7 @@
 
 ## Kiến trúc và mở rộng gameplay flow
 
-- Flow hiện tại: `Preparation -> Examination -> TreatmentDecision -> DayResults -> Preparation`.
+- Flow hiện tại: `Preparation -> Examination -> TreatmentDecision -> PatientDeparture`, sau đó quay về Examination nếu còn thời gian hoạt động, hoặc sang `DayResults -> Preparation` khi đã đóng cửa. Nhánh lặp khai báo tập trung trong DayFlowPlan.
 - Dùng state machine quản lý chuyển bước tập trung. Mỗi state có `EnterAsync/Exit`, chịu trách nhiệm đăng ký và dọn sự kiện của chính nó.
 - Đặt tên state theo ý nghĩa gameplay. Chọn thuốc là thao tác UI bên trong TreatmentDecision; bước này cũng là nơi mở rộng quyết định báo cảnh sát.
 - Thứ tự bước khai báo trong `DayFlowPlan` tại `DailyGameLoop`; không suy ra thứ tự từ giá trị enum và không gọi thẳng bước kế tiếp từ UI.
@@ -63,6 +63,15 @@
 - Phép tính tiền thưởng/phạt trong đêm phải hoàn tất trước checkpoint và chỉ được áp dụng một lần cho ngày kết thúc.
 - Spawn NPC qua component `PatientSpawnPoint` trên `NPC_Position`, không phụ thuộc vào tên object để tìm điểm spawn.
 
+## Thời gian hoạt động và vòng bệnh nhân
+
+- Bấm Open bắt đầu đồng hồ từ 08:00. 08:00–21:00 tương đương 720 giây (12 phút) thực. Đồng hồ hiển thị HH:mm ở góc trên phải, trong Safe Area của Office; UI có sẵn trong scene và lưu thành prefab để chỉnh.
+- Đồng hồ tiếp tục chạy khi chọn thuốc và khi NPC bước vào/ra, không phụ thuộc Time.timeScale. App vào nền/mất focus thì tạm dừng; trở lại không cộng bù thời gian ở nền. Không lưu tiến trình đồng hồ giữa ngày.
+- Đồng hồ dừng ở 21:00, không vượt quá. Không tự kết thúc phiên khám khi hết giờ. NPC đã bắt đầu bước vào bằng A_Walk_in thì phải được khám xong kể cả đã đến 21:00.
+- Give chốt thao tác cho bệnh nhân hiện tại, đóng popup và dừng tương tác khám; NPC chạy A_Walk_Out một lần. Chờ animation hoàn tất và NPC cũ được hủy rồi mới nhận khách mới bằng A_Walk_in. Chỉ mở thao tác khám khi khách bước vào xong và đến NPC_Idle.
+- Sau khi khách bước ra xong: nếu chưa đến 21:00 thì nhận NPC tiếp theo; nếu đã đến giờ thì chuyển sang kết quả ngày. Không nhận thêm khách khi đã đóng cửa. Mỗi lần spawn là phiên khám mới, kể cả trùng prefab; thân nhiệt giữ nguyên trong từng phiên.
+- Chỉ lưu checkpoint/tăng ngày sau vị khách cuối cùng; các bệnh nhân ở giữa ngày không lưu hoặc tăng ngày. Báo công an chưa triển khai trong vòng này. Give hiện vẫn là thao tác placeholder, chưa tự thêm trừ thuốc, tính sống/chết hoặc tiền thưởng/phạt.
+
 ## UI, scene và prefab
 
 - Canvas, EventSystem, FPS, button và popup phải thuộc scene, có sẵn trong Hierarchy trước Play. Không spawn UI dưới `DontDestroyOnLoad`.
@@ -70,6 +79,51 @@
 - Button và popup phải lưu thành prefab để người dùng chỉnh giao diện. Các prefab UI hiện ở `Assets/Resources/UI`; ưu tiên giữ liên kết nested prefab khi tái sử dụng button.
 - Chỉnh bố cục, màu, sprite, font và chữ tĩnh trong prefab/scene; code chỉ kết nối hành động và cập nhật nội dung/trạng thái động cần thiết.
 - Nội dung placeholder được phép theo yêu cầu thiết kế, nhưng phần triển khai vẫn phải có cấu trúc có thể bảo trì.
+
+## Dữ liệu bệnh, triệu chứng và thuốc
+
+- Ba ScriptableObject tại `Assets/Data/Medical`: `AllSickness.asset` quản lý bệnh và liên kết; `SymptomProfile.asset` quản lý triệu chứng; `PillProfile.asset` quản lý thuốc/phương pháp chữa trong sơ đồ thiết kế.
+- Cho phép thêm, xóa và đặt tên trong Inspector. Mỗi bệnh có các slot triệu chứng và thuốc chọn từ hai profile nguồn; không nhập lại tên thành dữ liệu riêng trong từng bệnh.
+- Dùng ID ổn định cho liên kết. Đổi tên hoặc sắp xếp không được làm đổi ID; không dùng tên hiển thị hay vị trí trong danh sách làm khóa. Xóa mục nguồn phải cảnh báo nếu đang được dùng, giữ liên kết thiếu hiển thị rõ để sửa, không tự gán sang mục khác.
+- Bệnh dùng thuốc yêu cầu đủ TẤT CẢ loại thuốc đã khai báo, không phải chọn một thuốc thay thế. Slot biểu thị loại thuốc, chưa biểu thị số lượng/liều. Công thức rỗng, trùng ID, thiếu thuốc hoặc tham chiếu không hợp lệ không được tính là đủ thuốc.
+- `SicknessTreatment` phân biệt `RequiredPills` và `ReportToPolice`. Zombie Infection và Vampire Infection phải báo cảnh sát, không có công thức thuốc; báo cảnh sát không phải một mục trong PillProfile.
+- Bộ dữ liệu nhập từ sơ đồ hiện có 12 bệnh, 15 triệu chứng dùng chung và 9 loại thuốc/phương pháp chữa, đặt tên tiếng Anh. Chi tiết ánh xạ song ngữ ở `Assets/Data/Medical/README.md`; đây là dữ liệu thiết kế có thể chỉnh sửa, không phải số lượng cố định cho hệ thống.
+- Giữ đúng ánh xạ trong sơ đồ game, kể cả Internal Organ Disease dùng Deworming Medicine, Flu dùng Antibiotics và Brain Rot dùng Science Book. Không tự sửa theo kiến thức y khoa thực tế. `Brain Abnormality (Tung Tung Tung)` hiện là triệu chứng riêng với `Brain Abnormality`.
+- Không tự tái tạo dữ liệu mẫu khi khởi động hoặc ghi đè các chỉnh sửa Inspector của người dùng.
+- Hiện đây là lớp dữ liệu và truy vấn điều kiện thuốc; chưa tích hợp chẩn đoán, trừ tồn kho hay kết quả bệnh nhân. `HasRequiredPills` chưa loại trường hợp cho thêm thuốc ngoài công thức; tác dụng của thuốc thừa chưa được chốt.
+- Khi tích hợp gameplay, popup phải hỗ trợ cả bộ thuốc yêu cầu và quyết định báo cảnh sát. Việc trừ thuốc, tính kết quả và thưởng/phạt phải tuân thủ luật lưu cuối ngày; không coi truy vấn dữ liệu là giao dịch tồn kho.
+
+## Chọn dụng cụ và mechanic khám bệnh
+
+- Chỉ sử dụng dụng cụ trong bước Examination. Mỗi lần chỉ chọn một dụng cụ: bấm lại để bỏ chọn, bấm dụng cụ khác để chuyển lựa chọn. Khi rời bước khám bệnh phải bỏ chọn và dừng hiệu ứng/âm thanh.
+- Dụng cụ đang chọn trên Desk có viền glow trắng mềm, nhấp nháy chậm và nhẹ; bật object con `Selected_Icon`. Bỏ chọn thì tắt cả hai. Độ dày, độ sáng và nhịp glow chỉnh được trong Inspector.
+- Dùng `ExaminationToolSelection` quản lý chung lựa chọn và thao tác chuột/touch. Cú bấm chọn dụng cụ không đồng thời sử dụng mechanic; cần một lần giữ tiếp theo. Thao tác bắt đầu trên UI không được kích hoạt khám bệnh khi kéo sang bệnh nhân.
+- X-ray: chọn `Desk/KinhLup`, sau đó giữ/kéo để soi; thả tay dừng soi nhưng giữ lựa chọn. Kính trên bàn và kính đi theo con trỏ là hai object khác nhau, dùng tham chiếu rõ ràng, không tìm bằng tên KinhLup.
+- Nhiệt kế: chọn `Desk/NhietKe` như các dụng cụ khác (glow và Selected_Icon). Sau đó giữ chuột/touch ở bất kỳ đâu ngoài button để hiện `Mechanics/NhietKe`; thủy ngân tăng từ 33°C đến nhiệt độ đo được trong 2 giây. Thả tay, bỏ chọn, đổi dụng cụ hoặc rời bước khám thì ẩn và hủy lần đo; lần giữ mới bắt đầu lại từ 33°C.
+- Thang nhiệt kế dùng tham chiếu trực tiếp Min = 33°C và Max = 43°C. Giữ khung, vị trí, bề rộng và hình bầu thủy ngân; chỉ thay đổi độ cao phần thủy ngân hiển thị, không kéo dãn cả sprite. Phân biệt object dụng cụ trên Desk với object hiển thị trong Mechanics.
+- Nghe tim: chọn `TaiNghe` thì bật `HeartCheck`, bỏ chọn thì tắt. Giữ nguyên vị trí HeartCheck đã đặt trong scene; không di chuyển nó theo con trỏ. Khi giữ ngoài UI mới bắt đầu phản hồi; thả tay dừng và dọn particle/âm thanh.
+- Với bệnh nhân có nhịp tim, mỗi nhịp restart `VFX_HeartBeat`; nếu còn trong phạm vi nghe thì đồng thời restart `VFX_Sound` và phát `SFX_HeartBeat.mp3`. Đổi nhịp bằng khoảng cách giữa các lần trigger, không đổi pitch/tốc độ phát clip.
+- Khoảng cách tính trong mặt phẳng world XY từ chuột/ngón tay đến Heart của bệnh nhân hiện tại. Hệ số tín hiệu giảm tuyến tính theo `Clamp01(1 - distance / 4)`: sát tim 100%, cách 2 đơn vị 50%, từ 4 đơn vị trở lên bằng 0. Khoảng cách tối đa và âm lượng tối đa chỉnh được trong Inspector.
+- Hệ số trên áp dụng cho Start Size của `VFX_Sound` và âm lượng, cập nhật cả particle đã phát khi di chuyển con trỏ. Ngoài phạm vi không có sóng/tiếng; `VFX_HeartBeat` vẫn phản hồi với kích thước đã thiết kế, không giảm theo khoảng cách.
+- Giữ cấu hình hình ảnh, material, lifetime và kích thước tối đa trong particle system do người dùng thiết kế. Tắt Play On Awake để không tự phát khi mở scene/chọn dụng cụ. Hiệu ứng phản hồi phải hiển thị phía trên sprite bệnh nhân.
+
+## Profile NPC, bệnh và triệu chứng
+
+- Dùng `Assets/Data/NPC/NpcProfile.asset` làm nguồn tên và bệnh của NPC; `NpcAppearanceProfile` chỉ quản lý ngoại hình. Không tạo nguồn bệnh riêng cho mechanic nghe tim.
+- Spawner hiện chọn prefab từ NpcCatalog, rồi liên kết đúng bản ghi NpcProfile bằng tham chiếu prefab/ID ổn định. `PatientExaminationProfile` trên mỗi prefab giữ tham chiếu Heart; không tìm Heart toàn scene hoặc suy ra danh tính từ tên NPC runtime.
+- Đọc bệnh từ bản ghi NPC, đọc triệu chứng từ AllSickness bằng ID ổn định. Đổi tên/sắp xếp dữ liệu không được làm sai liên kết. Thay đổi bệnh/nhịp trong Play hiện được đọc ở lần giữ để nghe tiếp theo.
+- NPC không có phân loại chủng tộc riêng. Profile chỉ có tên và một bệnh (hoặc không bệnh) để chỉnh; ID và tham chiếu prefab vẫn được giữ làm liên kết kỹ thuật. Zombie Infection và Vampire Infection là bệnh trong AllSickness, giữ nguyên tên và ID hiện có.
+- Thân nhiệt: bình thường 37°C; triệu chứng High Temperature random 38,6–42°C; Low Temperature random 33–34,9°C. Mỗi phiên khám của một NPC chỉ lấy một nhiệt độ và giữ nguyên đến khi phiên khám kết thúc (cho thuốc hoặc báo công an, chuyển sang NPC tiếp theo). Đo lại, thả/giữ, đổi dụng cụ hoặc bật/tắt nhiệt kế không được random lại. Phiên khám mới được lấy giá trị mới trong đúng khoảng triệu chứng, kể cả khi dùng lại cùng prefab NPC. Nhiệt độ thuộc trạng thái runtime của phiên bệnh nhân, không ghi ngược vào NpcProfile hay save người chơi. Nhiệt độ chỉ phụ thuộc triệu chứng của bệnh đang gán.
+- Nhịp tim chỉ phụ thuộc triệu chứng bệnh: mặc định 60 BPM, Rapid Heartbeat 180 BPM (gấp ba nhịp gốc), Slow Heartbeat 30 BPM (nửa nhịp gốc); No Heartbeat là 0 BPM và ưu tiên hơn triệu chứng nhanh/chậm. BPM gốc chỉnh được trong Inspector. Vampire Infection hiện có No Heartbeat nên không có nhịp tim; không có nhánh ưu tiên theo danh tính NPC.
+- Khi không có nhịp tim, thao tác giữ để nghe chỉ hiện hình tim đứng yên: không restart VFX, không phát sự kiện nhịp lặp, không VFX_Sound, không tiếng. Hình tim vẫn hiện khi ở ngoài phạm vi nghe. Thả tay hoặc bỏ chọn dừng và dọn hiệu ứng; lần giữ mới hiển thị lại hình tim tĩnh.
+- Các mechanic đọc cùng một bệnh từ NpcProfile và không tự đổi bệnh khi khám. Dữ liệu cũ đã được chuyển: Zombie sang Zombie Infection, Vampire sang Vampire Infection; không chạy lại việc chuyển này khi mở game.
+- Liên kết bệnh/triệu chứng thiếu hoặc đồng thời có triệu chứng nhanh và chậm phải báo lỗi rõ; không âm thầm coi là nhịp bình thường.
+
+## Tình trạng quyền sử dụng nhân vật tham chiếu
+
+- Đã trao đổi về Tung Tung Tung Sahur, nhưng chưa xác minh quyền sử dụng hoặc có giấy phép cho project; người dùng chưa chốt sử dụng hay loại bỏ nhân vật này.
+- Tên triệu chứng `Brain Abnormality (Tung Tung Tung)` trong dữ liệu không chứng minh quyền sử dụng nhân vật, hình ảnh hoặc âm thanh liên quan. Không suy diễn meme hoặc nội dung có AI hỗ trợ là được tự do dùng thương mại.
+- Nếu tiếp tục đánh giá quyền sử dụng, kiểm tra nguồn và tình trạng pháp lý tại thời điểm đó; phân biệt tuyên bố của bên nhận sở hữu, đăng ký và kết luận của tòa án. Không ghi nhận project đã có giấy phép nếu chưa có bằng chứng.
 
 ## Tiêu chuẩn triển khai và kiểm chứng
 
@@ -81,4 +135,11 @@
 - Với thay đổi UI/flow, chạy thử hành vi liên quan trong Play Mode và kiểm tra ảnh render thực tế. Luồng chọn thuốc cần xác nhận popup mở ngay lần đầu, chọn được thuốc, Give hiển thị và hoạt động, rồi sang kết quả/ngày mới đúng luật.
 - Kiểm tra mở lại popup và lặp vòng ngày để phát hiện listener trùng, lưu trùng và tăng ngày trùng. Chú ý dữ liệu runtime khi Unity reload code trong Play Mode.
 - Báo đúng phạm vi đã kiểm chứng; phân biệt kiểm tra code, Edit Mode, Play Mode và bản build trên thiết bị. Không khẳng định đã kiểm thử phần chưa chạy.
+- Chọn phạm vi kiểm thử theo thay đổi: sửa quy tắc dữ liệu thì ưu tiên kiểm tra Edit Mode tập trung; chỉ chạy lại bộ Play Mode rộng khi thay đổi hành vi/UI hoặc có rủi ro hồi quy liên quan. Không lặp kiểm tra đã đạt nếu không có thay đổi, lỗi hoặc nghi vấn mới; ưu tiên đọc log tóm tắt để tiết kiệm token.
 - Chi tiết cấu trúc và hướng dẫn mở rộng: xem `INITIAL_SETUP.md`.
+
+
+
+
+
+

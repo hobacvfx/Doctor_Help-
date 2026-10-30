@@ -26,7 +26,8 @@ namespace DoctorHelp
         {
             if (Instance != null && Instance != this) { Destroy(this); return; }
             Instance = this;
-            store = new PlayerProfileStore(Application.persistentDataPath);
+            string profileDirectory = Application.persistentDataPath;
+            store = new PlayerProfileStore(profileDirectory);
             try
             {
                 session = new PlayerProfileSession(store.Load(), store.Save);
@@ -105,3 +106,5 @@ namespace DoctorHelp
         private void OnDestroy() { if (Instance == this) Instance = null; }
     }
 }
+
+

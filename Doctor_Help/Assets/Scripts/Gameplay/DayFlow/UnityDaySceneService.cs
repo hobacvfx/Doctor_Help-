@@ -46,13 +46,13 @@ namespace DoctorHelp
         }
     }
 
-    public sealed class PatientService : IPatientService
+    public sealed class PatientService : IAnimatedPatientService
     {
         private readonly UnityDaySceneService scenes;
         private readonly NpcCatalog catalog;
         public PatientService(UnityDaySceneService scenes, NpcCatalog catalog)
         { this.scenes = scenes; this.catalog = catalog; }
-        public void EnsurePatient()
+        private PatientSpawnPoint ResolveSpawnPoint()
         {
             PatientSpawnPoint spawnPoint = null;
             foreach (var root in scenes.CurrentScene.GetRootGameObjects())
@@ -62,7 +62,12 @@ namespace DoctorHelp
                     spawnPoint = candidate;
                 }
             if (spawnPoint == null) throw new InvalidOperationException("Office is missing PatientSpawnPoint on NPC_Position.");
-            spawnPoint.EnsurePatient(catalog);
+            return spawnPoint;
         }
+        public void EnsurePatient() => ResolveSpawnPoint().EnsurePatient(catalog);
+        public Task WaitForArrivalAsync(CancellationToken token) => ResolveSpawnPoint().WaitForArrivalAsync(token);
+        public Task DepartAsync(CancellationToken token) => ResolveSpawnPoint().DepartAsync(token);
     }
 }
+
+

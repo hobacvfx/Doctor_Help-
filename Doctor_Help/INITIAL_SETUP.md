@@ -41,22 +41,28 @@ There are no automatic gameplay rewards, patient outcomes or bankruptcy rules.
 
 Editor Play mode starts Home regardless of the currently edited scene. Home is also first in the build list.
 Home Preparation: `open` -> Office Examination -> `Give Pills` -> `Select Pill` popup.
-Select `pill_a`, `pill_b` or `pill_c`, then press `Give` to finish the day.
+Select `pill_a`, `pill_b` or `pill_c`, then press `Give` to finish that consultation. The patient plays A_Walk_Out completely before removal. If the clock is still before 21:00, the next patient enters with A_Walk_in; otherwise the day ends. A patient already admitted keeps their consultation even if closing occurs during their arrival.
 The profile is saved for the next morning, Home loads, and displays `chạy cut scene ở đây và xem kết quả ở đây` for 3 real-time seconds.
 Then Preparation begins with the next day and `open` is shown again. A failed transition displays an error and a `Thử lại` action using the scene's primary button; its authored label is restored after recovery.
 Pill buttons are colored image placeholders with text labels, require a selection, and do not consume inventory or decide patient outcomes yet.
-One random NPC is instantiated by the `PatientSpawnPoint` component on Office's `NPC_Position`, using references in `Assets/Resources/NpcCatalog.asset`. Renaming the object does not break spawning. Re-entering examination in the same scene reuses the existing patient.
+One random NPC at a time is instantiated by PatientSpawnPoint on NPC_Position, using Assets/Resources/NpcCatalog.asset. Re-entering a failed examination reuses the existing consultation. After a completed departure, the next admission spawns a fresh patient consultation.
 The catalogue references the six existing prefabs in `Assets/2D_Assets/NPC`; original assets stay in place and are included in builds through these references.
 Each scene contains its own `Gameplay Canvas` and `EventSystem`. The Canvas contains `Safe Area`, day/step and error labels, FPS text, and prefab instances of that scene's buttons/popups.
-Home owns OpenButton and ResultsPopup; Office owns GivePillsButton and SelectPillPopup.
+Home owns OpenButton and ResultsPopup; Office owns GivePillsButton, SelectPillPopup and the ClinicClock prefab instance at the top right of Safe Area.
 UI exists in the scene hierarchy before Play and is destroyed naturally when its scene unloads. No UI is instantiated or parented under `DontDestroyOnLoad`.
 The persistent Game Services object holds only profile, flow and performance settings; the flow binds scene UI references after scene loading.
+
+## Clinic opening hours and patient motion
+
+ClinicClock maps 720 real seconds to 08:00–21:00, displays HH:mm and clamps at 21:00. DailyGameLoop starts it on Open, updates it with unscaled foreground time, and skips the resume frame so time spent in the background is not added. It runs during the medicine popup and all patient animations. There is no unfinished-day clock persistence. Opening the following day starts at 08:00 again.
+
+PatientDepartureState waits for the animator's actual normalized completion, then removes the old patient before the plan checks whether another may enter. ExaminationState waits for NPC_Idle before enabling tools/treatment. Office stays loaded between patients. PatientSpawnPoint initializes each newly spawned consultation, preserving the existing temperature cache for its duration. Failed entry retry reuses the current instance; completed departure retry is idempotent. The shared All.controller uses its existing A_Walk_in -> NPC_Idle and a Leave trigger for NPC_Idle -> A_Walk_Out. Arrival and departure clips are nonlooping. Missing animator/controller states produce a flow error.
 
 ## Flow architecture and extending steps
 
 `DailyGameLoop` is the composition root. It declares the ordered `DayFlowPlan`, registers the states and services, and forwards advance/retry requests.
 `DayFlowMachine` is pure C# and is the only owner of state transitions. States implement `IDayFlowState.EnterAsync` and `Exit`; Exit always removes subscriptions and hides the previous view before entry starts.
-The current order is `Preparation -> Examination -> TreatmentDecision -> DayResults -> Preparation`. Enum values are stable identifiers, not sequence indexes.
+The current order is `Preparation -> Examination -> TreatmentDecision -> PatientDeparture`, then the plan repeats Examination while the clinic is open, otherwise continues `DayResults -> Preparation`. Enum values are stable identifiers, not sequence indexes.
 `UnityDaySceneService` loads only when the destination differs, checks the build list and resolves exactly one configured UI from the destination scene. It does not subscribe to unrelated scene-load events.
 `PatientService` resolves the scene-owned spawn-point component. UI exposes gameplay intent events; it never loads scenes or writes saves.
 `DayCompletionService` makes a successful checkpoint idempotent for the closing day, including retries after a subsequent scene-load failure. The save still occurs before results presentation. Future nightly penalties/rewards belong before this checkpoint and must also be applied only once per closing day.
@@ -104,10 +110,69 @@ Each disease has a treatment mode: RequiredPills or ReportToPolice. Zombie Infec
 The data is not yet wired into patient diagnosis, inventory consumption or the single-pill gameplay popup. That integration must support selecting the entire required set and handling police cases separately.
 The default data assets are outside Resources; future gameplay consumers must hold explicit serialized references or load them through an intentional asset-loading system.
 
-## Validation
+## NPC profiles
 
-Run **Doctor Help > Validate Initial Setup** in Unity to check settings, NPC references, defaults, JSON round trip, backup recovery, invalid stock, duplicate IDs, preservation of corrupt/newer saves, daily checkpoint semantics, and state-machine order/lifecycle/retry/cancellation.
-UI regression checks also load all six prefabs through Unity, verify real Button/GameObject/Graphic references, usable fonts and text bounds, toggle interactability, select every pill, confirm Give, and reset/reopen the popup to detect duplicate callbacks.
-Tests write isolated data under `Library/ProfileValidation`, never to the player's real save directory.
-Run **Doctor Help > Validate Scene UI** to inspect both scenes' Canvas, nested prefab references, FPS and EventSystem in preview scenes without changing currently open scenes.
-On a phone, verify touch buttons, NPC visibility, portrait lock and FPS placement. Close during Office: reopening must repeat that day from Home; close during/after results: reopening must start the next day from Home.
+Select `Assets/Data/NPC/NpcProfile.asset` in the Project window. It holds all authored NPC records and references `Assets/Data/Medical/AllSickness.asset`.
+
+- **Load NPC** scans the assigned NPC Folder and all subfolders for prefab assets. The default folder is `Assets/2D_Assets/NPC`. New entries use the prefab name and no sickness. Loading again adds only new prefab GUIDs and preserves authored names and sickness IDs. The folder should contain complete NPC prefabs, not individual appearance parts.
+- Search by NPC name or prefab name; the Inspector displays 30 matching slots per page. Click a slot to view its front-facing 2D prefab preview and edit its NPC name and single sickness (or None). **Mở prefab NPC** opens the source in Unity Prefab Mode.
+- NPC IDs use prefab asset GUIDs; sickness references use existing stable disease IDs. Renaming/moving prefabs or renaming diseases preserves the links. Keep `.meta` files when moving assets outside Unity. Names and sickness assignments are the editable NPC gameplay data; stable IDs and prefab references remain technical links. Zombie Infection and Vampire Infection are ordinary sickness records with their existing names and IDs.
+- Deleted/missing prefabs remain listed with a warning; reloading never removes their information. Missing sickness IDs also remain visible until explicitly replaced. Changing the scan folder does not remove previous entries. Inspector changes and loading support Undo.
+- No NPCs or medical data are generated at runtime by this profile. The examination spawner still selects prefabs from `Assets/Resources/NpcCatalog.asset`, then resolves the exact prefab reference in its assigned NpcProfile and binds that record to the spawned patient. Stethoscope rhythm and temperature read this authored sickness and its symptoms. Diagnosis, treatment and spawn selection rules remain separate gameplay work.
+
+## Bulk NPC authoring tool
+
+Open **Tools > NPC > Tạo NPC hàng loạt**. Defaults: NPC_0 template, current NpcProfile and NpcCatalog, first seed 6, count 10. Set the count before pressing Tạo NPC. Outputs are NPC_<seed>.prefab with ascending Seed and Confirmed Seed, saved into the profile's NPC Folder. The next successful batch automatically advances the window's first seed by its count.
+
+The template hierarchy, Heart reference and animation controller are retained; appearance is applied through NpcAppearanceProfile with nested part prefab links. By default, template Lock Override flags are cleared so each slot uses the new seed. Enable Giữ Lock Override to retain intentionally locked parts. Seeds determine appearance, not uniqueness: different seeds can produce matching looks when the available part combinations overlap.
+
+Each generated prefab is registered immediately in NpcProfile using its new asset GUID, its NPC_<seed> name and one random existing AllSickness ID. Only new records receive random diseases; existing NPC names, diseases and IDs are preserved. The selected NpcCatalog also receives the new prefabs so they can spawn; leave that field empty for authoring without spawn registration. The NPC Profile must reference a nonempty valid disease catalogue.
+
+The tool prechecks the entire requested name range and refuses existing prefab paths; it never overwrites NPCs. Canceling or a failure during generation removes assets created by that batch and restores profile/catalog data. No real NPCs are generated just by opening the tool. The editor window/service are permanent authoring tools, not temporary test menus.
+
+## Verification
+
+Temporary Editor validation menus and their test harnesses have been removed after implementation checks. The production custom Inspectors, NPC importer and Home Play Mode startup remain. Future verification must use isolated player data; never run save checks against the real player profile.
+
+On a phone, verify touch buttons, NPC visibility, portrait lock, FPS/clock placement and background/resume. Close during Office: reopening must repeat that day from Home; close after the final checkpoint: reopening starts the next day from Home.
+
+## Examination tools and X-ray
+
+Office's `Desk` owns `ExaminationToolSelection`, with explicit references to the camera, the separate pointer magnifier and its selectable tools. Each desk tool has `ExaminationTool`, a sprite-shaped `PolygonCollider2D`, its existing `Selected_Icon`, and `ToolSelectionGlow`. Select nothing on entry. Click a tool to select it, click it again to deselect, or click another to switch. Selection is available only during Examination and clears on leaving that step.
+
+Xray and Stethoscope currently start mechanics. After selecting `Desk/KinhLup`, start a new mouse hold/touch outside UI and drag to scan. The selecting gesture itself never scans. Releasing stops the scan but keeps the selected tool. UI gestures and other tools cannot activate X-ray. Cloth/hair see-through controllers read the scene selection service and use its explicit pointer magnifier; they no longer search for an ambiguous object named KinhLup.
+
+On each tool's `Tool Selection Glow` component, adjust Thickness (source texture pixels), Brightness, Pulse Amount and Pulse Period (seconds). Defaults are a soft white border with a subtle 2.5-second pulse. The existing icon's position/style remains authored in the scene. The glow quad is scene-owned; only its mesh is generated at runtime.
+
+To add a future tool, configure its `ExaminationTool` kind, icon, collider and glow references, then add it to the Desk selection component's Tools array. New mechanics should read the selected kind and respect gesture/UI ownership rather than polling raw pointer state independently.
+
+## Stethoscope and heartbeat
+
+`Desk/HeartbeatExamination` owns the scene-authored HeartCheck view, its `VFX_HeartBeat` feedback, `VFX_Sound` signal, and the AudioSource playing `SFX_HeartBeat.mp3`. Selecting TaiNghe activates HeartCheck at its authored position; deselection, switching tools and leaving Examination hide it. Selecting alone does not emit particles or audio. A subsequent hold outside UI starts listening immediately; release stops and clears both particle systems and audio. Pointer ownership/UI blocking are shared with X-ray through ExaminationToolSelection.
+
+The PatientSpawnPoint has an explicit reference to NpcProfile. Each NPC prefab has PatientExaminationProfile with an explicit Heart transform; the spawned instance receives the selected prefab's stable NPC record. Runtime code does not discover a Heart by name or guess a profile from the spawned object's name. Adding an NPC requires its profile record and assigned examination Heart anchor, as well as the spawn catalogue entry.
+
+At each new listening gesture, HeartbeatRhythm resolves the patient's authored sickness through AllSickness and stable symptom IDs. Normal is 60 BPM, Rapid Heartbeat triples it (180 BPM at the default baseline), Slow Heartbeat halves it. No Heartbeat means zero biological signal: the feedback heart is materialized once at No Heartbeat Preview Time (default 0.1 seconds) and its particle simulation is paused, leaving a static heart while holding. It never repeats or emits pulse events, including outside range. Release clears the static heart; a new hold displays it again. Missing disease/symptom links and conflicting fast/slow symptoms report errors rather than silently becoming normal. No Heartbeat takes precedence if explicitly combined with other heartbeat symptoms. There are no identity/classification overrides: Vampire Infection currently has No Heartbeat, so it resolves to zero through the same symptom rules as every other illness.
+
+For patients with a heartbeat, each pulse restarts the feedback VFX. For an audible biological signal it also restarts VFX_Sound and the prepared clip together. The 0.34-second clip keeps its authored pitch; rapid pulses change the trigger interval, not audio playback speed. The invisible container particle system is not played. Play On Awake is disabled so selecting/opening Office cannot accidentally emit a pulse.
+
+Distance is measured in world XY from pointer to the current patient's Heart, projected through the scene camera onto the heart's depth plane. Signal gain is `Clamp01(1 - distance / Max Distance)`, with Max Distance default 4. Gain multiplies the authored VFX_Sound Start Size and Max Volume, including live particles already emitted. At/beyond the limit or with No Heartbeat, sound particles are cleared and audio stops. VFX_HeartBeat keeps its authored size and is never attenuated by distance. Particle renderers use Order in Layer 200 to keep the feedback visible above patient sprites. None of these settings move HeartCheck.
+
+The HeartbeatExamination Inspector exposes Max Distance, Max Volume, Normal BPM and symptom dropdowns. Visual shape, material, lifetime and maximum Start Size remain authored in the original particle systems. Editing a patient's sickness or rhythm during Play takes effect on the next listening gesture; thermometer values remain fixed for the current consultation.
+
+GivePillsButton uses its authored Collider2D through Collider2DButtonHitArea (uGUI raycast filter). Adjust the collider's Size/Offset in the prefab or scene to change the clickable area; leave the image layout independent. Hits outside the collider are rejected by GraphicRaycaster, including examination UI-blocking queries. The collider should stay inside the UI RectTransform. Collider transform synchronization accounts for CanvasScaler/layout changes. 
+
+## Thermometer
+
+Select Desk/NhietKe using the same ExaminationToolSelection, glow and existing Selected_Icon as other desk tools. The selector's stable enum appends Thermometer = 4. A new hold outside UI/button hit areas shows Mechanics/NhietKe; it takes 2 seconds to rise linearly from 33 C to the sampled result. Release, tool switch, deselection or leaving Examination hides the view. There is no distance-to-body requirement. UI-started drags do not trigger measurements.
+
+ThermometerExamination on Desk reads the current patient's consultation temperature, sampled once from its NpcProfile sickness through TemperatureRules and the stable High Temperature / Low Temperature symptom IDs. Normal is 37 C, high is 38.6-42 C, low is 33-34.9 C, rounded to one decimal. Repeated measurements during the same consultation reuse the exact same temperature. PatientExaminationProfile caches it on first measurement; Initialize begins a new consultation and resets that cache. A new patient consultation may sample a different valid value, even for the same prefab. Releasing, switching tools, hiding the thermometer and Editor script reload do not reset it. Only the assigned sickness symptoms determine temperature. Missing references and contradictory high/low symptoms report errors instead of silently yielding normal temperature.
+
+ThermometerDisplay explicitly references ThuyNgan and the authored Min (33 C) / Max (43 C) transforms. ThermometerMercury material clips the mercury sprite above the interpolated local-space height using a MaterialPropertyBlock; neither sprite scaling nor the bulb/width is changed. Mercury renders above the opaque thermometer frame (Order in Layer 302 versus 301). Sprites, frame layout and calibration marks remain editable in the scene. Editing the Min/Max positions recalibrates the scale without code changes.
+
+Adjust Measurement Seconds and symptom dropdowns on Desk > Thermometer Examination. Both tool and display are authored scene objects; no UI is spawned at runtime.
+
+NPC data conversion removed the old classification field. Legacy Zombie/Vampire records were assigned Zombie Infection/Vampire Infection through Unity APIs before the field was removed. Names, stable IDs, prefab references and existing disease IDs were retained. One-time backup snapshots and the conversion manifest are in Library/NpcSicknessMigration; verification is in Logs/NpcSicknessMigration. The conversion scripts were removed after verification; no startup migration or automatic disease assignment remains.
+
+
+

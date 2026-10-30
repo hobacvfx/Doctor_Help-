@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 
 namespace DoctorHelp
 {
-    public enum DayStep { Preparation = 0, Examination = 10, TreatmentDecision = 20, DayResults = 30 }
+    public enum DayStep { Preparation = 0, Examination = 10, TreatmentDecision = 20, PatientDeparture = 25, DayResults = 30 }
 
     public interface IDayFlowState
     {
@@ -18,6 +18,8 @@ namespace DoctorHelp
     public sealed class DayFlowPlan
     {
         private readonly DayStep[] steps;
+        private DayStep repeatFrom, repeatTo;
+        private Func<bool> shouldRepeat;
         public DayStep Initial => steps[0];
         public IReadOnlyList<DayStep> Steps => Array.AsReadOnly(steps);
 
@@ -31,10 +33,21 @@ namespace DoctorHelp
                 throw new ArgumentException("A flow cannot contain duplicate steps.");
         }
 
+        public void RepeatWhile(DayStep from, DayStep to, Func<bool> condition)
+        {
+            int start = Array.IndexOf(steps, to), end = Array.IndexOf(steps, from);
+            if (start <= 0 || end < start || end >= steps.Length - 1 || condition == null)
+                throw new ArgumentException("A repeat must stay between Preparation and DayResults.");
+            repeatFrom = from;
+            repeatTo = to;
+            shouldRepeat = condition;
+        }
+
         public DayStep Next(DayStep current)
         {
             int index = Array.IndexOf(steps, current);
             if (index < 0) throw new ArgumentException("Step is not in this flow: " + current);
+            if (shouldRepeat != null && current == repeatFrom && shouldRepeat()) return repeatTo;
             return steps[(index + 1) % steps.Length];
         }
     }

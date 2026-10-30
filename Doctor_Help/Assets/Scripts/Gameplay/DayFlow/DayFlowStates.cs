@@ -35,6 +35,17 @@ namespace DoctorHelp
     }
 
     public interface IPatientService { void EnsurePatient(); }
+    public interface IAnimatedPatientService : IPatientService
+    {
+        Task WaitForArrivalAsync(CancellationToken token);
+        Task DepartAsync(CancellationToken token);
+    }
+
+    public interface IPatientMotionView
+    {
+        void ShowPatientArrival(int day);
+        void ShowPatientDeparture(int day);
+    }
 
     // One checkpoint per completed day, even when results entry is retried after a scene failure.
     public sealed class DayCompletionService
@@ -83,7 +94,9 @@ namespace DoctorHelp
         public async Task EnterAsync(CancellationToken token)
         {
             view = await scenes.LoadAsync(GameScene.Office, token);
+            if (view is IPatientMotionView motionView) motionView.ShowPatientArrival(profile.CurrentDay);
             patients.EnsurePatient();
+            if (patients is IAnimatedPatientService animated) await animated.WaitForArrivalAsync(token);
             view.TreatmentRequested += advance;
             view.ShowExamination(profile.CurrentDay);
         }
@@ -118,6 +131,25 @@ namespace DoctorHelp
         { if (view == null) return; view.GiveRequested -= ConfirmTreatment; view.HideAll(); view = null; }
     }
 
+    public sealed class PatientDepartureState : IDayFlowState
+    {
+        public DayStep Id => DayStep.PatientDeparture;
+        private readonly IDaySceneService scenes;
+        private readonly IDayProfile profile;
+        private readonly IAnimatedPatientService patients;
+        private IDayFlowView view;
+        public PatientDepartureState(IDaySceneService scenes, IDayProfile profile, IAnimatedPatientService patients)
+        { this.scenes = scenes; this.profile = profile; this.patients = patients; }
+        public async Task EnterAsync(CancellationToken token)
+        {
+            view = await scenes.LoadAsync(GameScene.Office, token);
+            if (view is IPatientMotionView departureView) departureView.ShowPatientDeparture(profile.CurrentDay);
+            await patients.DepartAsync(token);
+        }
+        public void Exit()
+        { view?.HideAll(); view = null; }
+    }
+
     public sealed class DayResultsState : IDayFlowState
     {
         public DayStep Id => DayStep.DayResults;
@@ -143,3 +175,4 @@ namespace DoctorHelp
         { if (view == null) return; view.ResultsCompleted -= FinishPresentation; view.HideAll(); view = null; }
     }
 }
+
