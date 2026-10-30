@@ -38,7 +38,22 @@ namespace DoctorHelp
             // Initialize marks a new consultation, including reuse of a pooled patient.
             hasConsultationTemperature = false;
             consultationTemperature = 0;
+            if (TryGetComponent<BoneFractureAppearance>(out var boneAppearance))
+                boneAppearance.Initialize(definition, source.AllSickness);
+            if (TryGetComponent<WormInfestationAppearance>(out var wormAppearance))
+                wormAppearance.Initialize(definition, source.AllSickness);
+            if (TryGetComponent<OrganAbnormalityAppearance>(out var organAppearance))
+                organAppearance.Initialize(definition, source.AllSickness);
+            if (TryGetComponent<SymptomPrefabAppearance>(out var symptomAppearance))
+                symptomAppearance.Initialize(definition, source.AllSickness);
+            if (TryGetComponent<NpcDialogue>(out var dialogue))
+                dialogue.Initialize(definition.Dialogue);
         }
     }
 }
+
+
+
+
+
 

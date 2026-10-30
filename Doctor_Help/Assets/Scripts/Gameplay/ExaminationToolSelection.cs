@@ -79,6 +79,7 @@ namespace DoctorHelp
         }
         private bool IsOverUI(Vector2 position)
         {
+            if (NpcDialogueNext.IsOverButton(position, targetCamera)) return true;
             if (EventSystem.current == null) return false;
             uiHits.Clear();
             EventSystem.current.RaycastAll(new PointerEventData(EventSystem.current) { position = position }, uiHits);
@@ -115,6 +116,7 @@ namespace DoctorHelp
         }
     }
 }
+
 
 
 

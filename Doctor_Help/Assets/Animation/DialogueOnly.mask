@@ -1,0 +1,77 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!319 &31900000
+AvatarMask:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: DialogueOnly
+  m_Mask: 00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
+  m_Elements:
+  - m_Path: 
+    m_Weight: 0
+  - m_Path: Body
+    m_Weight: 0
+  - m_Path: Body/Head
+    m_Weight: 0
+  - m_Path: Body/Head/Hair
+    m_Weight: 0
+  - m_Path: Body/Head/Hair/Hair_004
+    m_Weight: 0
+  - m_Path: Body/Head/Eye
+    m_Weight: 0
+  - m_Path: Body/Head/Eye/Eye_003
+    m_Weight: 0
+  - m_Path: Body/Head/Mouth
+    m_Weight: 0
+  - m_Path: Body/Head/Mouth/Mouth_004
+    m_Weight: 0
+  - m_Path: Body/Head/Speaking Lip
+    m_Weight: 0
+  - m_Path: Body/Heart
+    m_Weight: 0
+  - m_Path: Body/Bone
+    m_Weight: 0
+  - m_Path: Neck
+    m_Weight: 0
+  - m_Path: Outfit
+    m_Weight: 0
+  - m_Path: Outfit/Outfit 1
+    m_Weight: 0
+  - m_Path: TrieuTrung
+    m_Weight: 0
+  - m_Path: TrieuTrung/TrieuTrung
+    m_Weight: 0
+  - m_Path: TrieuTrung/Giun
+    m_Weight: 0
+  - m_Path: TrieuTrung/Giun/Pos_1
+    m_Weight: 0
+  - m_Path: TrieuTrung/Giun/Pos_2
+    m_Weight: 0
+  - m_Path: TrieuTrung/Giun/Pos_3
+    m_Weight: 0
+  - m_Path: TrieuTrung/Giun/Pos_4
+    m_Weight: 0
+  - m_Path: TrieuTrung/Giun/Pos_5
+    m_Weight: 0
+  - m_Path: TrieuTrung/Giun/Pos_6
+    m_Weight: 0
+  - m_Path: TrieuTrung/NoiTang
+    m_Weight: 0
+  - m_Path: TrieuTrung/NoiTang/Than
+    m_Weight: 0
+  - m_Path: TrieuTrung/NoiTang/Gan
+    m_Weight: 0
+  - m_Path: TrieuTrung/NoiTang/Da_day
+    m_Weight: 0
+  - m_Path: TrieuTrung/Nao
+    m_Weight: 0
+  - m_Path: TrieuTrung/Tim
+    m_Weight: 0
+  - m_Path: ChatBox
+    m_Weight: 1
+  - m_Path: ChatBox/Next
+    m_Weight: 1
+  - m_Path: ChatBox/Dialogue Text
+    m_Weight: 1

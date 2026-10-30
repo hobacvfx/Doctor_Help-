@@ -12,12 +12,14 @@ namespace DoctorHelp
         [SerializeField] private GameObject prefab;
         [SerializeField] private string npcName;
         [SerializeField] private string sicknessId;
+        [SerializeField] private NpcDialogueAsset dialogueAsset;
 
         // The prefab asset GUID is independent of its name and folder location.
         public string Id => id;
         public GameObject Prefab => prefab;
         public string NpcName => npcName;
         public string SicknessId => sicknessId;
+        public NpcDialogueAsset Dialogue => dialogueAsset;
         public bool HasSickness => !string.IsNullOrEmpty(sicknessId);
     }
 
@@ -37,5 +39,8 @@ namespace DoctorHelp
             ? null : npcs.Find(npc => npc != null && npc.Id == id);
     }
 }
+
+
+
 
 

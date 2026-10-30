@@ -32,7 +32,11 @@ namespace DoctorHelp
                 token.ThrowIfCancellationRequested();
                 if (animator == null || !animator.isActiveAndEnabled)
                     throw new InvalidOperationException("Patient animator was removed during arrival.");
-                if (!animator.IsInTransition(0) && animator.GetCurrentAnimatorStateInfo(0).fullPathHash == IdleState) return;
+                if (!animator.IsInTransition(0) && animator.GetCurrentAnimatorStateInfo(0).fullPathHash == IdleState)
+                {
+                    patient.GetComponent<NpcDialogue>()?.BeginAfterArrival();
+                    return;
+                }
                 await Awaitable.NextFrameAsync(token);
             }
         }
@@ -44,6 +48,7 @@ namespace DoctorHelp
             var animator = RequireAnimator();
             if (!departureStarted)
             {
+                patient.GetComponent<NpcDialogue>()?.StopDialogue();
                 animator.ResetTrigger("Leave");
                 animator.SetTrigger("Leave");
                 departureStarted = true;
@@ -79,13 +84,25 @@ namespace DoctorHelp
             if (template == null || template.Heart == null)
                 throw new InvalidOperationException("NPC prefab is missing its examination profile or Heart anchor: " + prefab.name);
             departureStarted = false;
-            patient = Instantiate(prefab, transform, false);
-            patient.GetComponent<PatientExaminationProfile>().Initialize(npcProfile, definition);
-            patient.transform.localPosition = Vector3.zero;
-            patient.transform.localRotation = Quaternion.identity;
-            patient.name = prefab.name;
+            var spawned = Instantiate(prefab, transform, false);
+            try
+            {
+                spawned.GetComponent<PatientExaminationProfile>().Initialize(npcProfile, definition);
+                spawned.transform.localPosition = Vector3.zero;
+                spawned.transform.localRotation = Quaternion.identity;
+                spawned.name = prefab.name;
+                patient = spawned;
+            }
+            catch
+            {
+                // A failed examination setup must not become the cached patient on retry.
+                Destroy(spawned);
+                throw;
+            }
         }
     }
 }
+
+
 
 

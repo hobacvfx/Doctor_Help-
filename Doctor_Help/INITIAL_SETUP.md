@@ -114,10 +114,10 @@ The default data assets are outside Resources; future gameplay consumers must ho
 
 Select `Assets/Data/NPC/NpcProfile.asset` in the Project window. It holds all authored NPC records and references `Assets/Data/Medical/AllSickness.asset`.
 
-- **Load NPC** scans the assigned NPC Folder and all subfolders for prefab assets. The default folder is `Assets/2D_Assets/NPC`. New entries use the prefab name and no sickness. Loading again adds only new prefab GUIDs and preserves authored names and sickness IDs. The folder should contain complete NPC prefabs, not individual appearance parts.
-- Search by NPC name or prefab name; the Inspector displays 30 matching slots per page. Click a slot to view its front-facing 2D prefab preview and edit its NPC name and single sickness (or None). **Mở prefab NPC** opens the source in Unity Prefab Mode.
-- NPC IDs use prefab asset GUIDs; sickness references use existing stable disease IDs. Renaming/moving prefabs or renaming diseases preserves the links. Keep `.meta` files when moving assets outside Unity. Names and sickness assignments are the editable NPC gameplay data; stable IDs and prefab references remain technical links. Zombie Infection and Vampire Infection are ordinary sickness records with their existing names and IDs.
-- Deleted/missing prefabs remain listed with a warning; reloading never removes their information. Missing sickness IDs also remain visible until explicitly replaced. Changing the scan folder does not remove previous entries. Inspector changes and loading support Undo.
+- **Refresh / cập nhật NPC** scans the assigned NPC Folder and all subfolders for prefab assets. The default folder is `Assets/2D_Assets/NPC`. New entries use the prefab name and no sickness. Loading again adds only new prefab GUIDs and preserves authored names and sickness IDs. The folder should contain complete NPC prefabs, not individual appearance parts.
+- Search by NPC name or prefab name; the Inspector displays 30 matching slots per page. Click a slot to view its front-facing 2D prefab preview and edit its NPC name, single sickness (or None), and optional NpcDialogueAsset. **Mở prefab NPC** opens the source in Unity Prefab Mode.
+- NPC IDs use prefab asset GUIDs; sickness references use existing stable disease IDs. Renaming/moving prefabs or renaming diseases preserves the links. Keep `.meta` files when moving assets outside Unity. Names, sickness assignments and optional dialogue assets are the editable NPC gameplay data; stable IDs and prefab references remain technical links. Zombie Infection and Vampire Infection are ordinary sickness records with their existing names and IDs.
+- Deleted/missing prefabs remain listed with a warning on normal Refresh. The explicit **Xóa bản ghi mất prefab + cập nhật spawn** button removes only missing-prefab records; it never deletes prefab assets. Missing sickness IDs also remain visible until explicitly replaced. Changing the scan folder does not remove previous entries. Inspector changes and loading support Undo.
 - No NPCs or medical data are generated at runtime by this profile. The examination spawner still selects prefabs from `Assets/Resources/NpcCatalog.asset`, then resolves the exact prefab reference in its assigned NpcProfile and binds that record to the spawned patient. Stethoscope rhythm and temperature read this authored sickness and its symptoms. Diagnosis, treatment and spawn selection rules remain separate gameplay work.
 
 ## Bulk NPC authoring tool
@@ -126,9 +126,13 @@ Open **Tools > NPC > Tạo NPC hàng loạt**. Defaults: NPC_0 template, current
 
 The template hierarchy, Heart reference and animation controller are retained; appearance is applied through NpcAppearanceProfile with nested part prefab links. By default, template Lock Override flags are cleared so each slot uses the new seed. Enable Giữ Lock Override to retain intentionally locked parts. Seeds determine appearance, not uniqueness: different seeds can produce matching looks when the available part combinations overlap.
 
-Each generated prefab is registered immediately in NpcProfile using its new asset GUID, its NPC_<seed> name and one random existing AllSickness ID. Only new records receive random diseases; existing NPC names, diseases and IDs are preserved. The selected NpcCatalog also receives the new prefabs so they can spawn; leave that field empty for authoring without spawn registration. The NPC Profile must reference a nonempty valid disease catalogue.
+Each generated prefab is registered immediately in NpcProfile using its new asset GUID, its NPC_<seed> name and one random existing AllSickness ID. Only new records receive random diseases; existing NPC names, diseases and IDs are preserved. Dialogue content uses NpcDialogueAsset; Editor checks verified multiline Vietnamese serialization, profile references, refresh preservation and empty dialogue references on newly generated NPCs. Legacy assigned .txt references were checked and converted before the field changed; original text source files are preserved.
+
+The selected NpcCatalog also receives the new prefabs so they can spawn; leave that field empty for authoring without spawn registration. The NPC Profile must reference a nonempty valid disease catalogue.
 
 The tool prechecks the entire requested name range and refuses existing prefab paths; it never overwrites NPCs. Canceling or a failure during generation removes assets created by that batch and restores profile/catalog data. No real NPCs are generated just by opening the tool. The editor window/service are permanent authoring tools, not temporary test menus.
+
+NPC refresh controls are available in NpcProfile Inspector, NpcCatalog Inspector and the bulk-generation window. Refresh discovers current prefabs by GUID, preserves authored data for existing records, and rebuilds the selected spawn catalogue from all live profile prefab references (removing null/duplicate entries). Select the intended profile/catalog before refreshing; the catalogue is synchronized to the full profile, not a manually selected subset. Use the explicit missing-record cleanup after intentionally deleting outdated NPC prefabs. Prefabs recreated with the same filename get new GUIDs and new records; no identity or sickness is transferred by name. The generator checks OnlyExistingAssets so Unity's recently-deleted GUID cache cannot block reusing a deleted filename. New bulk-generated NPCs still receive random diseases; a plain folder import defaults newly discovered entries to no sickness.
 
 ## Verification
 
@@ -162,6 +166,52 @@ The HeartbeatExamination Inspector exposes Max Distance, Max Volume, Normal BPM 
 
 GivePillsButton uses its authored Collider2D through Collider2DButtonHitArea (uGUI raycast filter). Adjust the collider's Size/Offset in the prefab or scene to change the clickable area; leave the image layout independent. Hits outside the collider are rejected by GraphicRaycaster, including examination UI-blocking queries. The collider should stay inside the UI RectTransform. Collider transform synchronization accounts for CanvasScaler/layout changes. 
 
+## Bone fracture appearance
+
+NPC_0 includes BoneFractureAppearance on its root, with an explicit reference to the Bone renderer and the stable Bone Fracture symptom ID. New prefabs from the batch generator retain this configuration. PatientExaminationProfile.Initialize applies it from the consultation's assigned sickness; diseases share the same symptom mapping (for example Trauma and Brittle Bone Disease).
+
+For fracture, _BoneCrack is 1 and _Crack_Offset receives two independent random floats in 0–1 once per consultation. Otherwise the boolean and offset are reset to zero. Values persist through disabling/re-enabling and X-ray holds; a newly initialized consultation resamples. Per-renderer MaterialPropertyBlock overrides preserve the shared material asset and other properties used by X-ray. The material asset's Inspector does not show these runtime per-renderer overrides. Missing shader properties, renderer, sickness or symptom mapping report a configuration error. NPC prefabs without this optional appearance component keep their existing behavior.
+
+BoneFractureAppearance's Inspector exposes the renderer and a symptom dropdown. The bone's art, material and transform stay authored in the prefab. Edit Mode checks exercised disease mapping, range, offset persistence, healthy reset, per-patient isolation and shared asset preservation; GPU preview renders confirmed the fracture/healthy difference. This has not yet been tested on Android.
+
+## Worm infestation appearance
+
+WormInfestationAppearance on NPC_0 references the three authored Giun_1/Giun_2/Giun_3 prefabs and six direct Pos_* anchors below Giun. On PatientExaminationProfile.Initialize, exactly one randomly selected anchor receives one randomly selected prefab if the assigned disease has the stable Worm Infestation symptom ID. Both Worm Infestation and Zombie Infection currently share that symptom. Healthy patients receive none. No disease-name matching or runtime scene-name search is used.
+
+Instances are children of the anchors with localPosition zero. The prefab's layers, sorting, materials, rotation and scale remain intact. Each consultation samples once; tool toggles and enabling/disabling do not respawn or reroll worms. Reinitialization removes only instances tracked by this component before spawning the new consultation's worms. During Play, old instances are deactivated before deferred destruction to prevent an overlapping frame. Authored marker transforms and decorations are preserved.
+
+The component Inspector exposes positions, prefab options and a symptom dropdown. Prefabs generated from NPC_0 inherit these references. Earlier Edit Mode checks covered prefab/anchor configuration, both matching diseases, healthy cleanup, repeated initialization, stable instances on re-enable and preservation of authored prefab/profile data. The later single-worm adjustment selects one anchor and instantiates once; it has been compile-checked. The temporary setup/check script was removed after verification.
+
+## Internal organ abnormality appearance
+
+OrganAbnormalityAppearance on NPC_0 references three explicit prefab/anchor pairs under NoiTang: Than -> Than, Gan -> Gan, Da_Day -> Da_day. PatientExaminationProfile.Initialize queries the assigned disease for the stable Internal Organ Abnormality symptom ID. When present, exactly one random pair is selected and its prefab is spawned at the paired anchor with localPosition zero. Other transforms and renderer/material settings remain authored on the prefab. The normal Internal Organ Disease currently supplies that symptom.
+
+The selected organ stays fixed through tool switches and disable/enable. A new consultation clears only the tracked generated instance before selecting again; a consultation without the symptom clears it and spawns none. Deferred destruction is preceded by deactivation. The component Inspector allows editing the prefab/anchor pairs and symptom mapping. Bulk-generated NPCs inherit the configuration from NPC_0. Edit Mode verification exercised six successive consultations, single-instance counts, correct pairings, renderer preservation, stable re-enable and healthy cleanup. Temporary setup/check scripts were removed after verification.
+
+## Heart and brain symptom prefabs
+
+SymptomPrefabAppearance on NPC_0 binds Heart Abnormality to Tim.prefab at the Tim anchor and Brain Abnormality to Nao.prefab at the Nao anchor. PatientExaminationProfile.Initialize applies these mappings independently from the current disease's stable symptom IDs. There is no random selection between Tim and Nao; if both mapped symptoms exist, both spawn. Brain Abnormality (Tung Tung Tung) remains a different symptom, so Brain Rot does not use Nao through this mapping. Vampire Infection does show Tim because it has Heart Abnormality. The Tim display anchor is separate from the Heart listening anchor.
+
+Spawned objects use localPosition zero and retain authored prefab layers, materials, sorting, rotation and scale. Tool/enable toggles preserve instances; initializing another consultation removes only tracked generated objects before applying new symptoms. The Inspector exposes each prefab, position and symptom dropdown. NPCs generated from NPC_0 inherit the configuration.
+
+Play Mode verification entered Office through Open, confirmed the spawned NPC's saved mappings, exercised healthy/Heart Disease/Brain Disease/Brain Rot/Vampire Infection and a combined-symptom fixture, repeated consultation initialization and checked cleanup, prefab settings and slot positions. Disease fixtures were in-memory clones; no Give/day completion was invoked, and the player's state/save remained unchanged. Temporary setup/check code was removed afterward.
+
+## NPC dialogue
+
+In NpcProfile, select a record and assign **Asset hội thoại** (NpcDialogueAsset, a ScriptableObject .asset). Its multiline content field is editable inline in the NPC Inspector, or select the asset to edit its TextArea in its own Inspector. **Tạo hội thoại mới** creates and assigns an empty asset; **Chọn asset hội thoại** selects it. Assets can also be created with Assets/Create/Doctor Help/Dialogue/NPC Dialogue. NPC_0 references NPC_0_Dialogue.asset; its content is authored user data and must be preserved. Empty/unassigned/whitespace-only content means no dialogue. New imported/generated records start with no dialogue; refresh preserves an existing record's reference. The current consultation snapshots content; edits are read when a new consultation initializes.
+
+PatientSpawnPoint starts NpcDialogue only after arrival reaches NPC_Idle. The shared All.controller has an independent Dialogue layer with Closed and ChatBox_Open states; the existing Chatbox_Open clip plays once and keeps its final pose. DialogueOnly.mask limits this layer to the ChatBox subtree, explicitly excluding the animator root and body. Layer weight defaults to zero, becomes one while dialogue opens/is shown and returns to zero on StopDialogue. Both masking and the zero-weight closed state are required: an unmasked empty override layer at weight one can freeze root translation even while Base Layer state/normalizedTime advance. Text/Next stay hidden until the opening completes. Confirmation of Give stops dialogue before Leave/A_Walk_Out. Opening the medicine popup does not stop it.
+
+Every line in the asset content field is a turn (including internal empty lines); LF/CRLF are supported and a terminating newline adds no extra empty turn. TMP plain text progressively reveals at 30 characters/second, adjustable on NpcDialogue. Clicking Next during typing completes that turn; a later click advances; clicking after the final completed turn restarts from line zero without reopening ChatBox. The Dialogue Text child uses wrap, auto-size and masking in a defined RectTransform above Next. Font, font size range, color and bounds are authored in the prefab; both text renderers use Sorting Order -11. Fit In Viewport defaults on with Maximum Viewport Width 0.38 and Screen Padding 16 pixels; LateUpdate fits the animated bubble pose inside the camera/screen Safe Area. Adjust or disable these settings for a fully manual layout.
+
+NpcLipAnimation hides Mouth's existing part objects while typing and cycles the 11 ordered sprite frames in 2D_Assets/Lip at 10 FPS. It restores each part's previous active state when waiting or stopping. Speaking Lip is a sibling of Mouth so NpcAppearanceProfile can replace the Mouth parts without breaking dialogue references. The slot's transform and sprite renderer are editable in the prefab.
+
+NpcDialogueNext uses the authored Next BoxCollider2D with mouse/touch press-release handling, ignores clicks through popup UI and registers an examination gesture blocker. No global Physics2DRaycaster is added to the camera, so other world colliders remain tool targets. All new text/lip objects and component references are authored in NPC_0; bulk-generated NPCs inherit them.
+
+Dialogue was verified in actual Home -> Office Play Mode with in-memory dialogue fixtures: Walk_in/open sequencing, Vietnamese typewriter text, empty lines, mouse/touch Next completion/advance/restart, 10 FPS lip changes, original-mouth restoration, text sorting/bounds, popup coexistence and Give/Walk_out cleanup. Portrait render captures were inspected. Player state/save and authored NPC profile were unchanged. Edit the NPC_0 dialogue asset content in the Inspector to control that patient's speech; do not overwrite authored text during setup or cleanup. Android/device verification remains separate.
+
+A later motion regression exposed a gap in the earlier dialogue checks: state transitions succeeded while the unmasked Dialogue layer overrode root movement. The fix was verified in Play Mode by sampling actual root positions during arrival/departure, testing movement with the masked layer forced to weight one, and running three Give -> departure -> next-arrival -> dialogue cycles. Opening transforms, lip/Next behavior, no-dialogue behavior and source/save preservation were also checked; render captures confirmed physical movement. Temporary probes and verification artifacts were removed after the checks.
+
 ## Thermometer
 
 Select Desk/NhietKe using the same ExaminationToolSelection, glow and existing Selected_Icon as other desk tools. The selector's stable enum appends Thermometer = 4. A new hold outside UI/button hit areas shows Mechanics/NhietKe; it takes 2 seconds to rise linearly from 33 C to the sampled result. Release, tool switch, deselection or leaving Examination hides the view. There is no distance-to-body requirement. UI-started drags do not trigger measurements.
@@ -173,6 +223,17 @@ ThermometerDisplay explicitly references ThuyNgan and the authored Min (33 C) / 
 Adjust Measurement Seconds and symptom dropdowns on Desk > Thermometer Examination. Both tool and display are authored scene objects; no UI is spawned at runtime.
 
 NPC data conversion removed the old classification field. Legacy Zombie/Vampire records were assigned Zombie Infection/Vampire Infection through Unity APIs before the field was removed. Names, stable IDs, prefab references and existing disease IDs were retained. One-time backup snapshots and the conversion manifest are in Library/NpcSicknessMigration; verification is in Logs/NpcSicknessMigration. The conversion scripts were removed after verification; no startup migration or automatic disease assignment remains.
+
+
+
+
+
+
+
+
+
+
+
 
 
 

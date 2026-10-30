@@ -26,10 +26,8 @@ namespace DoctorHelp
         private double nextBeatTime;
         private float previousGain;
         private string lastError;
-        public float CurrentBpm { get; private set; }
-        public float CurrentGain { get; private set; }
-        public HeartbeatRhythm Rhythm => rhythm;
-        public event Action BeatTriggered;
+        private float CurrentBpm { get; set; }
+        private float CurrentGain { get; set; }
 
         private void Awake()
         {
@@ -106,7 +104,6 @@ namespace DoctorHelp
                 heartbeatAudio.clip = heartbeatClip;
                 heartbeatAudio.Play();
             }
-            BeatTriggered?.Invoke();
             nextBeatTime = now + 60d / CurrentBpm;
         }
         private void ShowStaticFeedback()
@@ -178,6 +175,8 @@ namespace DoctorHelp
         }
     }
 }
+
+
 
 
 

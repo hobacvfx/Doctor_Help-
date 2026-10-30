@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using UnityEditor;
 using UnityEngine;
 
@@ -41,7 +40,7 @@ namespace DoctorHelp.Editor
             for (int i = 0; i < count; i++)
             {
                 string path = $"{folder}/NPC_{firstSeed + i}.prefab";
-                if (!string.IsNullOrEmpty(AssetDatabase.AssetPathToGUID(path)) || System.IO.File.Exists(path) || System.IO.File.Exists(path + ".meta"))
+                if (!string.IsNullOrEmpty(AssetDatabase.AssetPathToGUID(path, AssetPathToGUIDOptions.OnlyExistingAssets)) || System.IO.File.Exists(path) || System.IO.File.Exists(path + ".meta"))
                     throw new InvalidOperationException($"Đã có {path}. Chọn seed khác; tool không ghi đè NPC cũ.");
             }
 
@@ -90,12 +89,13 @@ namespace DoctorHelp.Editor
                     entry.FindPropertyRelative("id").stringValue = AssetDatabase.AssetPathToGUID(AssetDatabase.GetAssetPath(prefab));
                     entry.FindPropertyRelative("prefab").objectReferenceValue = prefab;
                     entry.FindPropertyRelative("npcName").stringValue = prefab.name;
+                    entry.FindPropertyRelative("dialogueAsset").objectReferenceValue = null;
                     entry.FindPropertyRelative("sicknessId").stringValue = sicknesses[random.Next(sicknesses.Count)].Id;
                 }
                 serialized.ApplyModifiedPropertiesWithoutUndo();
                 if (catalog != null)
                 {
-                    catalog.prefabs = (catalog.prefabs ?? Array.Empty<GameObject>()).Concat(generated).Distinct().ToArray();
+                    NpcProfileSynchronization.UpdateCatalog(profile, catalog);
                     EditorUtility.SetDirty(catalog);
                     AssetDatabase.SaveAssetIfDirty(catalog);
                 }
@@ -123,4 +123,10 @@ namespace DoctorHelp.Editor
         }
     }
 }
+
+
+
+
+
+
 

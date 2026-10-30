@@ -16,7 +16,7 @@ MonoBehaviour:
   pillProfile: {fileID: 11400000, guid: bf93b046ff584a34fa0bf877db704af4, type: 2}
   sicknesses:
   - id: e5c336e89c4145a7a647c6813adbbb2e
-    displayName: Trauma
+    displayName: Physical Injury
     treatment: 0
     symptomIds:
     - 3faa1f876c2a48f783d453e90ad80866
@@ -42,7 +42,7 @@ MonoBehaviour:
     symptomIds:
     - 868f3555805749b391b6641bd163f651
     pillIds:
-    - 7bc8b2b6c8d04eb1a087ea2e3d20088c
+    - 8a7b42b468154a2fb8fc7c9971c598b5
   - id: 051fba9345c84e7488e692592100bb6d
     displayName: Heart Disease
     treatment: 0

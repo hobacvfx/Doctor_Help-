@@ -11,10 +11,7 @@ namespace DoctorHelp
         [SerializeField] private Transform minimumMark;
         [SerializeField] private Transform maximumMark;
         private MaterialPropertyBlock properties;
-        public float DisplayedCelsius {get;private set;}=MinimumCelsius;
-        public SpriteRenderer Mercury=>mercury;
-        public Transform MinimumMark=>minimumMark;
-        public Transform MaximumMark=>maximumMark;
+        private float DisplayedCelsius {get;set;}=MinimumCelsius;
         public bool IsConfigured=>mercury!=null && minimumMark!=null && maximumMark!=null &&
             mercury.sharedMaterial!=null && mercury.sharedMaterial.HasProperty(MercuryTop) &&
             mercury.transform.InverseTransformPoint(maximumMark.position).y>mercury.transform.InverseTransformPoint(minimumMark.position).y;
@@ -31,3 +28,5 @@ namespace DoctorHelp
         }
     }
 }
+
+

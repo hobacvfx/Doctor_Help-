@@ -14,10 +14,7 @@ namespace DoctorHelp
         private bool measuring;
         private bool rejectedGesture;
         private double startedAt;
-        public float TargetCelsius {get;private set;}=ThermometerDisplay.MinimumCelsius;
-        public bool IsMeasuring=>measuring;
-        public ThermometerDisplay Display=>display;
-        public TemperatureRules Rules=>temperatureRules;
+        private float TargetCelsius {get;set;}=ThermometerDisplay.MinimumCelsius;
         private void Awake()=>StopMeasurement();
         private void Update()
         {
@@ -57,4 +54,6 @@ namespace DoctorHelp
         private void OnDisable()=>StopMeasurement();
     }
 }
+
+
 

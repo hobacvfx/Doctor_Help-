@@ -34,6 +34,8 @@ namespace DoctorHelp.Editor
             template = (GameObject)EditorGUILayout.ObjectField("Prefab mẫu", template, typeof(GameObject), false);
             profile = (NpcProfile)EditorGUILayout.ObjectField("NPC Profile", profile, typeof(NpcProfile), false);
             catalog = (NpcCatalog)EditorGUILayout.ObjectField(new GUIContent("Danh sách spawn", "Thêm NPC mới để có thể xuất hiện khi khám. Để trống nếu chỉ tạo prefab/profile."), catalog, typeof(NpcCatalog), false);
+            NpcProfileSynchronization.DrawButtons(profile, catalog, (text, type) => { message = text; messageType = type; });
+            EditorGUILayout.Space();
             firstSeed = EditorGUILayout.IntField("Seed bắt đầu", firstSeed);
             count = EditorGUILayout.IntField("Số lượng", count);
             keepLockedSlots = EditorGUILayout.Toggle(new GUIContent("Giữ Lock Override", "Mặc định tắt để các slot ngoại hình đều được chọn theo seed mới."), keepLockedSlots);
@@ -58,3 +60,4 @@ namespace DoctorHelp.Editor
         }
     }
 }
+

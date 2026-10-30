@@ -9,6 +9,8 @@ namespace DoctorHelp.Editor
     public sealed class NpcProfileEditor : UnityEditor.Editor
     {
         private const int PageSize = 30;
+        private NpcCatalog catalog;
+        private void OnEnable() => catalog = AssetDatabase.LoadAssetAtPath<NpcCatalog>("Assets/Resources/NpcCatalog.asset");
         private string search = "";
         private string selectedId;
         private int page;
@@ -37,20 +39,13 @@ namespace DoctorHelp.Editor
             if (EditorGUI.EndChangeCheck()) folder.stringValue = picked != null ? AssetDatabase.GetAssetPath(picked) : "";
             EditorGUILayout.PropertyField(serializedObject.FindProperty("allSickness"), new GUIContent("Danh mục bệnh"));
             serializedObject.ApplyModifiedProperties();
-            using (new EditorGUI.DisabledScope(EditorApplication.isPlayingOrWillChangePlaymode))
-                if (GUILayout.Button("Load NPC", GUILayout.Height(28)))
-                {
-                    try
-                    {
-                        int added = NpcProfileImporter.LoadNpcs(profile);
-                        status = $"Đã thêm {added} NPC. Thông tin NPC cũ được giữ nguyên.";
-                        statusType = MessageType.Info;
-                    }
-                    catch (Exception exception) { status = exception.Message; statusType = MessageType.Error; }
-                    serializedObject.Update();
-                }
+            catalog = (NpcCatalog)EditorGUILayout.ObjectField("Danh sách spawn", catalog, typeof(NpcCatalog), false);
+            NpcProfileSynchronization.DrawButtons(profile, catalog, (text, type) =>
+            {
+                status = text; statusType = type; ClearPreview(); serializedObject.Update();
+            });
             if (!string.IsNullOrEmpty(status)) EditorGUILayout.HelpBox(status, statusType);
-            EditorGUILayout.HelpBox("Nạp cả thư mục con. NPC mới: tên theo prefab, không bệnh. Bấm slot để xem prefab và chỉnh thông tin. Prefab bị xóa vẫn giữ slot để bạn kiểm tra.", MessageType.Info);
+            EditorGUILayout.HelpBox("Nạp cả thư mục con. NPC mới: tên theo prefab, không bệnh. Bấm slot để xem prefab và chỉnh thông tin. Refresh giữ các bản ghi mất prefab để bạn kiểm tra; dùng nút Xóa bản ghi mất prefab khi muốn dọn chúng.", MessageType.Info);
 
             var list = serializedObject.FindProperty("npcs");
             EditorGUI.BeginChangeCheck();
@@ -103,6 +98,35 @@ namespace DoctorHelp.Editor
                 EditorGUILayout.PropertyField(entry.FindPropertyRelative("prefab"), new GUIContent("Prefab"));
             }
             EditorGUILayout.PropertyField(entry.FindPropertyRelative("npcName"), new GUIContent("Tên NPC"));
+            var dialogue = entry.FindPropertyRelative("dialogueAsset");
+            EditorGUILayout.PropertyField(dialogue, new GUIContent("Asset hội thoại"));
+            if (dialogue.objectReferenceValue == null)
+            {
+                if (GUILayout.Button("Tạo hội thoại mới"))
+                {
+                    string path = EditorUtility.SaveFilePanelInProject("Tạo hội thoại NPC", entry.FindPropertyRelative("npcName").stringValue + "_Dialogue", "asset", "Chọn nơi lưu asset hội thoại.", "Assets/Data/NPC");
+                    if (!string.IsNullOrEmpty(path))
+                    {
+                        path = AssetDatabase.GenerateUniqueAssetPath(path);
+                        var created = CreateInstance<NpcDialogueAsset>();
+                        AssetDatabase.CreateAsset(created, path);
+                        dialogue.objectReferenceValue = created;
+                        serializedObject.ApplyModifiedProperties();
+                    }
+                }
+            }
+            if (dialogue.objectReferenceValue is NpcDialogueAsset conversation)
+            {
+                using (var content = new SerializedObject(conversation))
+                {
+                    content.Update();
+                    EditorGUILayout.PropertyField(content.FindProperty("content"), new GUIContent("Nội dung (mỗi dòng một lượt)"));
+                    content.ApplyModifiedProperties();
+                }
+                if (GUILayout.Button("Chọn asset hội thoại"))
+                { Selection.activeObject = conversation; EditorGUIUtility.PingObject(conversation); }
+            }
+            EditorGUILayout.HelpBox("Chỉnh nội dung ngay tại đây. Không gán asset hoặc nội dung trống thì NPC không nói.", MessageType.Info);
             var sickness = entry.FindPropertyRelative("sicknessId");
             var ids = new List<string> { "" };
             var names = new List<string> { "Không bệnh" };
@@ -173,4 +197,7 @@ namespace DoctorHelp.Editor
         }
     }
 }
+
+
+
 

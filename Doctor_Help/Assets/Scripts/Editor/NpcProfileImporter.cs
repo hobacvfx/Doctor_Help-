@@ -42,6 +42,7 @@ namespace DoctorHelp.Editor
                 entry.FindPropertyRelative("id").stringValue = guid;
                 entry.FindPropertyRelative("prefab").objectReferenceValue = prefab;
                 entry.FindPropertyRelative("npcName").stringValue = prefab.name;
+                    entry.FindPropertyRelative("dialogueAsset").objectReferenceValue = null;
                 entry.FindPropertyRelative("sicknessId").stringValue = "";
                 existing.Add(guid, next);
                 added++;
@@ -53,4 +54,7 @@ namespace DoctorHelp.Editor
         }
     }
 }
+
+
+
 
