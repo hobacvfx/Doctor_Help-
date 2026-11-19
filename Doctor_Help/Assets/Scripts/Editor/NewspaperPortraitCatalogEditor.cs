@@ -66,6 +66,15 @@ namespace DoctorHelp.Editor
                         importer.alphaIsTransparency = true;
                         importer.mipmapEnabled = false;
                         importer.textureCompression = TextureImporterCompression.Uncompressed;
+                        // Mobile builds compress portraits (ASTC 6x6); the editor/PC keeps the uncompressed source look.
+                        foreach (string platform in new[] { "Android", "iOS" })
+                        {
+                            var settings = importer.GetPlatformTextureSettings(platform);
+                            settings.overridden = true;
+                            settings.format = TextureImporterFormat.ASTC_6x6;
+                            settings.compressionQuality = 50;
+                            importer.SetPlatformTextureSettings(settings);
+                        }
                         importer.SaveAndReimport();
                         sprite = AssetDatabase.LoadAssetAtPath<Sprite>(path);
                     }

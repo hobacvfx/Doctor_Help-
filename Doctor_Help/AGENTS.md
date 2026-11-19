@@ -38,6 +38,13 @@
 - Khóa Portrait, không tự xoay màn hình.
 - Khi test hiệu năng: tắt VSync, đặt mục tiêu 200 FPS và hiển thị FPS cùng thời gian mỗi frame trên Canvas, trong vùng Safe Area. FPS thực tế phụ thuộc thiết bị và tần số quét; cần đánh giá lại cấu hình test trước khi phát hành.
 
+## Nén ảnh cho mobile
+
+- Mọi texture vào build Android/iOS phải được nén ASTC; không để Uncompressed/RGBA32/RGB24 trên mobile (trừ icon rất nhỏ ≤ 64px). Dùng override Android và iOS, giữ nguyên cài đặt PC/Default.
+- ASTC 4x4 cho UI có nét mảnh/chữ, 9-slice và flipbook nội tạng X-ray (`*_sheet`); ASTC 6x6 (mặc định của project) cho tranh, nền, nội thất, NPC, portrait báo, comic. Không dùng mipmap cho sprite 2D. Max size 2048.
+- Portrait báo (`Resources/UI/Portraits`) do NewspaperPortraitCatalogEditor sinh ra tự đặt override ASTC 6x6 cho Android/iOS.
+- Trước khi build, kiểm tra ảnh mới thêm không bị đặt Compression = None.
+
 ## Player profile và luật lưu game
 
 - Dữ liệu cơ bản: tiền, tồn kho thuốc theo `medicineId`, ngày hiện tại, tổng số bệnh nhân đã chết và đã cứu.
