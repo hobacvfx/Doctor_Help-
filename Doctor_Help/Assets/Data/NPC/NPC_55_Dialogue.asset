@@ -12,4 +12,4 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9a19a6ecd4ed2114c9ccb631dd1f32f4, type: 3}
   m_Name: NPC_55_Dialogue
   m_EditorClassIdentifier: Assembly-CSharp::DoctorHelp.NpcDialogueAsset
-  content: "Doctor, may I sit? I'm terribly warm and feel sick.\nI thought it might be the pie from the market.\nIt started before breakfast, so your guess is better than mine."
+  content: "Doctor, may I sit? I'm terribly warm and I feel like I'm going to vomit.\nI thought it might be the pie from the market.\nIt started before breakfast, so your guess is better than mine."

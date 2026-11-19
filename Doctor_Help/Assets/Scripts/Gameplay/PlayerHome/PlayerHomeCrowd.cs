@@ -42,6 +42,11 @@ namespace DoctorHelp
         private float nextGhostSpeech = float.PositiveInfinity;
         private GhostDialogue speaker;
         private float? playerPreviousX;
+        private bool ghostRideWitnessed;
+        private const string GhostPassLine = "Why it so cold?";
+        private const string GhostElevatorLine = "The elevator move it self!";
+        [SerializeField, Min(0f), Tooltip("NPCs this close to the elevator shaft react when a Ghost rides it alone.")]
+        private float elevatorWitnessRange = 4f;
         private bool IsStreet => streetFloor != null;
         internal IReadOnlyList<PlayerHomeWalker> StreetWalkers => walkers;
 
@@ -92,7 +97,7 @@ namespace DoctorHelp
                 wantedCount = Mathf.Min(wantedCount, walkers.Count + inactiveVisitors.Count + unusedNpcPrefabs.Count);
                 clinicDirt.UpdateVisitorCount(wantedCount);
             }
-            wantedGhostCount = useProfileGhostCount ? (hasProfile ? profile.GhostNumber : 0) : Mathf.Clamp(fixedGhostCount, 0, 10);
+            wantedGhostCount = useProfileGhostCount ? (hasProfile ? ClinicDemand.VisibleHomeGhosts(profile.GhostNumber) : 0) : Mathf.Clamp(fixedGhostCount, 0, 10);
         }
 
         private void Update()
@@ -102,6 +107,7 @@ namespace DoctorHelp
             if (ghostPrefab != null)
                 UpdatePopulation(ghosts, wantedGhostCount, isGhost: true);
             UpdateGhostSpeech();
+            if (!IsStreet) ObserveGhostElevatorRide();
 
             if (IsStreet || Time.time < nextElevatorCall || !elevator.IsReady)
                 return;
@@ -194,6 +200,7 @@ namespace DoctorHelp
                 if (!isGhost && currentReceptionist != null)
                     currentReceptionist.ObserveWalk(walker.Floor, previousX, walker.Transform.position.x);
                 if (!isGhost && clinicDirt != null) clinicDirt.Observe(walker, previousX);
+                if (isGhost) ObserveGhostPass(walker, previousX);
             }
         }
 
@@ -233,6 +240,42 @@ namespace DoctorHelp
             var ground = streetFloor.bounds;
             return new Vector2(Mathf.Max(ground.min.x, streetLeftWall.bounds.max.x) + 1f,
                 Mathf.Min(ground.max.x, streetRightWall.bounds.min.x) - 1f);
+        }
+
+        // An NPC shivers when a Ghost on the same floor passes through its position.
+        private void ObserveGhostPass(PlayerHomeWalker ghost, float previousX)
+        {
+            if (ghost.Transform == null) return;
+            float currentX = ghost.Transform.position.x;
+            if (previousX == currentX) return;
+            foreach (var npc in walkers)
+            {
+                if (npc.Transform == null || !npc.Transform.gameObject.activeInHierarchy || npc.Floor != ghost.Floor)
+                    continue;
+                float x = npc.Transform.position.x;
+                if ((previousX - x) * (currentX - x) <= 0f)
+                    SpeakAmbient(npc, GhostPassLine);
+            }
+        }
+
+        // NPCs near the shaft react once when the cabin starts moving with only a Ghost inside.
+        private void ObserveGhostElevatorRide()
+        {
+            var passenger = elevator.RidingPassenger;
+            bool ghostRide = passenger != null && !elevator.Rider.IsRiding && ghosts.Contains(passenger);
+            if (ghostRide && !ghostRideWitnessed)
+                foreach (var npc in walkers)
+                    if (npc.Transform != null && npc.Transform.gameObject.activeInHierarchy && !elevator.IsServing(npc) &&
+                        Mathf.Abs(npc.Transform.position.x - elevator.BoardingX) <= elevatorWitnessRange)
+                        SpeakAmbient(npc, GhostElevatorLine);
+            ghostRideWitnessed = ghostRide;
+        }
+
+        // A turn already in progress is kept, the same as receptionist greetings.
+        private static void SpeakAmbient(PlayerHomeWalker npc, string line)
+        {
+            if (npc.Transform.TryGetComponent<NpcDialogue>(out var dialogue) && !dialogue.IsShowing)
+                dialogue.SpeakAmbient(line);
         }
 
         private void UpdateGhostSpeech()

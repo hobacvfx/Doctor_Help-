@@ -230,7 +230,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::DoctorHelp.ClinicShopItem
   itemId: clinic-sign-lv4
   displayName: Clinic Sign Lv4
-  description: Make this place busy!
+  description: Make this place busy and +3 Client Limit
   price: 240
   icon: {fileID: 21300000, guid: 0a90c747b9ddddb4bb466642917bb517, type: 3}
   poster: {fileID: 21300000, guid: f01cc1eb5aa466547b53d39cd26b6504, type: 3}

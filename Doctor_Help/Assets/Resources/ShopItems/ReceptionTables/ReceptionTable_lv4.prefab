@@ -47,7 +47,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::DoctorHelp.ClinicShopItem
   itemId: reception-table-lv4
   displayName: Reception Table Lv4
-  description: +2 stars to each patient review.
+  description: '+1 stars to each patient review. +20% patient patience duration in
+    the Office. '
   price: 360
   icon: {fileID: 21300000, guid: 161af3882bca7aa4abf153ba2debe69d, type: 3}
   poster: {fileID: 0}

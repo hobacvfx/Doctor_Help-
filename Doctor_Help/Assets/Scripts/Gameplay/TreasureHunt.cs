@@ -14,7 +14,7 @@ namespace DoctorHelp
         [SerializeField] private PatientSpawnPoint patients;
         [SerializeField] private TreasureHuntFeedback feedback;
         [SerializeField] private ParticleSystem treasurePrefab, puffPrefab;
-        [SerializeField, Range(0, 1)] private float chance = .2f;
+        [SerializeField, Range(0, 1)] private float chance = .7f;
         [SerializeField, Min(0), Tooltip("World distance at which the treasure reaches full size.")]
         private float fullSizeDistance = .1f;
         [SerializeField, Min(.001f), Tooltip("World distance at which the treasure shrinks to its minimum size.")]

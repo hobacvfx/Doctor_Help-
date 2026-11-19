@@ -11,11 +11,13 @@ namespace DoctorHelp
 
     internal static class MainObjectives
     {
+        internal const int MakeGoldTarget = 400;
+
         internal static void Advance(PlayerProfileData profile, int receptionistLevel, ClinicRankingsCatalog rankings)
         {
             if (profile.mainObjective == MainObjective.ClearFirstDay && profile.currentDay >= 2)
                 profile.mainObjective = MainObjective.MakeGold;
-            if (profile.mainObjective == MainObjective.MakeGold && profile.money >= 1200)
+            if (profile.mainObjective == MainObjective.MakeGold && profile.money >= MakeGoldTarget)
                 profile.mainObjective = MainObjective.UpgradeReceptionist;
             if (profile.mainObjective == MainObjective.UpgradeReceptionist && receptionistLevel >= 3)
                 profile.mainObjective = MainObjective.LeadRankings;

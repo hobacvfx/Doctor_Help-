@@ -6,7 +6,6 @@ namespace DoctorHelp
     [DisallowMultipleComponent]
     public sealed class PlayerHomeDirt : MonoBehaviour
     {
-        private const float MinSpacing = 0.5f;
         private const float SameVisitorSpacing = 2f;
         private const int MaxVisibleStains = 28;
         private const int TestVisitorCount = 2;
@@ -21,6 +20,11 @@ namespace DoctorHelp
         [SerializeField] private float stainHeightOffset = 1.4f;
         [SerializeField, Min(0.1f)] private float stainSize = 6.4f;
         [SerializeField] private int stainSortingOrder = -5;
+        [SerializeField, Min(0f), Tooltip("Empty wall kept between two stains on the same floor, in stain widths.")]
+        private float minimumStainGap = .5f;
+
+        // Centre-to-centre world distance so two stains never overlap or sit close together.
+        private float StainSpacing => stainSize * Mathf.Abs(transform.lossyScale.x) * (1f + minimumStainGap);
 
         private sealed class Visitor
         {
@@ -216,7 +220,7 @@ namespace DoctorHelp
             {
                 var kind = entry.visitors[index];
                 if (kind == ClinicVisitorDirt.None || CountStains(entry.stains, index) > 0) continue;
-                for (int attempt = 0; attempt < 8; attempt++)
+                for (int attempt = 0; attempt < 16; attempt++)
                 {
                     int floor = Random.Range(0, 2);
                     var range = elevator.WalkingRange(floor);
@@ -235,7 +239,7 @@ namespace DoctorHelp
                 if (stain.visitorIndex == visitor && stain.floor == floor && Mathf.Abs(stain.x - x) < SameVisitorSpacing)
                     return false;
             foreach (var stain in visibleStains)
-                if (stain.floor == floor && Mathf.Abs(stain.x - x) < MinSpacing) return false;
+                if (stain.floor == floor && Mathf.Abs(stain.x - x) < StainSpacing) return false;
 
             var mark = new ClinicWallStain
             {

@@ -42,7 +42,7 @@ namespace DoctorHelp
     [Serializable]
     public sealed class PlayerProfileData
     {
-        public const float DefaultRating = 2f;
+        public const float DefaultRating = 3.5f;
         public const float MaxRating = 5f;
         internal const int CurrentSchemaVersion = 2;
         internal const int RockThrowDeathThreshold = 4;
@@ -64,6 +64,8 @@ namespace DoctorHelp
         public int rockThrowCleanDays;
         public bool throwRock;
         public bool clean;
+        // Active play time since the last day result; drives furniture gold per minute.
+        public double playSeconds;
         internal bool IsStreetRockThrowingActive => rockThrowDeaths >= RockThrowDeathThreshold;
         public List<ClinicDayRating> dayRatings = new List<ClinicDayRating>();
         public List<RivalClinicRating> rivalRatings = new List<RivalClinicRating>();
@@ -85,7 +87,7 @@ namespace DoctorHelp
                 diffProgress = diffProgress, diffStreakDays = diffStreakDays, diffStreakMistakeDay = diffStreakMistakeDay,
                 patientsKilled = patientsKilled, patientsSaved = patientsSaved, ghostNumber = ghostNumber,
                 rockThrowDeaths = rockThrowDeaths, rockThrowCleanDays = rockThrowCleanDays,
-                throwRock = throwRock, clean = clean
+                throwRock = throwRock, clean = clean, playSeconds = playSeconds
             };
             foreach (var stock in medicines)
                 copy.medicines.Add(new MedicineStock { medicineId = stock.medicineId, quantity = stock.quantity });
@@ -115,7 +117,8 @@ namespace DoctorHelp
                 rockThrowDeaths < 0 || rockThrowDeaths > LegacyRockThrowDeathThreshold ||
                 rockThrowCleanDays < 0 || rockThrowCleanDays > (IsStreetRockThrowingActive ? 1 : 0) ||
                 dayRatings == null || rivalRatings == null || clinicDirtDays == null ||
-                shopItems == null || equippedFurniture == null || !IsRatingValid(rating)) return false;
+                shopItems == null || equippedFurniture == null || !IsRatingValid(rating) ||
+                !(playSeconds >= 0d) || double.IsInfinity(playSeconds)) return false;
             int previousDay = 0;
             foreach (var entry in dayRatings)
             {

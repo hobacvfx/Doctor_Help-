@@ -12,6 +12,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c4a7f77883e44144bb08b127678dd1d3, type: 3}
   m_Name: PlayerStartingProfile
   m_EditorClassIdentifier: Assembly-CSharp::DoctorHelp.PlayerStartingProfile
-  money: 500
+  money: 200
   pills: {fileID: 11400000, guid: bf93b046ff584a34fa0bf877db704af4, type: 2}
   clinicRankings: {fileID: 11400000, guid: 5787912630e80f945913acbdba31fe02, type: 2}

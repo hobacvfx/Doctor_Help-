@@ -12,4 +12,4 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9a19a6ecd4ed2114c9ccb631dd1f32f4, type: 3}
   m_Name: NPC_62_Dialogue
   m_EditorClassIdentifier: Assembly-CSharp::DoctorHelp.NpcDialogueAsset
-  content: "Hello, doctor. I feel hot and my stomach's turned.\nI thought the leftover stew might be to blame.\nI'd rather stay near a basin until you've had a look."
+  content: "Hello, doctor. I feel hot and my stomach keeps heaving.\nI thought the leftover stew might be to blame.\nI'd rather stay near a basin in case I throw up before you've had a look."

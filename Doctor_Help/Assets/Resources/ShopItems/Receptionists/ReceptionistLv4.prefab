@@ -46,8 +46,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::DoctorHelp.ClinicShopItem
   itemId: receptionist-lv4
   displayName: Receptionist Lv4
-  description: +40% gold from business.
-  price: 500
+  description: '+80% gold from business. + 1.5 star review '
+  price: 700
   icon: {fileID: 21300000, guid: f24c05e247ed4ea45a28894944acf540, type: 3}
   poster: {fileID: 0}
   posterOffset: {x: 0, y: 0}

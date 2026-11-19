@@ -46,8 +46,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::DoctorHelp.ClinicShopItem
   itemId: receptionist-lv3
   displayName: Receptionist Lv3
-  description: +30% gold from business.
-  price: 360
+  description: +60% gold from business. + 20 gold per/minute
+  price: 400
   icon: {fileID: 21300000, guid: 744b059cce8d3de4aaaa7289e8b288f0, type: 3}
   poster: {fileID: 0}
   posterOffset: {x: 0, y: 0}

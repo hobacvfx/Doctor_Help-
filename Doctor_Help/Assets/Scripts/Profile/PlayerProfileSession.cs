@@ -3,10 +3,11 @@ using System.Collections.Generic;
 
 namespace DoctorHelp
 {
-    // The working day is memory-only. Only CompleteDay can create a checkpoint.
+    // PlayerProfileService autosaves WorkingProfile outside the Office working day.
+    // An opened working day stays memory-only until CompleteDay creates the next-day checkpoint.
     public sealed class PlayerProfileSession
     {
-        private const int InitialRatingDays = 10;
+        private const int InitialRatingDays = 5;
         public PlayerProfileData WorkingProfile { get; private set; }
         private readonly Action<PlayerProfileData> persist;
         private readonly Action<PlayerProfileData> updateObjectives;
@@ -45,6 +46,7 @@ namespace DoctorHelp
             nextDay.walterQuest.RecordEarnings(goldEarned);
             nextDay.walterQuest.CloseDay(nextDay.currentDay);
             nextDay.currentDay = checked(nextDay.currentDay + 1);
+            nextDay.playSeconds = 0d;
             DifficultyProfile.Advance(nextDay, incorrectPatients, hadConsultations, requiredStreakDays);
             nextDay.clinicDirtDays.RemoveAll(entry => entry.IsExpiredOn(nextDay.currentDay));
             nextDay.ghostNumber = checked(nextDay.ghostNumber + incorrectPatients);
@@ -77,7 +79,8 @@ namespace DoctorHelp
             error = null;
             if (ids == null || (ids.Count == 0 && !allowEmpty)) { error = "Select at least one medicine."; return false; }
             if (!pills.TryGetCost(ids, out long cost)) { error = "Selected medicine is unavailable."; return false; }
-            if (cost > 0 && cost > WorkingProfile.money) { error = "Not enough gold for the selected medicines."; return false; }
+            // Medicines may be paid on credit: gold can go negative (debt), only int overflow is refused.
+            if ((long)WorkingProfile.money - cost < int.MinValue) { error = "Debt limit reached."; return false; }
             try { record(); }
             catch (Exception ex) { error = "Cannot record treatment. Retry: " + ex.Message; return false; }
             WorkingProfile.money -= (int)cost;

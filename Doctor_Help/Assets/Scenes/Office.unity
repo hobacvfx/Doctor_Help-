@@ -2094,7 +2094,7 @@ MonoBehaviour:
   feedback: {fileID: 927320003}
   treasurePrefab: {fileID: 3342197913089542085, guid: 7e646d6f8239d5a4f8779d29b1aa32b3, type: 3}
   puffPrefab: {fileID: 6380188943085063200, guid: 6b360a682d9c0ad40825e0a3b245bc2d, type: 3}
-  chance: 0.2
+  chance: 0.7
   fullSizeDistance: 0.1
   minimumSizeDistance: 0.3
 --- !u!212 &646583094

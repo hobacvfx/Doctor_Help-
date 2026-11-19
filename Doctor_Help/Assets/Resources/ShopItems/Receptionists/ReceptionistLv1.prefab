@@ -46,7 +46,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::DoctorHelp.ClinicShopItem
   itemId: receptionist-lv1
   displayName: Receptionist Lv1
-  description: +10% gold from business.
+  description: '+20% gold from business. +10% patient patience duration in the Office. '
   price: 120
   icon: {fileID: 21300000, guid: 30bfa6e6523600e448928fb5fd2645cb, type: 3}
   poster: {fileID: 0}

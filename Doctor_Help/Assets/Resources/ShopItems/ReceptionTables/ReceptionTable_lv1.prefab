@@ -47,7 +47,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::DoctorHelp.ClinicShopItem
   itemId: reception-table-lv1
   displayName: Reception Table Lv1
-  description: +0.5 stars to each patient review.
+  description: +0.25 stars to each patient review. +5%Gold from business
   price: 100
   icon: {fileID: 21300000, guid: e4b73f9e3acc45d40ae72cfcfe3c5782, type: 3}
   poster: {fileID: 0}

@@ -12,4 +12,4 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9a19a6ecd4ed2114c9ccb631dd1f32f4, type: 3}
   m_Name: NPC_103_Dialogue
   m_EditorClassIdentifier: Assembly-CSharp::DoctorHelp.NpcDialogueAsset
-  content: "Morning, doctor. I feel hot and sick, and my breath won't come easily.\nMy heart's racing, and I hurt my arm falling against the wall.\nPerhaps I shouldn't have tried to walk here on my own."
+  content: "Morning, doctor. I feel hot and queasy, and my breath won't come easily.\nMy heart's racing, and I hurt my arm falling against the wall.\nPerhaps I shouldn't have tried to walk here on my own."

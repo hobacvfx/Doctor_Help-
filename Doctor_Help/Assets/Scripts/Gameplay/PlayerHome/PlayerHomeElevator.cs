@@ -32,6 +32,8 @@ namespace DoctorHelp
         internal bool IsReady => phase == Phase.Ready;
         internal int DockedFloor { get; private set; }
         internal PlayerHomeMovement Rider => rider;
+        // The walker inside the moving cabin, or null when the cabin is idle, fetching or carrying only the player.
+        internal PlayerHomeWalker RidingPassenger => phase == Phase.Riding ? passenger : null;
         internal float BoardingX => cabin.position.x;
         internal bool IsServing(PlayerHomeWalker walker) => passenger == walker;
 

@@ -23,6 +23,8 @@ namespace DoctorHelp
         public NpcProfile NpcProfile => npcProfile;
         public PatientExaminationProfile CurrentPatient => patient != null ? currentPatient : null;
         public bool IsDeparting => departureStarted;
+        // Office is reloaded each working day, so this counts today's admitted patients.
+        public int ArrivedCount { get; private set; }
         public bool HasRemainingPatients => remainingPatients != null &&
             Array.Exists(remainingPatients, group => group.Count > 0);
         private void Awake() => unfocused = !Application.isFocused;
@@ -137,6 +139,7 @@ namespace DoctorHelp
                 currentPatient = examination;
                 group.RemoveAt(index);
                 hasSpawnedPatient = true;
+                ArrivedCount++;
             }
             catch
             {

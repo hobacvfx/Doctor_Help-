@@ -19,9 +19,10 @@ namespace DoctorHelp
         [SerializeField] private VideoClip successClip, failClip;
         [SerializeField] private NewspaperResultsPopup newspaper;
         [SerializeField, Min(0)] private float textFadeSeconds = 1;
-        [SerializeField, Min(0)] private float textHoldSeconds = 3;
         [SerializeField, Min(0)] private float narrationSeconds = 3;
         [SerializeField, Min(0)] private float videoFadeSeconds = 1;
+        [SerializeField, Min(0), Tooltip("Total time of the 'new day has started' line, fades included.")]
+        private float newDaySeconds = 3;
         [SerializeField, Min(1)] private float preparationTimeout = 20;
         private TaskCompletionSource<bool> preparation, playback;
         private CancellationTokenSource presentationLifetime;
@@ -109,7 +110,7 @@ namespace DoctorHelp
             }
         }
 
-        private float NewDaySeconds => textHoldSeconds + 2 * textFadeSeconds;
+        private float NewDaySeconds => newDaySeconds;
 
         private async Task<bool> ShowTextAsync(CanvasGroup message, float duration, bool canSkip, CancellationToken token)
         {

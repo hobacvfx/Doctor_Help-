@@ -22,7 +22,6 @@ namespace DoctorHelp
 
         private Coroutine speech;
         private DialogueBubbleLayout layout;
-        private Vector3 sampledScale;
         internal bool IsSpeaking => speech != null;
 
         private void Awake()
@@ -87,16 +86,18 @@ namespace DoctorHelp
 
         private void SampleBox(float time)
         {
-            chatBoxClip.SampleAnimation(chatBox, time);
-            sampledScale = chatBox.transform.localScale;
+            if (layout != null) layout.Sample(time);
+            else chatBoxClip.SampleAnimation(chatBox, time);
         }
 
         private void LateUpdate()
         {
             if (layout == null || !chatBox.activeSelf) return;
             var camera = Camera.main;
-            if (camera != null) layout.Apply(camera, sampledScale, layout.TailAnchor, DialogueTextSize.Walking);
+            if (camera != null) layout.Apply(camera, layout.TailAnchor, DialogueTextSize.Walking);
         }
+
+        private void OnDestroy() => layout?.Dispose();
 
         private void OnDisable()
         {

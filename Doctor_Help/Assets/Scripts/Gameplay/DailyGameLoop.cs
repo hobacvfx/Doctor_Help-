@@ -27,7 +27,11 @@ namespace DoctorHelp
         private IDayFlowView retryView;
         private bool initialized, resetting;
         internal bool IsEndingDayEarly { get; private set; }
-        private bool AcceptingPatients => !IsEndingDayEarly && !Clock.IsClosed;
+        // Set when today's rating-based client limit is reached; the day then ends after a countdown.
+        private bool clientLimitReached;
+        // Ghosts are counted when the clinic opens, before any patient is examined.
+        private float ghostRatingPenalty;
+        private bool AcceptingPatients => !IsEndingDayEarly && !clientLimitReached && !Clock.IsClosed;
         public bool CanResetProfile => initialized && !resetting && !IsTransitioning;
 
         private async void Start()
@@ -80,6 +84,7 @@ namespace DoctorHelp
         private Task StartFlowAsync(PlayerProfileService profile)
         {
             IsEndingDayEarly = false;
+            clientLimitReached = false;
             // Explicit order; changing enum numeric values does not change the flow.
             var plan = new DayFlowPlan(DayStep.Preparation, DayStep.Examination,
                 DayStep.TreatmentDecision, DayStep.PatientDeparture, DayStep.DayResults);
@@ -97,14 +102,20 @@ namespace DoctorHelp
                 () => profile.TryDecline(patients.CurrentPatient, out var error) ? null : error);
             preparation = new PreparationState(scenes, profile, OpenClinic);
             completion = new DayCompletionService(profile,
-                day => TreatmentEvaluator.Evaluate(day, profile.GetTreatmentSnapshot(), patients.MedicalData,
-                    profile.Money, profile.ClinicDirtPenalty(), profile.ReceptionRatingBonus,
-                    profile.ReceptionistLevel));
+                day =>
+                {
+                    var result = TreatmentEvaluator.Evaluate(day, profile.GetTreatmentSnapshot(), patients.MedicalData,
+                        profile.Money, profile.ClinicDirtPenalty(), profile.ReceptionRatingBonus,
+                        profile.BusinessGoldMultiplier, ghostRatingPenalty,
+                        (int)Math.Floor(profile.PlaySeconds / 60d * profile.GoldPerMinute));
+                    result.ClientLimitReached = clientLimitReached;
+                    return result;
+                });
             machine = new DayFlowMachine(plan,
                 preparation,
                 examination, treatment,
                 new PatientDepartureState(scenes, profile, patients, RequestEndDay, Clock, () => AcceptingPatients,
-                    () => profile.ClinicSignLevel),
+                    () => profile.ClinicSignLevel, () => profile.Rating, () => clientLimitReached = true),
                 new DayResultsState(scenes, profile, completion,
                     GetComponent<DayEndInterstitialService>()));
             return RunAsync(() => machine.StartAsync(lifetime.Token));
@@ -131,6 +142,9 @@ namespace DoctorHelp
 
         private void Update()
         {
+            // Furniture gold per minute counts active play only; pause and background are excluded.
+            if (!skipClockFrame && !applicationPaused && !applicationUnfocused)
+                PlayerProfileService.Instance?.AddPlaySeconds(Mathf.Min(Time.unscaledDeltaTime, Time.maximumDeltaTime));
             Clock.Tick(skipClockFrame ? 0 : Time.unscaledDeltaTime,
                 applicationPaused || applicationUnfocused || FirstRunTutorial.Instance?.PausesClinicClock == true);
             skipClockFrame = false;
@@ -141,6 +155,10 @@ namespace DoctorHelp
         {
             if (machine == null || machine.IsTransitioning || machine.FailedStep.HasValue || Step != DayStep.Preparation) return;
             IsEndingDayEarly = false;
+            clientLimitReached = false;
+            var profile = PlayerProfileService.Instance;
+            ghostRatingPenalty = profile != null && profile.IsLoaded ? ClinicDemand.HomeGhostRatingPenalty(profile.GhostNumber) : 0f;
+            if (profile != null && profile.IsLoaded) profile.BeginWorkingDay();
             GetComponent<FirstRunTutorial>()?.OnClinicOpened();
             Clock.Open(operatingSeconds);
             RequestAdvance();

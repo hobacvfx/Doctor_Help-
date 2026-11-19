@@ -55,6 +55,8 @@ namespace DoctorHelp
         private DeskActionButton retryLabel;
         private string originalRetryLabel;
         private Coroutine waitingForPatientFade;
+        private string waitingForPatientLabel;
+        private const string ClientLimitMessage = "Maximum client reached, increase rating to get more client.";
 
         private void Awake()
         {
@@ -188,6 +190,19 @@ namespace DoctorHelp
             HideAll(); ShowClock(); ShowEndDay(); Status("Bệnh nhân ra về");
         }
         public void ShowWaitingForPatient()
+        {
+            if (waitingForPatientLabel != null) waitingForPatientText.text = waitingForPatientLabel;
+            ShowWaitingLabel();
+        }
+        public void ShowClientLimitReached(int secondsLeft)
+        {
+            // Reuses the waiting label so the notice keeps the Office's centered message style.
+            waitingForPatientLabel ??= waitingForPatientText.text;
+            waitingForPatientText.verticalOverflow = VerticalWrapMode.Overflow;
+            waitingForPatientText.text = $"{ClientLimitMessage}\nDay end in {secondsLeft}";
+            ShowWaitingLabel();
+        }
+        private void ShowWaitingLabel()
         {
             statusText.gameObject.SetActive(false);
             if (waitingForPatientText.gameObject.activeSelf) return;

@@ -13,6 +13,8 @@ namespace DoctorHelp
         [SerializeField, HideInInspector] private string npcId;
         [SerializeField, HideInInspector] private bool hasConsultationTemperature;
         [SerializeField, HideInInspector] private float consultationTemperature;
+        [SerializeField, HideInInspector] private bool hasConsultationHeartbeat;
+        [SerializeField, HideInInspector] private float consultationHeartbeat;
         public Transform Heart => heart;
         internal SpriteRenderer TreasureBody => treasureBody;
         public NpcProfile Profile => profile;
@@ -61,6 +63,19 @@ namespace DoctorHelp
             return consultationTemperature;
         }
 
+        // One BPM per consultation: listening again or switching tools never re-rolls it.
+        public float GetConsultationHeartbeat(HeartbeatRhythm rules)
+        {
+            if (rules == null || profile == null || Definition == null)
+                throw new InvalidOperationException("Heartbeat requires an initialized patient consultation and rules.");
+            if (!hasConsultationHeartbeat)
+            {
+                consultationHeartbeat = rules.Sample(Definition, profile.AllSickness, UnityEngine.Random.value);
+                hasConsultationHeartbeat = true;
+            }
+            return consultationHeartbeat;
+        }
+
         public void Initialize(NpcProfile source, NpcDefinition definition)
         {
             if (source == null || definition == null || heart == null)
@@ -78,11 +93,13 @@ namespace DoctorHelp
             // Initialize marks a new consultation, including reuse of a pooled patient.
             HasArrived = patienceRunning = false;
             var playerProfile = PlayerProfileService.Instance;
-            int elevatorLevel = playerProfile != null && playerProfile.IsLoaded ? playerProfile.ElevatorLevel : 0;
-            maximumPatienceSeconds = PatienceDuration * (10 + elevatorLevel) / 10;
+            float patienceMultiplier = playerProfile != null && playerProfile.IsLoaded ? playerProfile.PatienceMultiplier : 1f;
+            maximumPatienceSeconds = PatienceDuration * patienceMultiplier;
             patienceSeconds = maximumPatienceSeconds;
             hasConsultationTemperature = false;
             consultationTemperature = 0;
+            hasConsultationHeartbeat = false;
+            consultationHeartbeat = 0;
             if (TryGetComponent<BoneFractureAppearance>(out var boneAppearance))
                 boneAppearance.Initialize(definition, source.AllSickness);
             if (TryGetComponent<WormInfestationAppearance>(out var wormAppearance))

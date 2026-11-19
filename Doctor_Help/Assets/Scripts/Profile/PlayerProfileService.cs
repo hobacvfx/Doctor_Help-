@@ -40,6 +40,15 @@ namespace DoctorHelp
         internal bool HauntedTest => hauntedTest;
         internal IReadOnlyList<ClinicDirtDay> ClinicDirtDays => Data.clinicDirtDays;
         public TreatmentJournal.Day GetTreatmentSnapshot() => journal?.GetSnapshot();
+        // True from Open until the day result is checkpointed; quitting then returns to the state at Open.
+        [SerializeField, HideInInspector] private bool workingDayOpen; // Survives Play Mode code reload.
+        // Changes are coalesced: the first change schedules one autosave SaveDelay seconds later.
+        private bool saveQueued;
+        private float saveDueTime;
+        private bool playTimeUnsaved; // Play time rides along with other saves, and pause/quit.
+        private const float SaveDelay = 1f;
+        private const float RetryDelay = 5f;
+        internal double PlaySeconds => Data.playSeconds;
         private PlayerProfileData Data => session?.WorkingProfile ??
             throw new InvalidOperationException("Player profile could not be loaded. Check the Console.");
 
@@ -252,9 +261,13 @@ namespace DoctorHelp
         internal int ShopItemQuantity(string id) => Data.shopItems.Find(entry => entry.itemId == id)?.quantity ?? 0;
         internal string EquippedFurnitureId(string slot) => Data.equippedFurniture.Find(entry => entry.slotId == slot)?.itemId;
         internal int ClinicSignLevel => FurnitureLevel(ClinicDemand.SignSlot);
-        internal float ReceptionRatingBonus => 0.5f * FurnitureLevel(ClinicDemand.ReceptionSlot);
+        internal int ReceptionTableLevel => FurnitureLevel(ClinicDemand.ReceptionSlot);
         internal int ReceptionistLevel => FurnitureLevel(ClinicDemand.ReceptionistSlot);
         internal int ElevatorLevel => FurnitureLevel(ClinicDemand.ElevatorSlot);
+        internal float ReceptionRatingBonus => ClinicUpgrades.StarBonus(ReceptionTableLevel, ReceptionistLevel);
+        internal float BusinessGoldMultiplier => ClinicUpgrades.GoldMultiplier(ReceptionTableLevel, ReceptionistLevel);
+        internal float PatienceMultiplier => ClinicUpgrades.PatienceMultiplier(ElevatorLevel, ReceptionTableLevel, ReceptionistLevel);
+        internal int GoldPerMinute => ClinicUpgrades.GoldPerMinute(ReceptionTableLevel, ReceptionistLevel);
 
         private ClinicShopItem[] shopDefinitions;
         internal IReadOnlyList<ClinicShopItem> ShopDefinitions =>
@@ -302,6 +315,8 @@ namespace DoctorHelp
             catch (Exception ex) { Debug.LogError($"Player profile save failed: {ex}"); return false; }
             // Future patient-result calculations must read history before this checkpoint.
             journal.Clear();
+            workingDayOpen = false;
+            ClearPendingSave(); // The checkpoint already holds every change.
             NotifyChanged();
             return true;
         }
@@ -317,6 +332,8 @@ namespace DoctorHelp
             }
 
             journal = new TreatmentJournal();
+            workingDayOpen = false;
+            ClearPendingSave();
             workingDay = session.WorkingProfile.Copy();
             NotifyChanged();
             return true;
@@ -328,8 +345,71 @@ namespace DoctorHelp
         private void Commit()
         {
             UpdateObjectives(Data);
+            QueueSave(SaveDelay);
             NotifyChanged();
         }
+
+        // Called when the clinic opens: saves the state players return to if they quit mid-day.
+        internal void BeginWorkingDay()
+        {
+            if (session != null && !workingDayOpen) Autosave();
+            workingDayOpen = true;
+        }
+
+        internal void AddPlaySeconds(double seconds)
+        {
+            if (session == null || !(seconds > 0d)) return;
+            Data.playSeconds += seconds;
+            playTimeUnsaved = true;
+        }
+
+        private void QueueSave(float delay)
+        {
+            if (saveQueued) return;
+            saveQueued = true;
+            saveDueTime = Time.unscaledTime + delay;
+        }
+
+        private void Update()
+        {
+            if (store != null && store.ConsumeWriteFailure()) QueueSave(RetryDelay);
+            if (saveQueued && !workingDayOpen && Time.unscaledTime >= saveDueTime) Autosave();
+        }
+
+        // Background write; the profile snapshot is serialized immediately.
+        private void Autosave()
+        {
+            if (session == null) return;
+            ClearPendingSave();
+            try { store.Autosave(Data); }
+            catch (Exception ex) { Debug.LogError($"Player profile save failed: {ex}"); }
+        }
+
+        private void ClearPendingSave()
+        {
+            saveQueued = false;
+            playTimeUnsaved = false;
+        }
+
+        // Pause/quit: write synchronously, at most once (Pause and Focus both fire when backgrounding).
+        private void FlushSaves()
+        {
+            if (store == null) return;
+            try
+            {
+                if (session != null && !workingDayOpen && (saveQueued || playTimeUnsaved))
+                {
+                    ClearPendingSave();
+                    store.AutosaveNow(Data);
+                }
+                else store.Flush();
+            }
+            catch (Exception ex) { Debug.LogError($"Player profile save failed: {ex}"); }
+        }
+
+        private void OnApplicationPause(bool paused) { if (paused) FlushSaves(); }
+        private void OnApplicationFocus(bool focused) { if (!focused) FlushSaves(); }
+        private void OnApplicationQuit() => FlushSaves();
         private void NotifyChanged()
         {
             if (Changed == null) return;
@@ -339,8 +419,11 @@ namespace DoctorHelp
                 catch (Exception error) { Debug.LogException(error); }
             }
         }
-        private void OnDestroy() { if (Instance == this) Instance = null; }
+        private void OnDestroy()
+        {
+            if (Instance != this) return;
+            FlushSaves();
+            Instance = null;
+        }
     }
 }
-
-

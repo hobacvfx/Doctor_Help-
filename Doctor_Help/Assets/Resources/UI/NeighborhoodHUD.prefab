@@ -302,7 +302,7 @@ MonoBehaviour:
   sideObjectiveTitle: {fileID: 2011534428465230813}
   sideObjectiveText: {fileID: 4255910285778343356}
   clearFirstDay: Clear the first day.
-  makeGold: Make 1200 Gold.
+  makeGold: Make 400 Gold.
   upgradeReceptionist: Upgrade Receptionist to Lv 3.
   leadRankings: Be top 1 Clinic in leader board.
   rankingsButton: {fileID: 4128993962522122064}

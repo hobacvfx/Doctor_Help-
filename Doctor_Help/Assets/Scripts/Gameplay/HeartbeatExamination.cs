@@ -73,7 +73,7 @@ namespace DoctorHelp
             {
                 try
                 {
-                    CurrentBpm = rhythm.Resolve(patient.Definition, patient.Profile != null ? patient.Profile.AllSickness : null);
+                    CurrentBpm = patient.GetConsultationHeartbeat(rhythm);
                     lastError = null;
                 }
                 catch (InvalidOperationException error)

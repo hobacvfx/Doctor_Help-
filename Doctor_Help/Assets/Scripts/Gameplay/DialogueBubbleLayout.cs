@@ -1,12 +1,17 @@
+using System;
 using TMPro;
 using UnityEngine;
+using UnityEngine.Animations;
+using UnityEngine.Playables;
 
 namespace DoctorHelp
 {
     internal enum DialogueTextSize { Examination, Walking }
 
     // Sizes a 9-slice speech bubble around its text so every speaker shows the same on-screen text size.
-    internal sealed class DialogueBubbleLayout
+    // The open clip is evaluated through a manual PlayableGraph: AnimationClip.SampleAnimation only works
+    // in the Editor unless the target has an Animator with a controller, so builds would skip the pop.
+    internal sealed class DialogueBubbleLayout : IDisposable
     {
         private readonly Transform box;
         private readonly SpriteRenderer boxRenderer;
@@ -14,8 +19,14 @@ namespace DoctorHelp
         private readonly RectTransform textRect;
         private readonly Transform next;
         private readonly BoxCollider2D nextArea;
-        private readonly Vector3 openedScale;
-        private readonly Vector3 tailAnchor;
+        private readonly AnimationClip openClip;
+        private Vector3 openedScale = Vector3.one;
+        private Vector3 tailAnchor;
+        private bool hasOpenedPose;
+        private Vector2 pop = Vector2.one;
+        private Animator animator;
+        private PlayableGraph graph;
+        private AnimationClipPlayable clipPlayable;
 
         private string line = string.Empty;
         private bool hasNext;
@@ -26,7 +37,7 @@ namespace DoctorHelp
         private Vector2 tailOffset;
 
         // The tail position of the fully opened authored bubble, in the bubble parent's local space.
-        internal Vector3 TailAnchor => tailAnchor;
+        internal Vector3 TailAnchor => hasOpenedPose ? tailAnchor : box.localPosition;
 
         internal static DialogueBubbleLayout Create(GameObject chatBox, AnimationClip openClip, TMP_Text text, GameObject next)
         {
@@ -47,16 +58,7 @@ namespace DoctorHelp
             this.text = text;
             textRect = text.rectTransform;
 
-            // Pin the tail where the authored bubble drew it once open, so it still points at the speaker.
-            Vector3 authoredPosition = box.localPosition, authoredScale = box.localScale;
-            openClip.SampleAnimation(box.gameObject, openClip.length);
-            openedScale = box.localScale;
-            Vector3 openedPosition = box.localPosition;
-            box.localPosition = authoredPosition;
-            box.localScale = authoredScale;
-            var sprite = renderer.sprite;
-            Vector2 tail = (DialogueTextStyle.Current.TailTipPixels - sprite.pivot) / sprite.pixelsPerUnit;
-            tailAnchor = openedPosition + new Vector3(tail.x * openedScale.x, tail.y * openedScale.y, 0f);
+            this.openClip = openClip;
 
             text.enableAutoSizing = false;
             if (text.fontSizeMax > 0f) text.fontSize = text.fontSizeMax;
@@ -76,6 +78,55 @@ namespace DoctorHelp
             renderer.drawMode = SpriteDrawMode.Sliced;
         }
 
+        // Poses the bubble at this time of its open clip. The bubble must be active.
+        internal void Sample(float time)
+        {
+            if (!box.gameObject.activeInHierarchy) return;
+            if (!hasOpenedPose)
+            {
+                // Pin the tail where the authored bubble draws it once open, so it still points at the speaker.
+                if (!Evaluate(openClip.length)) return;
+                openedScale = box.localScale;
+                var sprite = boxRenderer.sprite;
+                Vector2 tail = (DialogueTextStyle.Current.TailTipPixels - sprite.pivot) / sprite.pixelsPerUnit;
+                tailAnchor = box.localPosition + new Vector3(tail.x * openedScale.x, tail.y * openedScale.y, 0f);
+                hasOpenedPose = true;
+            }
+            if (!Evaluate(Mathf.Clamp(time, 0f, openClip.length))) return;
+            Vector3 sampled = box.localScale;
+            pop = new Vector2(openedScale.x != 0f ? sampled.x / openedScale.x : 1f,
+                openedScale.y != 0f ? sampled.y / openedScale.y : 1f);
+        }
+
+        private bool Evaluate(float time)
+        {
+            if (animator == null) animator = box.GetComponent<Animator>();
+            if (animator != null && animator.runtimeAnimatorController != null)
+            {
+                openClip.SampleAnimation(box.gameObject, time);
+                return true;
+            }
+            if (!graph.IsValid())
+            {
+                if (animator == null) animator = box.gameObject.AddComponent<Animator>();
+                animator.applyRootMotion = false;
+                graph = PlayableGraph.Create("Speech bubble pop");
+                graph.SetTimeUpdateMode(DirectorUpdateMode.Manual);
+                var output = AnimationPlayableOutput.Create(graph, "Bubble", animator);
+                clipPlayable = AnimationClipPlayable.Create(graph, openClip);
+                clipPlayable.SetApplyFootIK(false);
+                output.SetSourcePlayable(clipPlayable);
+            }
+            clipPlayable.SetTime(time);
+            graph.Evaluate();
+            return true;
+        }
+
+        public void Dispose()
+        {
+            if (graph.IsValid()) graph.Destroy();
+        }
+
         internal void SetLine(string value, bool showNext)
         {
             line = value ?? string.Empty;
@@ -83,11 +134,12 @@ namespace DoctorHelp
             dirty = true;
         }
 
-        // sampledScale is the open clip's current pose; it becomes a pop multiplier around the tail.
+        // The last Sample pose becomes a pop multiplier around the tail.
         // rightLimit keeps the whole bubble left of this screen x, so it never covers the speaker's face.
-        internal bool Apply(Camera camera, Vector3 sampledScale, Vector3 anchor, DialogueTextSize size,
+        internal bool Apply(Camera camera, Vector3 anchor, DialogueTextSize size,
             float rightLimit = float.PositiveInfinity, float screenPadding = 0f)
         {
+            if (!hasOpenedPose) return false;
             var style = DialogueTextStyle.Current;
             Rect safe = ScreenSafeArea.Current;
             Vector3 parentScale = box.parent != null ? box.parent.lossyScale : Vector3.one;
@@ -115,9 +167,7 @@ namespace DoctorHelp
                 dirty = false;
             }
 
-            float popX = openedScale.x != 0f ? sampledScale.x / openedScale.x : 1f;
-            float popY = openedScale.y != 0f ? sampledScale.y / openedScale.y : 1f;
-            var visualScale = new Vector2(scale * popX, scale * popY);
+            var visualScale = new Vector2(scale * pop.x, scale * pop.y);
             box.localScale = new Vector3(visualScale.x, visualScale.y, 1f);
             box.localPosition = anchor - (Vector3)Vector2.Scale(tailOffset, visualScale);
 

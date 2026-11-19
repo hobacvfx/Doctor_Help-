@@ -14,14 +14,16 @@ namespace DoctorHelp.Editor
             EditorGUILayout.Space();
             EditorGUILayout.LabelField("Heartbeat rhythm",EditorStyles.boldLabel);
             var rhythm=serializedObject.FindProperty("rhythm");
-            EditorGUILayout.PropertyField(rhythm.FindPropertyRelative("normalBpm"));
+            EditorGUILayout.LabelField("BPM ranges by NPC Diff (min-max, both included)",EditorStyles.miniBoldLabel);
+            for(int diff=1;diff<=4;diff++)
+                EditorGUILayout.PropertyField(rhythm.FindPropertyRelative("diff"+diff),new GUIContent("Diff "+diff),true);
             var spawn=serializedObject.FindProperty("patients").objectReferenceValue as PatientSpawnPoint;
             var symptoms=spawn != null && spawn.NpcProfile != null && spawn.NpcProfile.AllSickness != null
                 ? spawn.NpcProfile.AllSickness.SymptomProfile : null;
             DrawSymptom(rhythm.FindPropertyRelative("rapidHeartbeatSymptomId"),"Rapid heartbeat",symptoms);
             DrawSymptom(rhythm.FindPropertyRelative("slowHeartbeatSymptomId"),"Slow heartbeat",symptoms);
             DrawSymptom(rhythm.FindPropertyRelative("noHeartbeatSymptomId"),"No heartbeat",symptoms);
-            EditorGUILayout.HelpBox("Normal / slow / fast: BPM, BPM × 0.5, BPM × 3. No Heartbeat shows a frozen heart without repeating VFX or audio. Distance affects sound VFX and audio, not the feedback VFX.",MessageType.Info);
+            EditorGUILayout.HelpBox("Each consultation rolls one BPM in the range for its symptom and NPC Diff (number of sicknesses). No Heartbeat shows a frozen heart without repeating VFX or audio. Distance affects sound VFX and audio, not the feedback VFX.",MessageType.Info);
             serializedObject.ApplyModifiedProperties();
         }
         private static void DrawSymptom(SerializedProperty property,string label,SymptomProfile source)

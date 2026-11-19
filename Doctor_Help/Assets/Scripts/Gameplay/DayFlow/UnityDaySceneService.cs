@@ -108,6 +108,7 @@ namespace DoctorHelp
         }
         public void EnsurePatient() => ResolveSpawnPoint().EnsurePatient(catalog, profile.DifficultySettings, profile.DiffProgress);
         public bool HasRemainingPatients => ResolveSpawnPoint().HasRemainingPatients;
+        public int ArrivedToday => ResolveSpawnPoint().ArrivedCount;
         public PatientExaminationProfile CurrentPatient => ResolveSpawnPoint().CurrentPatient;
         public AllSickness MedicalData => ResolveSpawnPoint().NpcProfile.AllSickness;
         public Task WaitForArrivalAsync(CancellationToken token) => ResolveSpawnPoint().WaitForArrivalAsync(token);

@@ -42,7 +42,6 @@ namespace DoctorHelp
         // or bigger body animations never move or re-wrap the bubble.
         private Vector3? speakerEdge;
         private DialogueBubbleLayout layout;
-        private Vector3 sampledScale;
         private string[] lines = Array.Empty<string>();
         private string ambientLine;
         private bool streetOutburst;
@@ -221,8 +220,8 @@ namespace DoctorHelp
         private void SampleBox(float time)
         {
             animationTime = time;
-            chatBoxClip.SampleAnimation(chatBox, time);
-            sampledScale = chatBox.transform.localScale;
+            if (layout != null) layout.Sample(time);
+            else chatBoxClip.SampleAnimation(chatBox, time);
         }
 
         private void LateUpdate()
@@ -233,7 +232,7 @@ namespace DoctorHelp
             bool examination = IsExamination;
             Vector3 anchor = streetOutburst ? layout.TailAnchor + Vector3.up * StreetOutburstLift : layout.TailAnchor;
             float rightLimit = examination ? SpeakerLeftEdge(camera) : float.PositiveInfinity;
-            if (!layout.Apply(camera, sampledScale, anchor,
+            if (!layout.Apply(camera, anchor,
                     examination ? DialogueTextSize.Examination : DialogueTextSize.Walking, rightLimit, screenPadding)) return;
             if ((ambientLine != null && !streetOutburst && !patientComplaint) || !fitInViewport) return;
 
@@ -370,6 +369,7 @@ namespace DoctorHelp
         }
 
         private void OnDisable() => HideBox();
+        private void OnDestroy() => layout?.Dispose();
     }
 }
 

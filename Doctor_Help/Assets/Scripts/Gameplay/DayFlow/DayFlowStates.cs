@@ -53,6 +53,7 @@ namespace DoctorHelp
     public interface IAnimatedPatientService : IPatientService
     {
         bool HasRemainingPatients { get; }
+        int ArrivedToday { get; }
         Task WaitForArrivalAsync(CancellationToken token);
         Task DepartAsync(CancellationToken token);
     }
@@ -62,6 +63,7 @@ namespace DoctorHelp
         void ShowPatientArrival(int day);
         void ShowPatientDeparture(int day);
         void ShowWaitingForPatient();
+        void ShowClientLimitReached(int secondsLeft);
     }
 
     // One checkpoint per completed day, even when results entry is retried after a scene failure.
@@ -320,11 +322,15 @@ namespace DoctorHelp
         private readonly ClinicClock clock;
         private readonly Func<bool> acceptingPatients;
         private readonly Func<int> signLevel;
+        private readonly Func<float> rating;
+        private readonly Action clientLimitReached;
+        private const int ClientLimitCountdownSeconds = 15;
         private readonly Action endDay;
         private IDayFlowView view;
         public PatientDepartureState(IDaySceneService scenes, IDayProfile profile, IAnimatedPatientService patients,
-            Action endDay, ClinicClock clock, Func<bool> acceptingPatients, Func<int> signLevel)
-        { this.scenes = scenes; this.profile = profile; this.patients = patients; this.endDay = endDay; this.clock = clock; this.acceptingPatients = acceptingPatients; this.signLevel = signLevel; }
+            Action endDay, ClinicClock clock, Func<bool> acceptingPatients, Func<int> signLevel, Func<float> rating,
+            Action clientLimitReached)
+        { this.scenes = scenes; this.profile = profile; this.patients = patients; this.endDay = endDay; this.clock = clock; this.acceptingPatients = acceptingPatients; this.signLevel = signLevel; this.rating = rating; this.clientLimitReached = clientLimitReached; }
         public async Task EnterAsync(CancellationToken token)
         {
             view = await scenes.LoadAsync(GameScene.Office, token);
@@ -334,8 +340,22 @@ namespace DoctorHelp
             await patients.DepartAsync(token);
             if (!acceptingPatients()) return;
 
+            // The rating caps today's clients; once reached, count down and close like a normal day end.
+            if (patients.ArrivedToday >= ClinicDemand.DailyClientLimit(rating(), signLevel()))
+            {
+                clientLimitReached();
+                for (int secondsLeft = ClientLimitCountdownSeconds; secondsLeft > 0; secondsLeft--)
+                {
+                    motion?.ShowClientLimitReached(secondsLeft);
+                    float until = UnityEngine.Time.unscaledTime + 1f;
+                    while (UnityEngine.Time.unscaledTime < until)
+                        await UnityEngine.Awaitable.NextFrameAsync(token);
+                }
+                return;
+            }
+
             double delay = patients.HasRemainingPatients
-                ? ClinicDemand.NextPatientDelay(signLevel(), UnityEngine.Random.value, UnityEngine.Random.value)
+                ? ClinicDemand.NextPatientDelay(signLevel(), rating(), UnityEngine.Random.value, UnityEngine.Random.value)
                 : double.PositiveInfinity;
             if (delay <= 0) return;
 

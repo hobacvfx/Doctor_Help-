@@ -12,4 +12,4 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9a19a6ecd4ed2114c9ccb631dd1f32f4, type: 3}
   m_Name: NPC_105_Dialogue
   m_EditorClassIdentifier: Assembly-CSharp::DoctorHelp.NpcDialogueAsset
-  content: "Hello, doctor. I'm hot, sick, and having trouble breathing.\nMy pulse is racing, and my wrist hurts where the cart tipped.\nI don't know how it all fits together. I just want to sit down."
+  content: "Hello, doctor. I'm hot, I keep wanting to vomit, and I'm having trouble breathing.\nMy pulse is racing, and my wrist hurts where the cart tipped.\nI don't know how it all fits together. I just want to sit down."

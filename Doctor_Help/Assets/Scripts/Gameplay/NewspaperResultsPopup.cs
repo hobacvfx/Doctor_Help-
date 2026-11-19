@@ -29,6 +29,10 @@ namespace DoctorHelp
         private TaskCompletionSource<bool> dismissal;
         private CancellationTokenSource presentation;
         private Vector2? patientListAnchorMax;
+        // Report warnings share the dirt line's font, size and color; extra lines are cloned from it.
+        private Text coldClinicFeedback, clientLimitFeedback;
+        private const string ColdClinicFeedbackText = "The clinic is cold! (ghost)";
+        private const string ClientLimitFeedbackText = "Patient limit reached! (low rating)";
         public bool IsConfigured => paper != null && paper.sprite != null && edition != null && article != null && list != null && list.content != null &&
             dirtyClinicFeedback != null && rowPrefab != null && portraits != null &&
             continueButton != null && settlement != null && settlement.IsConfigured;
@@ -59,7 +63,8 @@ namespace DoctorHelp
                 bool animate = showSettlement && showPatients;
                 article.text = result == null ? morningArticle : !showPatients ? emptyDayArticle :
                     result.IsSuccess ? successArticleContent : articleContent;
-                ShowDirtFeedback(showPatients && result.HasDirtyClinicFeedback);
+                ShowFeedback(showPatients && result.HasDirtyClinicFeedback, showPatients && result.HasColdClinicFeedback,
+                    showPatients && result.ClientLimitReached);
                 list.gameObject.SetActive(showPatients);
                 if (showPatients)
                 {
@@ -102,14 +107,49 @@ namespace DoctorHelp
             continueButton.interactable = false; dismissal?.TrySetResult(true);
         }
 
-        private void ShowDirtFeedback(bool visible)
+        // Visible warning lines stack downward from the dirt line's slot; the patient list starts below the last one.
+        private void ShowFeedback(bool dirt, bool cold, bool clientLimit)
         {
-            dirtyClinicFeedback.gameObject.SetActive(visible);
+            var source = dirtyClinicFeedback.rectTransform;
+            float lineHeight = source.anchorMax.y - source.anchorMin.y;
+            int shown = 0;
+            Text lowest = null;
+            PlaceFeedback(dirtyClinicFeedback, dirt, lineHeight, ref shown, ref lowest);
+            if (cold) coldClinicFeedback ??= CloneFeedback("ColdClinicFeedback", ColdClinicFeedbackText);
+            if (coldClinicFeedback != null) PlaceFeedback(coldClinicFeedback, cold, lineHeight, ref shown, ref lowest);
+            if (clientLimit) clientLimitFeedback ??= CloneFeedback("ClientLimitFeedback", ClientLimitFeedbackText);
+            if (clientLimitFeedback != null) PlaceFeedback(clientLimitFeedback, clientLimit, lineHeight, ref shown, ref lowest);
+
             var listRect = (RectTransform)list.transform;
             var anchor = patientListAnchorMax ??= listRect.anchorMax;
-            if (visible)
-                anchor.y = Mathf.Min(anchor.y, dirtyClinicFeedback.rectTransform.anchorMin.y - .006f);
+            if (lowest != null)
+                anchor.y = Mathf.Min(anchor.y, lowest.rectTransform.anchorMin.y - .006f);
             listRect.anchorMax = anchor;
+        }
+
+        private void PlaceFeedback(Text line, bool visible, float lineHeight, ref int shown, ref Text lowest)
+        {
+            line.gameObject.SetActive(visible);
+            if (!visible) return;
+            var source = dirtyClinicFeedback.rectTransform;
+            var offset = new Vector2(0f, lineHeight * shown);
+            line.rectTransform.anchorMin = dirtySlotMin ??= source.anchorMin;
+            line.rectTransform.anchorMax = dirtySlotMax ??= source.anchorMax;
+            line.rectTransform.anchorMin -= offset;
+            line.rectTransform.anchorMax -= offset;
+            shown++;
+            lowest = line;
+        }
+        private Vector2? dirtySlotMin, dirtySlotMax;
+
+        private Text CloneFeedback(string name, string message)
+        {
+            dirtySlotMin ??= dirtyClinicFeedback.rectTransform.anchorMin;
+            dirtySlotMax ??= dirtyClinicFeedback.rectTransform.anchorMax;
+            var line = Instantiate(dirtyClinicFeedback, dirtyClinicFeedback.transform.parent, false);
+            line.name = name;
+            line.text = message;
+            return line;
         }
         private void ClearRows()
         {

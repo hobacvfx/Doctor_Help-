@@ -20,9 +20,15 @@ namespace DoctorHelp
         public IReadOnlyList<PatientTreatmentResult> Patients { get; }
         public float? DailyRating { get; }
         public bool HasDirtyClinicFeedback { get; }
+        public bool HasColdClinicFeedback { get; }
+        // Passive income from furniture (gold per minute open), already included in TotalEarn.
+        public int PassiveGold { get; }
+        // True when the rating-based daily client limit closed the clinic early.
+        public bool ClientLimitReached { get; internal set; }
         public DayTreatmentResult(int day, int correct, int incorrect)
             : this(day, correct, incorrect, 0, new List<PatientTreatmentResult>()) { }
-        internal DayTreatmentResult(int day, int correct, int incorrect, int goldBefore, List<PatientTreatmentResult> patients)
+        internal DayTreatmentResult(int day, int correct, int incorrect, int goldBefore, List<PatientTreatmentResult> patients,
+            int passiveGold = 0)
         {
             Day = day;
             CorrectPatients = correct;
@@ -39,8 +45,11 @@ namespace DoctorHelp
                 totalStars += stars;
                 votes++;
                 HasDirtyClinicFeedback |= patient.RatingReducedByDirt;
+                HasColdClinicFeedback |= patient.RatingReducedByGhost;
             }
             if (votes > 0) DailyRating = totalStars / votes;
+            PassiveGold = passiveGold;
+            TotalEarn = checked(TotalEarn + passiveGold);
         }
     }
 
@@ -64,23 +73,26 @@ namespace DoctorHelp
         public float? FeedbackStars { get; }
         public bool IsJailed { get; }
         public bool RatingReducedByDirt { get; }
+        public bool RatingReducedByGhost { get; }
         public int GoldDelta { get; }
         public IReadOnlyList<TreatmentTextPart> Required { get; }
         public IReadOnlyList<TreatmentTextPart> Action { get; }
         internal PatientTreatmentResult(TreatmentJournal.Entry entry, bool correct, bool isPoliceCase,
             List<TreatmentTextPart> required, List<TreatmentTextPart> action, float clinicDirtPenalty,
-            float receptionRatingBonus, int receptionistLevel)
+            float receptionRatingBonus, float goldMultiplier, float ghostPenalty)
         {
             NpcId = entry.npcId; NpcName = entry.npcName; IsCorrect = correct;
-            GoldDelta = correct ? DayTreatmentResult.CorrectGold * (10 + receptionistLevel) / 10 :
+            GoldDelta = correct ? (int)Math.Round(DayTreatmentResult.CorrectGold * goldMultiplier, MidpointRounding.AwayFromZero) :
                 DayTreatmentResult.IncorrectGold;
             IsJailed = isPoliceCase && correct;
             if (!isPoliceCase)
             {
                 int baseStars = correct ? Math.Clamp(entry.patienceStars, 1, 5) : 1;
-                float stars = Math.Clamp(baseStars - clinicDirtPenalty + receptionRatingBonus, 1f, PlayerProfileData.MaxRating);
+                float withoutGhosts = Math.Clamp(baseStars - clinicDirtPenalty + receptionRatingBonus, 1f, PlayerProfileData.MaxRating);
+                float stars = Math.Clamp(baseStars - clinicDirtPenalty - ghostPenalty + receptionRatingBonus, 1f, PlayerProfileData.MaxRating);
                 FeedbackStars = stars;
-                RatingReducedByDirt = stars < Math.Min(baseStars + receptionRatingBonus, PlayerProfileData.MaxRating);
+                RatingReducedByDirt = withoutGhosts < Math.Min(baseStars + receptionRatingBonus, PlayerProfileData.MaxRating);
+                RatingReducedByGhost = stars < withoutGhosts;
             }
             Illness = string.Join(" + ", entry.sicknesses.ConvertAll(x => x.name));
             Required = required.AsReadOnly(); Action = action.AsReadOnly();
@@ -91,18 +103,21 @@ namespace DoctorHelp
     {
         public static DayTreatmentResult Evaluate(int day, TreatmentJournal.Day history, AllSickness medical,
             int goldBefore = 0, float clinicDirtPenalty = 0f, float receptionRatingBonus = 0f,
-            int receptionistLevel = 0)
+            float goldMultiplier = 1f, float ghostPenalty = 0f, int passiveGold = 0)
         {
+            if (!(goldMultiplier >= 1f && float.IsFinite(goldMultiplier)))
+                throw new ArgumentOutOfRangeException(nameof(goldMultiplier));
+            if (passiveGold < 0) throw new ArgumentOutOfRangeException(nameof(passiveGold));
+            if (!(ghostPenalty >= 0f && float.IsFinite(ghostPenalty)))
+                throw new ArgumentOutOfRangeException(nameof(ghostPenalty));
             if (!(clinicDirtPenalty >= 0f && float.IsFinite(clinicDirtPenalty)))
                 throw new ArgumentOutOfRangeException(nameof(clinicDirtPenalty));
             if (!(receptionRatingBonus >= 0f && float.IsFinite(receptionRatingBonus)))
                 throw new ArgumentOutOfRangeException(nameof(receptionRatingBonus));
-            if (receptionistLevel < 0 || receptionistLevel > ClinicDemand.MaxFurnitureLevel)
-                throw new ArgumentOutOfRangeException(nameof(receptionistLevel));
             if (day < 1 || (history != null && (history.day != day || history.treatments == null)))
                 throw new InvalidOperationException("Missing treatment history for the closing day.");
             if (history == null || history.treatments.Count == 0)
-                return new DayTreatmentResult(day, 0, 0, goldBefore, new List<PatientTreatmentResult>());
+                return new DayTreatmentResult(day, 0, 0, goldBefore, new List<PatientTreatmentResult>(), passiveGold);
             if (medical == null || medical.PillProfile == null)
                 throw new InvalidOperationException("Medical catalogue is unavailable for day results.");
             int correct = 0, incorrect = 0;
@@ -114,13 +129,13 @@ namespace DoctorHelp
                     throw new InvalidOperationException("Treatment history contains a missing or duplicate consultation.");
                 bool valid = IsCorrect(entry, medical);
                 if (valid) correct++; else incorrect++;
-                patients.Add(BuildPatient(entry, medical, valid, clinicDirtPenalty, receptionRatingBonus, receptionistLevel));
+                patients.Add(BuildPatient(entry, medical, valid, clinicDirtPenalty, receptionRatingBonus, goldMultiplier, ghostPenalty));
             }
-            return new DayTreatmentResult(day, correct, incorrect, goldBefore, patients);
+            return new DayTreatmentResult(day, correct, incorrect, goldBefore, patients, passiveGold);
         }
 
         private static PatientTreatmentResult BuildPatient(TreatmentJournal.Entry entry, AllSickness medical,
-            bool correct, float clinicDirtPenalty, float receptionRatingBonus, int receptionistLevel)
+            bool correct, float clinicDirtPenalty, float receptionRatingBonus, float goldMultiplier, float ghostPenalty)
         {
             var required = new List<TreatmentTextPart>();
             var action = new List<TreatmentTextPart>();
@@ -171,7 +186,7 @@ namespace DoctorHelp
                             action.Add(new TreatmentTextPart("Missing: " + part.Text, TreatmentTextTone.Incorrect));
             }
             return new PatientTreatmentResult(entry, correct, police, required, action,
-                clinicDirtPenalty, receptionRatingBonus, receptionistLevel);
+                clinicDirtPenalty, receptionRatingBonus, goldMultiplier, ghostPenalty);
         }
 
         private static bool IsCorrect(TreatmentJournal.Entry entry, AllSickness medical)
