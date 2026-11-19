@@ -25,10 +25,9 @@ namespace DoctorHelp
                 rapidHeartbeatSymptomId == noHeartbeatSymptomId || slowHeartbeatSymptomId == noHeartbeatSymptomId)
                 throw new InvalidOperationException("Heartbeat symptom mappings are missing, duplicated or no longer valid.");
             if (!npc.HasSickness) return normalBpm;
-            var sickness = medicalData.Find(npc.SicknessId);
-            if (sickness == null) throw new InvalidOperationException("NPC references a missing sickness: " + npc.SicknessId);
+            var resolvedSymptoms = NpcMedicalConditions.Resolve(npc.SicknessIds, medicalData);
             bool rapid = false, slow = false, none = false;
-            foreach (var id in sickness.SymptomIds)
+            foreach (var id in resolvedSymptoms)
             {
                 if (symptoms.Find(id) == null) throw new InvalidOperationException("Sickness references a missing symptom: " + id);
                 rapid |= id == rapidHeartbeatSymptomId;
@@ -44,6 +43,7 @@ namespace DoctorHelp
             => maxDistance > 0 ? Mathf.Clamp01(1 - distance / maxDistance) : 0;
     }
 }
+
 
 
 

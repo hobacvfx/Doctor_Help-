@@ -8,13 +8,50 @@ namespace DoctorHelp
 {
     public sealed class UnityDaySceneService : IDaySceneService
     {
+        private TutorialPlan tutorialPlan;
         public IDayFlowView CurrentView { get; private set; }
+        public INeighborhoodView CurrentNeighborhood { get; private set; }
         public Scene CurrentScene { get; private set; }
 
         public async Task<IDayFlowView> LoadAsync(GameScene destination, CancellationToken cancellation)
         {
+            var scene = await LoadSceneAsync(destination.ToString(), cancellation);
+            return CurrentView = BindGameplayView(scene);
+        }
+
+        public async Task<INeighborhoodView> LoadNeighborhoodAsync(string destination, CancellationToken cancellation)
+        {
+            string origin = SceneManager.GetActiveScene().name;
+            var scene = await LoadSceneAsync(destination, cancellation);
+            var view = FindSceneComponent<NeighborhoodView>(scene);
+            if (view == null || !view.IsConfigured)
+                throw new InvalidOperationException("Neighborhood scene has invalid navigation: " + scene.name);
+            CurrentView = destination == nameof(GameScene.Player_Home) ? BindGameplayView(scene) : null;
+            view.PlacePlayerAtEntrance(origin);
+            if (PlayerProfileService.Instance is { IsLoaded: true })
+                ConfigureFirstDayGuide(view, CurrentView as SceneGameplayUI);
+            CurrentNeighborhood = view;
+            return view;
+        }
+
+        private void ConfigureFirstDayGuide(NeighborhoodView view, SceneGameplayUI home)
+        {
+            if (tutorialPlan == null) tutorialPlan = Resources.Load<TutorialPlan>("FirstRunTutorial");
+            var target = home != null ? home.OpenButton : view.DoorTo(nameof(GameScene.Player_Home)) ?? view.DoorTo("Street");
+            view.ConfigureFirstDayGuide(tutorialPlan?.FirstDayGuide, target);
+        }
+
+        private static SceneGameplayUI BindGameplayView(Scene scene)
+        {
+            var view = FindSceneComponent<SceneGameplayUI>(scene);
+            if (view == null || !view.IsConfigured)
+                throw new InvalidOperationException("Scene UI is missing or has invalid Inspector references: " + scene.name);
+            return view;
+        }
+
+        private async Task<Scene> LoadSceneAsync(string name, CancellationToken cancellation)
+        {
             cancellation.ThrowIfCancellationRequested();
-            string name = destination.ToString();
             var scene = SceneManager.GetActiveScene();
             if (scene.name != name)
             {
@@ -23,6 +60,7 @@ namespace DoctorHelp
                 var operation = SceneManager.LoadSceneAsync(name, LoadSceneMode.Single);
                 if (operation == null) throw new InvalidOperationException("Cannot load scene: " + name);
                 CurrentView = null;
+                CurrentNeighborhood = null;
                 var completed = new TaskCompletionSource<bool>();
                 operation.completed += _ => completed.TrySetResult(true);
                 if (operation.isDone) completed.TrySetResult(true);
@@ -32,17 +70,20 @@ namespace DoctorHelp
                 scene = SceneManager.GetActiveScene();
             }
             CurrentScene = scene;
-            SceneGameplayUI view = null;
+            return scene;
+        }
+
+        private static T FindSceneComponent<T>(Scene scene) where T : Component
+        {
+            T result = null;
             foreach (var root in scene.GetRootGameObjects())
-                foreach (var candidate in root.GetComponentsInChildren<SceneGameplayUI>(true))
+                foreach (var candidate in root.GetComponentsInChildren<T>(true))
                 {
-                    if (view != null) throw new InvalidOperationException("Multiple scene UI views in " + name);
-                    view = candidate;
+                    if (result != null)
+                        throw new InvalidOperationException($"Multiple {typeof(T).Name} components in {scene.name}.");
+                    result = candidate;
                 }
-            if (view == null || !view.IsConfigured)
-                throw new InvalidOperationException("Scene UI is missing or has invalid Inspector references: " + name);
-            CurrentView = view;
-            return view;
+            return result;
         }
     }
 
@@ -50,8 +91,9 @@ namespace DoctorHelp
     {
         private readonly UnityDaySceneService scenes;
         private readonly NpcCatalog catalog;
-        public PatientService(UnityDaySceneService scenes, NpcCatalog catalog)
-        { this.scenes = scenes; this.catalog = catalog; }
+        private readonly PlayerProfileService profile;
+        public PatientService(UnityDaySceneService scenes, NpcCatalog catalog, PlayerProfileService profile)
+        { this.scenes = scenes; this.catalog = catalog; this.profile = profile; }
         private PatientSpawnPoint ResolveSpawnPoint()
         {
             PatientSpawnPoint spawnPoint = null;
@@ -64,7 +106,10 @@ namespace DoctorHelp
             if (spawnPoint == null) throw new InvalidOperationException("Office is missing PatientSpawnPoint on NPC_Position.");
             return spawnPoint;
         }
-        public void EnsurePatient() => ResolveSpawnPoint().EnsurePatient(catalog);
+        public void EnsurePatient() => ResolveSpawnPoint().EnsurePatient(catalog, profile.DifficultySettings, profile.DiffProgress);
+        public bool HasRemainingPatients => ResolveSpawnPoint().HasRemainingPatients;
+        public PatientExaminationProfile CurrentPatient => ResolveSpawnPoint().CurrentPatient;
+        public AllSickness MedicalData => ResolveSpawnPoint().NpcProfile.AllSickness;
         public Task WaitForArrivalAsync(CancellationToken token) => ResolveSpawnPoint().WaitForArrivalAsync(token);
         public Task DepartAsync(CancellationToken token) => ResolveSpawnPoint().DepartAsync(token);
     }

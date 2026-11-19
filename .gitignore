@@ -107,3 +107,24 @@ InitTestScene*.unity*
 Doctor_Help/Library
 Doctor_Help/UserSettings
 Doctor_Help/Temp
+
+# The Unity project lives in Doctor_Help/, so the root-anchored rules above never matched it.
+/Doctor_Help/[Ll]ibrary/
+/Doctor_Help/[Tt]emp/
+/Doctor_Help/[Oo]bj/
+/Doctor_Help/[Bb]uild/
+/Doctor_Help/[Bb]uilds/
+/Doctor_Help/[Ll]ogs/
+/Doctor_Help/[Uu]ser[Ss]ettings/
+/Doctor_Help/[Rr]ecordings/
+/Doctor_Help/[Mm]emoryCaptures/
+/Doctor_Help/tmp/
+/Doctor_Help/.utmp/
+
+# Source art archives are far above GitHub's 100 MB file limit; keep them in cloud storage instead.
+*.zip
+
+# Raw source art stays out of git (back it up in cloud storage); only design notes are versioned.
+/Doctor_Help/Design/**
+!/Doctor_Help/Design/**/
+!/Doctor_Help/Design/**/*.md

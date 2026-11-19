@@ -8,17 +8,27 @@ namespace DoctorHelp
     // Composition root: builds services/states and forwards requests; UI remains scene-owned.
     public sealed class DailyGameLoop : MonoBehaviour
     {
-        [SerializeField, Min(1)] private float operatingSeconds = 720;
+        private const string OpeningCompletedKey = "DoctorHelp.OpeningComic.Completed";
+        [SerializeField, Min(1)] private float operatingSeconds = ClinicClock.DefaultOperatingSeconds;
         public ClinicClock Clock { get; } = new ClinicClock();
         private bool applicationPaused, applicationUnfocused, skipClockFrame;
         public DayStep? Step => machine?.CurrentStep;
-        public bool IsTransitioning => machine != null && machine.IsTransitioning;
-        public string SelectedPill => treatment?.SelectedMedicineId;
+        public bool IsTransitioning => (machine != null && machine.IsTransitioning) ||
+            (preparation != null && preparation.IsNavigating);
+        internal bool SkipOnboarding { get; set; }
+        public System.Collections.Generic.IReadOnlyList<string> SelectedPills => treatment?.SelectedMedicineIds;
         private readonly CancellationTokenSource lifetime = new CancellationTokenSource();
         private DayFlowMachine machine;
         private UnityDaySceneService scenes;
+        private PreparationState preparation;
         private TreatmentDecisionState treatment;
+        private DayCompletionService completion;
+        public DayTreatmentResult LatestDayResult => completion?.LatestResult;
         private IDayFlowView retryView;
+        private bool initialized, resetting;
+        internal bool IsEndingDayEarly { get; private set; }
+        private bool AcceptingPatients => !IsEndingDayEarly && !Clock.IsClosed;
+        public bool CanResetProfile => initialized && !resetting && !IsTransitioning;
 
         private async void Start()
         {
@@ -28,30 +38,101 @@ namespace DoctorHelp
                 scenes = new UnityDaySceneService();
                 if (profile == null || !profile.IsLoaded)
                 {
-                    var home = await scenes.LoadAsync(GameScene.Home, lifetime.Token);
+                    var home = await scenes.LoadAsync(GameScene.Player_Home, lifetime.Token);
                     home.ShowFlowError("Không thể tải profile. Dữ liệu cũ được giữ nguyên. Kiểm tra Console và mở lại game.");
                     return;
                 }
-                // Explicit order; changing enum numeric values does not change the flow.
-                var plan = new DayFlowPlan(DayStep.Preparation, DayStep.Examination,
-                    DayStep.TreatmentDecision, DayStep.PatientDeparture, DayStep.DayResults);
-                plan.RepeatWhile(DayStep.PatientDeparture, DayStep.Examination, () => !Clock.IsClosed);
-                var patients = new PatientService(scenes, Resources.Load<NpcCatalog>("NpcCatalog"));
-                treatment = new TreatmentDecisionState(scenes, profile, RequestAdvance);
-                machine = new DayFlowMachine(plan,
-                    new PreparationState(scenes, profile, OpenClinic),
-                    new ExaminationState(scenes, profile, patients, RequestAdvance), treatment,
-                    new PatientDepartureState(scenes, profile, patients),
-                    new DayResultsState(scenes, profile, new DayCompletionService(profile), RequestAdvance));
-                await RunAsync(() => machine.StartAsync(lifetime.Token));
+                await PresentOpeningAsync();
+                await StartFlowAsync(profile);
             }
             catch (OperationCanceledException) when (lifetime.IsCancellationRequested) { }
             catch (Exception error) { Debug.LogException(error); }
+            finally { initialized = true; }
+        }
+
+        private async Task PresentOpeningAsync(bool reset = false)
+        {
+            bool preview = false;
+#if UNITY_EDITOR
+            if (SkipOnboarding) return;
+            preview = TutorialPreviewSession.IsActive;
+#endif
+            if (reset && !preview)
+            {
+                PlayerPrefs.DeleteKey(OpeningCompletedKey);
+                PlayerPrefs.Save();
+            }
+            if (!preview && PlayerPrefs.GetInt(OpeningCompletedKey) != 0) return;
+
+            var home = await scenes.LoadAsync(GameScene.Player_Home, lifetime.Token);
+            var comic = ((SceneGameplayUI)home).GetComponentInChildren<OpeningComicView>(true);
+            if (comic == null || !comic.IsConfigured)
+            {
+                Debug.LogError("Player Home is missing its configured opening comic prefab.");
+                return;
+            }
+            await comic.PlayAsync(lifetime.Token);
+            if (preview) return;
+            PlayerPrefs.SetInt(OpeningCompletedKey, 1);
+            PlayerPrefs.Save();
+        }
+
+        private Task StartFlowAsync(PlayerProfileService profile)
+        {
+            IsEndingDayEarly = false;
+            // Explicit order; changing enum numeric values does not change the flow.
+            var plan = new DayFlowPlan(DayStep.Preparation, DayStep.Examination,
+                DayStep.TreatmentDecision, DayStep.PatientDeparture, DayStep.DayResults);
+            var patients = new PatientService(scenes, Resources.Load<NpcCatalog>("NpcCatalog"), profile);
+            var examination = new ExaminationState(scenes, profile, patients, RequestAdvance, RequestEndDay,
+                () => profile.EnsureClinicDirtDay(),
+                patient => profile.TryRecordRockHit(patient, out var error) ? null : error);
+            plan.SkipWhile(DayStep.Examination, DayStep.PatientDeparture, () => IsEndingDayEarly || examination.RockHitRecorded);
+            plan.RepeatWhile(DayStep.PatientDeparture, DayStep.Examination, () => AcceptingPatients);
+            plan.AllowReturn(DayStep.TreatmentDecision, DayStep.Examination);
+            var pills = Resources.Load<PlayerStartingProfile>("PlayerStartingProfile")?.Pills;
+            treatment = new TreatmentDecisionState(scenes, profile, RequestAdvance, RequestReturn,
+                ids => profile.TryGive(patients.CurrentPatient, pills, ids, out var error) ? null : error,
+                reason => profile.TryReportToPolice(patients.CurrentPatient, reason, out var error) ? null : error,
+                () => profile.TryDecline(patients.CurrentPatient, out var error) ? null : error);
+            preparation = new PreparationState(scenes, profile, OpenClinic);
+            completion = new DayCompletionService(profile,
+                day => TreatmentEvaluator.Evaluate(day, profile.GetTreatmentSnapshot(), patients.MedicalData,
+                    profile.Money, profile.ClinicDirtPenalty(), profile.ReceptionRatingBonus,
+                    profile.ReceptionistLevel));
+            machine = new DayFlowMachine(plan,
+                preparation,
+                examination, treatment,
+                new PatientDepartureState(scenes, profile, patients, RequestEndDay, Clock, () => AcceptingPatients,
+                    () => profile.ClinicSignLevel),
+                new DayResultsState(scenes, profile, completion,
+                    GetComponent<DayEndInterstitialService>()));
+            return RunAsync(() => machine.StartAsync(lifetime.Token));
+        }
+
+        public async Task<string> ResetProfileAsync()
+        {
+            if (!CanResetProfile) return "Please wait for the current action to finish.";
+            var profile = PlayerProfileService.Instance;
+            resetting = true;
+            try
+            {
+                if (profile == null || !profile.TryReset()) return "Could not reset the player profile. Please try again.";
+                DetachRetry();
+                machine?.Stop();
+                Clock.Stop();
+                GetComponent<FirstRunTutorial>()?.RestartAfterProfileReset();
+                await PresentOpeningAsync(reset: true);
+                await StartFlowAsync(profile);
+                return null;
+            }
+            finally { resetting = false; }
         }
 
         private void Update()
         {
-            Clock.Tick(skipClockFrame ? 0 : Time.unscaledDeltaTime, applicationPaused || applicationUnfocused);
+            Clock.Tick(skipClockFrame ? 0 : Time.unscaledDeltaTime,
+                applicationPaused || applicationUnfocused || FirstRunTutorial.Instance?.PausesClinicClock == true);
             skipClockFrame = false;
         }
         private void OnApplicationPause(bool paused) { applicationPaused = paused; skipClockFrame = true; }
@@ -59,8 +140,20 @@ namespace DoctorHelp
         private void OpenClinic()
         {
             if (machine == null || machine.IsTransitioning || machine.FailedStep.HasValue || Step != DayStep.Preparation) return;
+            IsEndingDayEarly = false;
+            GetComponent<FirstRunTutorial>()?.OnClinicOpened();
             Clock.Open(operatingSeconds);
             RequestAdvance();
+        }
+
+        private void RequestEndDay()
+        {
+            if (IsEndingDayEarly || machine == null || machine.FailedStep.HasValue || lifetime.IsCancellationRequested) return;
+            IsEndingDayEarly = true;
+            Clock.Stop();
+            GetComponent<FirstRunTutorial>()?.OnClinicClosed();
+            // If a patient is already walking, finish that motion before following the plan.
+            if (!machine.IsTransitioning) RequestAdvance();
         }
 
         private async void RequestAdvance()
@@ -73,6 +166,11 @@ namespace DoctorHelp
             if (machine == null || machine.IsTransitioning || lifetime.IsCancellationRequested) return;
             await RunAsync(() => machine.RetryAsync(lifetime.Token));
         }
+        private async void RequestReturn()
+        {
+            if (machine == null || machine.IsTransitioning || lifetime.IsCancellationRequested || Step != DayStep.TreatmentDecision) return;
+            await RunAsync(() => machine.ReturnAsync(lifetime.Token));
+        }
         private async Task RunAsync(Func<Task<bool>> operation)
         {
             DetachRetry();
@@ -81,7 +179,8 @@ namespace DoctorHelp
                 bool success = await operation();
                 // Arrival/departure awaits finish before another transition is requested.
                 // The plan decides whether to admit another patient only after walk-out completes.
-                if (success && machine.CurrentStep == DayStep.PatientDeparture)
+                while (success && (Step == DayStep.PatientDeparture || Step == DayStep.DayResults ||
+                    (Step == DayStep.Examination && IsEndingDayEarly)))
                     success = await machine.AdvanceAsync(lifetime.Token);
                 if (success && (machine.CurrentStep == DayStep.DayResults || machine.CurrentStep == DayStep.Preparation))
                     Clock.Stop();

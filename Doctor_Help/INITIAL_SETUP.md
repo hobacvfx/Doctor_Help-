@@ -13,8 +13,8 @@ Only `CompleteDay()` saves a checkpoint, including all profile values and the ne
 Pausing, losing focus, stopping Play mode and quitting do not save an unfinished day.
 Restarting always enters Home in Preparation at the checkpoint's day (day 1 for a new profile).
 Stored at `Application.persistentDataPath/player-profile.json`, with `.bak` recovery and `.tmp` staging files.
-Defaults: money 0, day 1, patients killed/saved 0, empty medicine inventory. Unknown medicine IDs have quantity 0.
-No medicine catalogue or starting economy has been invented. IDs are case-sensitive stable identifiers, independent of display names.
+Defaults: money 500, day 1, patients killed/saved 0, empty medicine inventory. Unknown medicine IDs have quantity 0.
+PlayerStartingProfile in Assets/Resources configures starting money (500) for new saves and references the existing PillProfile. Existing checkpoints retain their money. During Play, select Game Services > PlayerProfileService and edit Player Money to test the working day. IDs are case-sensitive stable identifiers, independent of display names.
 Money may be negative to support debt; quantities and patient counts cannot be negative.
 If both saves are corrupt or the primary uses a newer schema, loading fails visibly in the Console and existing files are preserved.
 
@@ -37,24 +37,32 @@ bool saved = profile.CompleteDay(); // Advances the day only if saving succeeds.
 `Changed` notifies UI after in-memory mutations and successful day completion.
 There are no automatic gameplay rewards, patient outcomes or bankruptcy rules.
 
-## Placeholder daily loop
+## Daily loop
 
 Editor Play mode starts Home regardless of the currently edited scene. Home is also first in the build list.
 Home Preparation: `open` -> Office Examination -> `Give Pills` -> `Select Pill` popup.
-Select `pill_a`, `pill_b` or `pill_c`, then press `Give` to finish that consultation. The patient plays A_Walk_Out completely before removal. If the clock is still before 21:00, the next patient enters with A_Walk_in; otherwise the day ends. A patient already admitted keeps their consultation even if closing occurs during their arrival.
-The profile is saved for the next morning, Home loads, and displays `chạy cut scene ở đây và xem kết quả ở đây` for 3 real-time seconds.
+Select one or more owned medicines, then press `Give` to consume one of each and finish that consultation. Click outside the panel or Close to cancel without consuming; the flow returns to Examination through the return branch declared in DayFlowPlan. The patient plays A_Walk_Out completely before removal. If the clock is still before 21:00, the next patient enters with A_Walk_in; otherwise the day ends. A patient already admitted keeps their consultation even if closing occurs during their arrival.
+TreatmentEvaluator compares the day history before its checkpoint; Home then plays Success.mp4 if every case is correct, or Fail.mp4 if any is wrong/incomplete. The selected result survives scene/video retries after the checkpoint.
 Then Preparation begins with the next day and `open` is shown again. A failed transition displays an error and a `Thử lại` action using the scene's primary button; its authored label is restored after recovery.
-Pill buttons are colored image placeholders with text labels, require a selection, and do not consume inventory or decide patient outcomes yet.
+MedicineRow and MedicineListView provide the shared catalogue, stock display and selection controls for shop, inventory and treatment. Give consumes the whole selection atomically and records its audit before departure; patient outcomes remain unimplemented.
 One random NPC at a time is instantiated by PatientSpawnPoint on NPC_Position, using Assets/Resources/NpcCatalog.asset. Re-entering a failed examination reuses the existing consultation. After a completed departure, the next admission spawns a fresh patient consultation.
-The catalogue references the six existing prefabs in `Assets/2D_Assets/NPC`; original assets stay in place and are included in builds through these references.
+The catalogue references the NPC prefabs currently registered in `Assets/2D_Assets/NPC`; original assets stay in place and are included in builds through these references.
 Each scene contains its own `Gameplay Canvas` and `EventSystem`. The Canvas contains `Safe Area`, day/step and error labels, FPS text, and prefab instances of that scene's buttons/popups.
 Home owns OpenButton and ResultsPopup; Office owns GivePillsButton, SelectPillPopup and the ClinicClock prefab instance at the top right of Safe Area.
 UI exists in the scene hierarchy before Play and is destroyed naturally when its scene unloads. No UI is instantiated or parented under `DontDestroyOnLoad`.
 The persistent Game Services object holds only profile, flow and performance settings; the flow binds scene UI references after scene loading.
 
+## Worm flipbooks
+
+`Giun_1`, `Giun_2` and `Giun_3` prefabs in `Assets/2D_Assets/TrieuTrung/Giun` automatically play their default looping Animator state when active. Each clip changes only the root SpriteRenderer sprite. Prefab transforms, material, layers and sorting are preserved. Nine sprites are sliced in row order from each transparent 3x3 atlas under `Flipbook`, with a shared centered pivot and the original sprite's world size. Giun_1 uses `Giun_1_Crawl_v3_Atlas`; Giun_2 and Giun_3 use their `Wriggle_Atlas` images. Timing is approximately 130 ms per frame. Edit the `.anim` and `.controller` assets directly in Unity; no runtime setup component is required.
+
+Giun_2 wriggles in place. Giun_3 alternates its two legs, flexes its tail and gently sways around a registered abdomen center. Source PNGs are preserved. GIF previews and image-generation prompts are stored beside the atlases. Editor verification sampled all nine rendered frames, advanced each Animator through three cycles and checked preserved prefab settings; this is not an Android device test.
+
 ## Clinic opening hours and patient motion
 
-ClinicClock maps 720 real seconds to 08:00–21:00, displays HH:mm and clamps at 21:00. DailyGameLoop starts it on Open, updates it with unscaled foreground time, and skips the resume frame so time spent in the background is not added. It runs during the medicine popup and all patient animations. There is no unfinished-day clock persistence. Opening the following day starts at 08:00 again.
+ClinicClock maps 240 real seconds (4 minutes) to 08:00–21:00, displays HH:mm and clamps at 21:00. DailyGameLoop starts it on Open, updates it with unscaled foreground time, and skips the resume frame so time spent in the background is not added. It runs during the medicine popup and all patient animations. There is no unfinished-day clock persistence. Opening the following day starts at 08:00 again.
+
+The Office Give Pills desk button stays visible during arrival, departure and popups. It accepts input only during Examination (or as the flow retry action). Touch X-ray scanning offsets both magnifier and cutout together above the finger by 240 reference pixels at a 1920px screen height; edit Touch Magnifier Offset on the scene's ExaminationToolSelection. Mouse scanning keeps its original alignment.
 
 PatientDepartureState waits for the animator's actual normalized completion, then removes the old patient before the plan checks whether another may enter. ExaminationState waits for NPC_Idle before enabling tools/treatment. Office stays loaded between patients. PatientSpawnPoint initializes each newly spawned consultation, preserving the existing temperature cache for its duration. Failed entry retry reuses the current instance; completed departure retry is idempotent. The shared All.controller uses its existing A_Walk_in -> NPC_Idle and a Leave trigger for NPC_Idle -> A_Walk_Out. Arrival and departure clips are nonlooping. Missing animator/controller states produce a flow error.
 
@@ -74,9 +82,9 @@ To add a step (for example Diagnosis):
 4. Add its scene-owned UI if needed, and test order, retry and cleanup.
 
 To remove an optional step, remove it from the plan and remove its registration if no longer needed. Other states do not encode their successor. Preparation and DayResults remain mandatory boundaries to protect startup and checkpoint rules.
-Adding a branch, such as reporting a patient to police, can initially stay inside TreatmentDecision. If it becomes a distinct stage, explicitly extend the flow model with validated branches rather than bypassing the state machine.
+Medication and police reporting are separate decisions inside TreatmentDecision. If it becomes a distinct stage, explicitly extend the flow model with validated branches rather than bypassing the state machine.
 
-Results finish through `ResultsCompleted`. The current scene view uses a configurable 3-second placeholder timer. For real cutscenes/results UI, disable `Use Placeholder Results Timer` on the scene Canvas and call `CompleteResultsPresentation()` from the presentation completion/confirm action.
+DayResultsState awaits SceneGameplayUI.PresentResultsAsync. ResultsVideoPresenter completes through VideoPlayer.loopPointReached, then DailyGameLoop asks the state machine to advance to Preparation. Preparation never uses a fixed results timer. Errors/cancellation propagate into the existing transition/retry flow.
 Failures leave the machine unlocked in a fault state. Retry re-enters the failed step and never re-exits an already cleaned previous state. Destroying the loop cancels its lifetime and detaches subscriptions; Unity scene loads already in progress finish before cancellation is observed.
 Check scene configuration errors in the Console if no valid scene view exists to display a retry action.
 
@@ -85,11 +93,11 @@ Check scene configuration errors in the Console if no valid scene view exists to
 Open prefabs in `Assets/Resources/UI` in Unity Prefab Mode:
 - `OpenButton.prefab` and `GivePillsButton.prefab`: button style, label and bottom-of-screen position.
 - `GiveButton.prefab`: shared Give button style and label.
-- `PillOptionButton.prefab`: shared pill button style, image and label layout.
-- `SelectPillPopup.prefab`: backdrop, panel, title, selected-pill label, save error and pill arrangement. Give and pill buttons are nested prefab instances; their common style comes from the button prefabs. Each pill's label and horizontal position are local overrides.
-- `ResultsPopup.prefab`: result backdrop and placeholder message.
+- `MedicineRow.prefab`: shared medicine icon, name/quantity, description, price and purchase/selection controls.
+- `SelectPillPopup.prefab`: backdrop, panel, scroll viewport, selected count, error label and nested Give button; medicine rows are instantiated from MedicineRow within the scene popup.
+- `ResultsPopup.prefab`: black backdrop, VideoPlayer, RawImage and result video presenter; both point to ResultsVideo.renderTexture.
 
-The loop preserves prefab layout, colors, sprites and static labels. Code attaches click handlers, enables Give after selection, updates selected-pill text and shows save errors. The `SelectPillPopup` component stores button/text references and medicine IDs; keep these references assigned when replacing child objects. Keep the resource prefab names stable.
+The loop preserves prefab layout, colors, sprites and static labels. Code attaches click handlers, enables Give after selection, updates selected-pill text and shows save errors. The `SelectPillPopup` component stores button/text references and its shared MedicineListView; keep these references assigned when replacing child objects. Keep the resource prefab names stable.
 Canvas, safe-area container, status/error labels and FPS can also be edited directly in Home and Office. `SceneGameplayUI` holds Inspector references and updates safe-area anchors during play. Status and error text content is updated by code.
 Keep the `SceneGameplayUI` references assigned when replacing scene objects. Popups start inactive; enable temporarily in Edit mode to preview their layout. Edit shared styling in Prefab Mode or apply scene instance overrides to the prefab.
 
@@ -97,7 +105,7 @@ Keep the `SceneGameplayUI` references assigned when replacing scene objects. Pop
 
 Three editable ScriptableObject assets live under `Assets/Data/Medical`:
 - `SymptomProfile.asset`: add/remove symptoms and edit their names.
-- `PillProfile.asset`: add/remove pill types and edit their names.
+- `PillProfile.asset`: add/remove pill types and edit name, unit price, separate description and sprite. Prices currently default to 1. Removing a pill preserves its stable ID stock in old saves and shows missing disease references; it never transfers stock to another item.
 - `AllSickness.asset`: references the two source profiles and lists diseases, each with a name, symptom slots and required-pill slots.
 
 Enter the source symptoms/pills first. Then add a disease in AllSickness and select existing source entries from its dropdown slots. `+` adds an entry/slot and `−` removes it. Asset changes use Unity serialization/Undo.
@@ -107,7 +115,7 @@ Deleting a source item used by a disease asks for confirmation and leaves a visi
 All pills listed for a disease are required together. Each ID is a distinct required pill type, not a quantity/dosage. Empty, duplicate, unresolved or incomplete recipes do not satisfy `AllSickness.HasRequiredPills`. Providing additional pills does not make this data query reject an otherwise complete required set; side effects/incorrect extra medication are not defined yet.
 The assets contain the user-approved diagram dataset: 12 diseases, 15 shared symptoms and 9 remedies. See `Assets/Data/Medical/README.md` for the imported mappings.
 Each disease has a treatment mode: RequiredPills or ReportToPolice. Zombie Infection and Vampire Infection require reporting to police and have no pill recipe. `HasRequiredPills` always returns false for police cases.
-The data is not yet wired into patient diagnosis, inventory consumption or the single-pill gameplay popup. That integration must support selecting the entire required set and handling police cases separately.
+The shared inventory/treatment popup selects multiple pill IDs and consumes one unit of each only after Give. It does not evaluate cure correctness, patient outcomes or rewards. Police reporting is a separate decision in the same TreatmentDecision step. AllSickness.HasRequiredPills remains a single-disease data query, not the treatment transaction.
 The default data assets are outside Resources; future gameplay consumers must hold explicit serialized references or load them through an intentional asset-loading system.
 
 ## NPC profiles
@@ -115,7 +123,7 @@ The default data assets are outside Resources; future gameplay consumers must ho
 Select `Assets/Data/NPC/NpcProfile.asset` in the Project window. It holds all authored NPC records and references `Assets/Data/Medical/AllSickness.asset`.
 
 - **Refresh / cập nhật NPC** scans the assigned NPC Folder and all subfolders for prefab assets. The default folder is `Assets/2D_Assets/NPC`. New entries use the prefab name and no sickness. Loading again adds only new prefab GUIDs and preserves authored names and sickness IDs. The folder should contain complete NPC prefabs, not individual appearance parts.
-- Search by NPC name or prefab name; the Inspector displays 30 matching slots per page. Click a slot to view its front-facing 2D prefab preview and edit its NPC name, single sickness (or None), and optional NpcDialogueAsset. **Mở prefab NPC** opens the source in Unity Prefab Mode.
+- Search by NPC name or prefab name; the Inspector displays 30 matching slots per page. Click a slot to view its front-facing 2D prefab preview and edit its NPC name, up to two compatible sicknesses (or none), and optional NpcDialogueAsset. **Mở prefab NPC** opens the source in Unity Prefab Mode.
 - NPC IDs use prefab asset GUIDs; sickness references use existing stable disease IDs. Renaming/moving prefabs or renaming diseases preserves the links. Keep `.meta` files when moving assets outside Unity. Names, sickness assignments and optional dialogue assets are the editable NPC gameplay data; stable IDs and prefab references remain technical links. Zombie Infection and Vampire Infection are ordinary sickness records with their existing names and IDs.
 - Deleted/missing prefabs remain listed with a warning on normal Refresh. The explicit **Xóa bản ghi mất prefab + cập nhật spawn** button removes only missing-prefab records; it never deletes prefab assets. Missing sickness IDs also remain visible until explicitly replaced. Changing the scan folder does not remove previous entries. Inspector changes and loading support Undo.
 - No NPCs or medical data are generated at runtime by this profile. The examination spawner still selects prefabs from `Assets/Resources/NpcCatalog.asset`, then resolves the exact prefab reference in its assigned NpcProfile and binds that record to the spawned patient. Stethoscope rhythm and temperature read this authored sickness and its symptoms. Diagnosis, treatment and spawn selection rules remain separate gameplay work.
@@ -126,7 +134,7 @@ Open **Tools > NPC > Tạo NPC hàng loạt**. Defaults: NPC_0 template, current
 
 The template hierarchy, Heart reference and animation controller are retained; appearance is applied through NpcAppearanceProfile with nested part prefab links. By default, template Lock Override flags are cleared so each slot uses the new seed. Enable Giữ Lock Override to retain intentionally locked parts. Seeds determine appearance, not uniqueness: different seeds can produce matching looks when the available part combinations overlap.
 
-Each generated prefab is registered immediately in NpcProfile using its new asset GUID, its NPC_<seed> name and one random existing AllSickness ID. Only new records receive random diseases; existing NPC names, diseases and IDs are preserved. Dialogue content uses NpcDialogueAsset; Editor checks verified multiline Vietnamese serialization, profile references, refresh preservation and empty dialogue references on newly generated NPCs. Legacy assigned .txt references were checked and converted before the field changed; original text source files are preserved.
+Each generated prefab is registered immediately in NpcProfile using its new asset GUID, its NPC_<seed> name and one random existing AllSickness ID, with a configurable 30% chance of a compatible second ID. Only new records receive random diseases; existing NPC names, diseases and IDs are preserved. Dialogue content uses NpcDialogueAsset; Editor checks verified multiline Vietnamese serialization, profile references, refresh preservation and empty dialogue references on newly generated NPCs. Legacy assigned .txt references were checked and converted before the field changed; original text source files are preserved.
 
 The selected NpcCatalog also receives the new prefabs so they can spawn; leave that field empty for authoring without spawn registration. The NPC Profile must reference a nonempty valid disease catalogue.
 
@@ -237,3 +245,72 @@ NPC data conversion removed the old classification field. Legacy Zombie/Vampire 
 
 
 
+
+## Multiple NPC diseases
+
+NpcDefinition now stores sicknessIds (0–2 distinct stable IDs). The profile has secondSicknessChance (default 0.3). NpcSicknessAssignment is used by the batch generator: choose one disease, independently roll for a second, then sample only compatible candidates. This is authoring data, never a consultation-time disease roll. Ordinary refresh/import preserves authored records and gives new imports an empty list. The Inspector adds/removes disease slots and filters incompatible choices.
+
+NpcMedicalConditions resolves a deduplicated union for all examination mechanics. Vampire and Zombie cannot coexist. Their symptoms take precedence in the heartbeat and temperature categories when present in that category. No Heartbeat suppresses rapid/slow; remaining rapid+slow combinations are rejected. Vampire+CoroNONO therefore has zero BPM and low temperature while retaining shortness of breath. Zombie retains high temperature. Other visual symptoms coexist, and shared symptoms spawn only one effect. Extend the central category rules when adding new mutually exclusive symptom types.
+
+The one-time conversion retained each NPC's first disease and asset references, rolled a compatible second disease, and updated dialogue complaints for the effective symptoms. Backups and a conversion manifest remain in Logs/NpcMultiSicknessMigration; no startup conversion script remains. Dialogue is authored English, 3–6 short lines, greeting and feelings before any suspected cause, approximately 60% guessing / 40% unsure. Manual disease edits require checking the dialogue text.
+
+The treatment design is recorded in AGENTS.md, but Give and outcome evaluation remain unchanged. AllSickness.HasRequiredPills still checks one disease only and must not be mistaken for a complete multi-disease treatment evaluator.
+
+Edit Mode checks covered all 12 single diseases and 66 distinct pairs (64 valid, 2 rejected), order independence, Vampire priority, Zombie temperature, BPM, consultation temperature caching, duplicate-worm suppression, simultaneous heart/brain appearances, fractures and cleanup. These checks do not claim a new Android/device test.
+
+
+## Shop, inventory and treatment audit
+
+Home's existing Shop and Inventory buttons are connected in the saved scene. Office also has an Inventory button for viewing stock separately from treatment selection. Shop is available only during Preparation. Buy X1/X10 charges the per-item price and adds stock in one memory-only transaction; insufficient funds show a message and leave both money and stock unchanged. There is no purchase on credit. Inventory/treatment lists show owned medicines; Shop lists all PillProfile entries. Empty inventories show a message. Lists scroll and use scene-owned popups with prefab rows. Clicking the backdrop or X closes the popup; clicking the panel does not close it. All UI lives under each scene's Safe Area.
+
+Edit MoneyDisplay, MedicineRow, ShopPopup, InventoryPopup, InventoryButton and SelectPillPopup in Assets/Resources/UI. Missing medicine artwork uses a temporary generic sprite; assign actual art in PillProfile. Descriptions are editable placeholder game text. The money display subscribes to the same PlayerProfileService.Changed event as the medicine lists. Prices, description, sprite and display names are catalogue data; saved inventory keeps only stable medicine IDs and quantities.
+
+TreatmentDecisionState snapshots selected IDs and delegates an atomic transaction to PlayerProfileService/PlayerProfileSession. Deselected or cancelled pills are not consumed. Confirming Give consumes one per selected type, independent of the disease recipe. Repeated Give is blocked per consultation, including duplicate journal detection. A history-recording failure leaves stock unchanged and keeps the popup available for retry. No patient result or money reward is calculated yet.
+
+TreatmentJournal holds the current day's records only in RAM: consultation GUID, stable NPC ID/name, exact sickness ID/name snapshot, medicine ID/name/quantity snapshot and UTC timestamp. Give does not write any treatment file. PlayerProfileService.GetTreatmentSnapshot() returns an independent copy for future result calculations before CompleteDay. Successful day checkpoint clears history; failed saving retains it for retry. Restarting discards unfinished history together with the working day. The Inspector displays the number of treatments in RAM. Player checkpoints still use persistentDataPath and are saved only at day completion.
+
+Shop/inventory verification used an isolated profile directory, exercised real button handlers and UI raycasts, checked rendered screens and repeated daily checkpoints. Temporary setup and verification runners/data were removed afterward. Physical Android/touch testing remains separate.
+
+
+
+## Police reporting
+
+Click the existing Telephone tool on Desk during Examination to open the scene-owned PoliceReportPopup. ExaminationToolSelection raises ToolSelected through the same mouse/touch gesture handling and UI blocking used by the other tools. SceneGameplayUI requests TreatmentDecision with ReportToPolice; UI never jumps directly to departure. Phone input is disabled during arrival/departure, while a popup is open, and outside Examination.
+
+The popup asks "Report this case to police?" and offers mutually exclusive Vampire infected / Zombie infected choices. Neither is preselected; Report requires one reason. Selecting the other replaces the check. Close/backdrop cancel returns through the DayFlowPlan return branch and records nothing. Reopening clears the previous choice. The clinic clock continues.
+
+Confirming Report calls PlayerProfileService.TryReportToPolice, records one RAM decision, then follows the existing PatientDeparture and repeat/closing rules. It does not consume medicines, charge money, classify correctness or modify NPC disease assignments. TreatmentJournal.Entry stores decisionKind, reportReason, reportedSicknessId and a snapshot of the actual NPC sicknesses for later evaluation. Reasons map to the existing stable Vampire/Zombie IDs independently of display names. Medication entries retain their selected medicines. Exact duplicate confirmations are idempotent; conflicting decisions for the same consultation are rejected. Successful day checkpoints clear RAM history, failed saves retain it.
+
+Edit Assets/Resources/UI/PoliceReportPopup.prefab for the panel, static question, option labels/check sprites and Report button. The Report button remains a nested GiveButton prefab. The popup instance and references are saved in Office before Play; no persistent service creates UI.
+
+Police reporting verification passed 36 isolated Play Mode checks: real telephone hit testing with simulated mouse/touch, mandatory exclusive choice, cancel/reopen, duplicate/conflicting decisions, medicine/report coexistence, NPC root motion/rendering with and without dialogue, and two consecutive day checkpoints. Real player save contents and project input settings were preserved. Temporary runners, captured frames and test saves were removed; no physical Android build was tested.
+
+
+TreatmentJournal treats an empty serialized Day as uninitialized, including Unity's inline null-to-default conversion (day 0). GetTreatmentSnapshot returns null for an empty journal; the first Give/Report assigns the active profile day. Nonempty history from another day remains an error and is never silently discarded. This applies after Inspector serialization, code reload and clearing history at a successful checkpoint.
+
+## Result cutscenes and day evaluation
+
+TreatmentEvaluator reads the closing day RAM snapshot and AllSickness from the Office PatientSpawnPoint profile before saving. Ordinary diseases require the union of every recipe; one unit covers each distinct required type even if shared by two diseases. Extra medicines are allowed. Vampire/Zombie require the matching police reason and stable reported disease ID, taking priority over the second disease's medicine recipe. Any incorrect/incomplete consultation selects Fail; an entirely correct day selects Success. Invalid catalogue/history data produces a retryable flow error before the checkpoint, rather than inventing a patient outcome. No money rewards, fines or saved/killed counters are calculated by this change.
+
+DayCompletionService caches DayTreatmentResult only after a successful profile checkpoint. The RAM journal is then cleared. Home/decoder errors can retry the same cutscene using that cached result without recomputing from cleared history or advancing/saving twice.
+
+Home's ResultsPopup.prefab contains ResultsVideoPresenter, a VideoPlayer and RawImage/AspectRatioFitter. The VideoPlayer renders to Assets/Resources/UI/ResultsVideo.renderTexture, also assigned to the RawImage; no frameReady callback or extracted image sequence is used. Clips are direct references to the supplied Success.mp4/Fail.mp4. Both are 1080x1920, about 10 seconds, with audio. They are fitted inside the Canvas without stretching/cropping. VideoPlayer uses unscaled time, does not loop/autoplay, and finishes through loopPointReached. Playback pauses on focus/background loss. Preparation has a foreground-only timeout; decoder errors use the flow's retry UI. Android clip import uses H.264 transcoding; actual-device validation is still required.
+
+After the last patient's departure, Office fades black for 1 second before checkpoint/Home loading. Home remains black across the scene load. The captions `The day has ended.` and `Later that night, your client takes your pill...` each fade in for 1 second, hold for 3 seconds and fade out for 1 second. The video fades in over its first second, plays to completion, then fades its final decoded frame to black for 1 second. `new day has started.` follows the same 5-second caption timing. Preparation is shown behind the cover before revealing Home over 1 second. The whole sequence is awaited by DayResultsState, so Open cannot start the next day early. All fades and caption timers pause in the background.
+
+Edit caption text/font/layout and ResultsVideoPresenter timing fields in Assets/Resources/UI/ResultsPopup.prefab. Edit the scene fade duration in Assets/Resources/UI/SceneTransitionFade.prefab. Both scenes contain a full-screen cover Canvas at sorting order 100; result content uses a Canvas at 200 inside Safe Area. Home's authored cover starts opaque and Preparation reveals it after initialization; Office starts clear. Flow errors clear the cover so Retry remains accessible.
+
+Transition verification covered consecutive Success/Fail days in Play Mode with isolated checkpoints, visible caption/video screenshots, caption durations, video fades/final frame retention, and return to Preparation without double saves. A separate run measured the animated NPC root moving 7.17 world units and checked departure renders before the Office fade. Timers start counting after their first awaited frame so scene-loading time is not counted toward the next fade. Temporary validation scripts and data were removed afterward; scene/prefab backups remain in Logs/DayTransitionBackup.
+
+Result cutscene verification passed 30 focused checks (Edit Mode rules and Play Mode integration): missing/wrong/extra medicines, multiple diseases and police priorities; real Give → departure → checkpoint → native Success/Fail playback through RenderTexture over two days; video error retry, background pause, waiting for actual clip completion, and unchanged real player save. Temporary runners, screenshots and isolated saves were removed after validation.
+
+
+## End-of-day newspaper popup
+
+Home now shows NewspaperResultsPopup after the final new-day caption, while the black cover remains visible. Continue returns through the existing DayResults/Preparation flow. The saved popup/row prefabs, editable Article Content, stable-ID prefab portrait capture workflow and verification details are documented in Design/Newspaper/README.md. Patient summaries are cached with DayTreatmentResult before journal cleanup, without introducing additional saves or day increments.
+
+## Desk actions and aspect ratio handling
+
+The base Home/Office actions are now DeskActionButton sprite/collider prefabs under Desk, saved in Assets/Prefabs/Desk. Popup actions remain screen UI. Camera framing, world input blocking, the magnifier's projected lens calibration, clamped Safe Area, editable settings and verification scope are documented in Design/DeskLayout/README.md.
+
+DeskActionButton also exposes press/release dimming settings. Each scene contains ClickFeedback.prefab to display Assets/VFX/VFX_Click.prefab once per new mouse press or touch, including over popups and black covers. Configuration is documented in Design/DeskLayout/README.md.

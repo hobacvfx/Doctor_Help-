@@ -1,0 +1,98 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5b77f257cdd34174698038e807e573f3, type: 3}
+  m_Name: FirstRunTutorial
+  m_EditorClassIdentifier: Assembly-CSharp::DoctorHelp.TutorialPlan
+  sicknessId: 811bcfba402245e7b53ea5c5a6938fc9
+  medicineId: 7bc8b2b6c8d04eb1a087ea2e3d20088c
+  targetTimeout: 20
+  firstDayGuide: {fileID: 3616115740957701198, guid: bf61a6c9dae077347a42a0d97767e65c, type: 3}
+  steps:
+  - Action: 4
+    Tool: 0
+    Instruction: Tap the magnifying glass to select X-ray.
+    Padding: 6
+    HoldArea: {x: 0.3, y: 0.25}
+    HoldAreaOffset: {x: 0, y: 0}
+    HandOffset: {x: 0, y: 0}
+  - Action: 5
+    Tool: 0
+    Instruction: Press and hold to scan. Drag the lens onto the worm and keep it there.
+    Padding: 6
+    RequireWormInLens: 1
+    HoldArea: {x: 0.41, y: 0.31}
+    HoldAreaOffset: {x: 0, y: 0}
+    HandOffset: {x: 0, y: 0}
+  - Action: 4
+    Tool: 1
+    Instruction: Tap the stethoscope to select it.
+    Padding: 6
+    HoldArea: {x: 0.3, y: 0.25}
+    HoldAreaOffset: {x: 0, y: 0}
+    HandOffset: {x: 0, y: 0}
+  - Action: 5
+    Tool: 1
+    Instruction: Press and hold over the patient's heart to listen.
+    Padding: 6
+    HoldArea: {x: 0.38, y: 0.43}
+    HoldAreaOffset: {x: 0, y: 0.06}
+    HandOffset: {x: 0, y: 0}
+  - Action: 4
+    Tool: 4
+    Instruction: Tap the thermometer to select it.
+    Padding: 6
+    HoldArea: {x: 0.3, y: 0.25}
+    HoldAreaOffset: {x: 0, y: 0}
+    HandOffset: {x: 0, y: 0}
+  - Action: 5
+    Tool: 4
+    Instruction: Press and hold to check the patient's temperature.
+    Padding: 6
+    HoldArea: {x: 0.76, y: 0.43}
+    HoldAreaOffset: {x: -0.19, y: 0.06}
+    HandOffset: {x: 0, y: 0}
+  - Action: 9
+    Tool: 2
+    Instruction: Tap the Doctor Book to look up the symptoms you found.
+    Padding: 6
+    HandOffset: {x: 0, y: 0}
+  - Action: 11
+    Tool: 2
+    Instruction: Check the symptoms listed for Worm Infestation and compare them with what you found. Tap Next when ready.
+    Padding: 4
+    HandOffset: {x: 0, y: 0}
+  - Action: 10
+    Tool: 2
+    Instruction: Tap X to close the Doctor Book.
+    Padding: 6
+    HandOffset: {x: -5, y: 0}
+  - Action: 6
+    Tool: 0
+    Instruction: Tap Give Medicines to choose a treatment.
+    Padding: 6
+    HoldArea: {x: 0.3, y: 0.25}
+    HoldAreaOffset: {x: 0, y: 0}
+    HandOffset: {x: 0, y: 0}
+  - Action: 7
+    Tool: 0
+    Instruction: Choose a medicine that treats the diagnosis. For Worm Infestation, select Deworming Medicine.
+    Padding: 6
+    HoldArea: {x: 0.3, y: 0.25}
+    HoldAreaOffset: {x: 0, y: 0}
+    HandOffset: {x: 0, y: 0}
+  - Action: 8
+    Tool: 0
+    Instruction: Tap Give to pay the total and treat the patient.
+    Padding: 6
+    HoldArea: {x: 0.3, y: 0.25}
+    HoldAreaOffset: {x: 0, y: 0}
+    HandOffset: {x: 0, y: 0}

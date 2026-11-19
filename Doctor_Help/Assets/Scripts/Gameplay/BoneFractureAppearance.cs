@@ -28,9 +28,8 @@ namespace DoctorHelp
             bool fracture = false;
             if (npc.HasSickness)
             {
-                var sickness = medicalData.Find(npc.SicknessId);
-                if (sickness == null) throw new InvalidOperationException("NPC references a missing sickness: " + npc.SicknessId);
-                foreach (var symptomId in sickness.SymptomIds)
+                var resolvedSymptoms = NpcMedicalConditions.Resolve(npc.SicknessIds, medicalData);
+                foreach (var symptomId in resolvedSymptoms)
                 {
                     if (medicalData.SymptomProfile.Find(symptomId) == null)
                         throw new InvalidOperationException("Sickness references a missing symptom: " + symptomId);
@@ -56,4 +55,5 @@ namespace DoctorHelp
         }
     }
 }
+
 

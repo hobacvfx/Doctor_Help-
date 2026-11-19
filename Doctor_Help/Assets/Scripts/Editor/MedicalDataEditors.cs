@@ -84,6 +84,12 @@ namespace DoctorHelp.Editor
                 bool remove = GUILayout.Button("−", GUILayout.Width(28));
                 EditorGUILayout.EndHorizontal();
                 MedicalDataInspector.ReadOnlyId(entry);
+                if (target is PillProfile)
+                {
+                    EditorGUILayout.PropertyField(entry.FindPropertyRelative("price"));
+                    EditorGUILayout.PropertyField(entry.FindPropertyRelative("description"));
+                    EditorGUILayout.PropertyField(entry.FindPropertyRelative("sprite"));
+                }
                 if (string.IsNullOrWhiteSpace(name.stringValue)) EditorGUILayout.HelpBox("Hãy đặt tên cho mục này.", MessageType.Warning);
                 else if (!names.Add(name.stringValue.Trim())) EditorGUILayout.HelpBox("Tên trùng; liên kết vẫn phân biệt bằng ID.", MessageType.Warning);
                 EditorGUILayout.EndVertical();
@@ -102,7 +108,17 @@ namespace DoctorHelp.Editor
                     break;
                 }
             }
-            if (GUILayout.Button("+ Thêm " + EntryLabel)) MedicalDataInspector.AddEntry(list);
+            if (GUILayout.Button("+ Thêm " + EntryLabel))
+            {
+                MedicalDataInspector.AddEntry(list);
+                if (target is PillProfile)
+                {
+                    var added = list.GetArrayElementAtIndex(list.arraySize - 1);
+                    added.FindPropertyRelative("price").intValue = 1;
+                    added.FindPropertyRelative("description").stringValue = "";
+                    added.FindPropertyRelative("sprite").objectReferenceValue = null;
+                }
+            }
             serializedObject.ApplyModifiedProperties();
         }
     }
@@ -164,16 +180,25 @@ namespace DoctorHelp.Editor
                 if (entry.isExpanded)
                 {
                     EditorGUILayout.PropertyField(name, new GUIContent("Tên bệnh"));
+                    EditorGUILayout.PropertyField(entry.FindPropertyRelative("referenceDescription"), new GUIContent("Mô tả trong sổ bác sĩ"));
+                    EditorGUILayout.HelpBox("Để trống mô tả để sổ tự liệt kê toàn bộ triệu chứng. Khi viết mô tả riêng, nhớ ghi đủ các triệu chứng qua lời khai và phép đo.", MessageType.None);
                     MedicalDataInspector.ReadOnlyId(entry);
                     MedicalDataInspector.References(entry.FindPropertyRelative("symptomIds"), symptoms != null ? symptoms.Symptoms : null, "Triệu chứng");
                     EditorGUILayout.PropertyField(entry.FindPropertyRelative("treatment"), new GUIContent("Cách xử lý"));
-                    bool police = entry.FindPropertyRelative("treatment").enumValueIndex == (int)SicknessTreatment.ReportToPolice;
-                    if (police) EditorGUILayout.HelpBox("Bệnh này phải báo cảnh sát, không điều trị bằng thuốc.", MessageType.Info);
-                    MedicalDataInspector.References(entry.FindPropertyRelative("pillIds"), pills != null ? pills.Pills : null, "Pill");
-                    if (!police && entry.FindPropertyRelative("pillIds").arraySize == 0)
+                    var treatment = (SicknessTreatment)entry.FindPropertyRelative("treatment").enumValueIndex;
+                    var pillIds = entry.FindPropertyRelative("pillIds");
+                    if (treatment == SicknessTreatment.RemoveGhosts)
+                    {
+                        for (int diff = 1; diff <= 4; diff++)
+                            EditorGUILayout.PropertyField(entry.FindPropertyRelative("ghostSpeedDiff" + diff),
+                                new GUIContent($"Ghost speed · Diff {diff}", "Orbit cycles per second."));
+                    }
+                    if (treatment == SicknessTreatment.RequiredPills || pillIds.arraySize > 0)
+                        MedicalDataInspector.References(pillIds, pills != null ? pills.Pills : null, "Pill");
+                    if (treatment == SicknessTreatment.RequiredPills && pillIds.arraySize == 0)
                         EditorGUILayout.HelpBox("Chưa cấu hình thuốc yêu cầu. Bệnh này chưa có công thức điều trị bằng thuốc.", MessageType.Warning);
-                    if (police && entry.FindPropertyRelative("pillIds").arraySize > 0)
-                        EditorGUILayout.HelpBox("Cách xử lý là báo cảnh sát; hãy xóa các slot thuốc để tránh dữ liệu mâu thuẫn.", MessageType.Warning);
+                    if (treatment != SicknessTreatment.RequiredPills && pillIds.arraySize > 0)
+                        EditorGUILayout.HelpBox("Hãy xóa các slot thuốc cho cách xử lý này.", MessageType.Warning);
                 }
                 if (string.IsNullOrWhiteSpace(name.stringValue)) EditorGUILayout.HelpBox("Hãy đặt tên bệnh.", MessageType.Warning);
                 else if (!names.Add(name.stringValue.Trim())) EditorGUILayout.HelpBox("Tên bệnh trùng; ID vẫn độc lập.", MessageType.Warning);
@@ -187,6 +212,7 @@ namespace DoctorHelp.Editor
                 entry.FindPropertyRelative("symptomIds").ClearArray();
                 entry.FindPropertyRelative("pillIds").ClearArray();
                 entry.FindPropertyRelative("treatment").enumValueIndex = 0;
+                entry.FindPropertyRelative("referenceDescription").stringValue = "";
                 entry.isExpanded = true;
             }
             serializedObject.ApplyModifiedProperties();

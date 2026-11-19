@@ -1,0 +1,47 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e9a881cbcf96d5d4d85080f4e4b79e97, type: 3}
+  m_Name: ClinicRankings
+  m_EditorClassIdentifier: Assembly-CSharp::DoctorHelp.ClinicRankingsCatalog
+  playerClinicName: Doctor Help
+  playerClinicLogo: {fileID: -1734640916, guid: 92fd00099c172924b9dbd65ef959786f, type: 3}
+  rivals:
+  - Name: Lantern Surgery
+    Id: Lantern_Surgery
+    StartingRating: 1.2
+    Logo: {fileID: -563585523, guid: 92fd00099c172924b9dbd65ef959786f, type: 3}
+    StartingGold: 323
+    DailyGrowth: 70
+  - Name: Ashbury Clinic
+    Id: Ashbury_Clinic
+    StartingRating: 2.5
+    Logo: {fileID: 359075504, guid: 92fd00099c172924b9dbd65ef959786f, type: 3}
+    StartingGold: 2548
+    DailyGrowth: 80
+  - Name: Bramwell Clinic
+    Id: Bramwell_Clinic
+    StartingRating: 3.4
+    Logo: {fileID: -432176914, guid: 92fd00099c172924b9dbd65ef959786f, type: 3}
+    StartingGold: 6753
+    DailyGrowth: 100
+  - Name: Ivy Clinic
+    Id: Ivy_Clinic
+    StartingRating: 4.3
+    Logo: {fileID: -800330474, guid: 92fd00099c172924b9dbd65ef959786f, type: 3}
+    StartingGold: 12050
+    DailyGrowth: 130
+  - Name: Crown Clinic
+    Id: Crown_Clinic
+    StartingRating: 5
+    Logo: {fileID: 601429127, guid: 92fd00099c172924b9dbd65ef959786f, type: 3}
+    StartingGold: 36042
+    DailyGrowth: 200

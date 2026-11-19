@@ -1,73 +1,56 @@
 using System;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.Events;
 using UnityEngine.UI;
-
 namespace DoctorHelp
 {
     public sealed class SelectPillPopup : MonoBehaviour
     {
-        [Serializable]
-        public sealed class PillOption { public string medicineId; public Button button; }
-        [SerializeField] private Button giveButton;
-        [SerializeField] private Text selectedPillText;
-        [SerializeField] private Text errorText;
-        [SerializeField] private string selectedTextPrefix = "Đã chọn: ";
-        [SerializeField] private PillOption[] options;
-        public event Action GiveRequested;
-        public string SelectedMedicineId { get; private set; }
-        private readonly List<UnityAction> selectionHandlers = new List<UnityAction>();
-        [NonSerialized] private bool initialized;
-        private string initialSelectionText;
-        public bool IsConfigured
-        {
-            get
-            {
-                if (!IsLiveButton(giveButton) || selectedPillText == null || errorText == null || options == null || options.Length == 0) return false;
-                var ids = new HashSet<string>(StringComparer.Ordinal);
-                var buttons = new HashSet<Button>();
-                foreach (var option in options)
-                    if (option == null || !IsLiveButton(option.button) || string.IsNullOrWhiteSpace(option.medicineId) ||
-                        !ids.Add(option.medicineId) || !buttons.Add(option.button)) return false;
-                return true;
-            }
-        }
-        private bool IsLiveButton(Button button) => button != null && button.gameObject != null &&
-            button.targetGraphic != null && button.transform.IsChildOf(transform);
+        [SerializeField] private MedicineListView medicines;
+        [SerializeField] private Button giveButton, declineButton, outsideButton, closeButton;
+        [SerializeField] private Text selectedPillText, errorText;
+        public event Action GiveRequested, DeclineRequested, CloseRequested;
+        public IReadOnlyList<string> SelectedMedicineIds => medicines.SelectedIds;
+        internal MedicineListView MedicineList => medicines;
+        internal Button GiveButton => giveButton;
+        public bool IsConfigured => medicines != null && giveButton != null && giveButton.targetGraphic != null &&
+            declineButton != null && declineButton.targetGraphic != null && outsideButton != null && closeButton != null &&
+            selectedPillText != null && errorText != null;
+        private bool initialized;
+        private bool allowEmpty;
         private void Awake() => Initialize();
-        private void OnEnable() => Initialize();
         private void Initialize()
         {
             if (initialized) return;
-            if (!IsConfigured) throw new InvalidOperationException("SelectPillPopup has invalid references or duplicate options.");
-            initialSelectionText = selectedPillText.text;
-            giveButton.onClick.AddListener(OnGive);
-            foreach (var option in options)
-            {
-                string id = option.medicineId;
-                UnityAction handler = () => Select(id);
-                selectionHandlers.Add(handler);
-                option.button.onClick.AddListener(handler);
-            }
+            if (!IsConfigured) throw new InvalidOperationException("Treatment popup references are incomplete.");
+            medicines.SelectionChanged += UpdateSelection;
+            giveButton.onClick.AddListener(Give); outsideButton.onClick.AddListener(Close); closeButton.onClick.AddListener(Close);
+            declineButton.onClick.AddListener(Decline);
             initialized = true;
         }
-        public void ResetSelection()
+        public void ResetSelection(bool allowEmpty = false)
         {
-            Initialize(); SelectedMedicineId = null; selectedPillText.text = initialSelectionText;
-            giveButton.interactable = false; errorText.gameObject.SetActive(false);
+            Initialize();
+            this.allowEmpty = allowEmpty;
+            medicines.ClearSelection();
+            UpdateSelection();
         }
-        private void Select(string id)
+        public void ShowError(string error) { errorText.text = error; errorText.gameObject.SetActive(!string.IsNullOrEmpty(error)); }
+        private void UpdateSelection()
         {
-            SelectedMedicineId = id; selectedPillText.text = selectedTextPrefix + id; giveButton.interactable = true;
+            ShowError("");
+            selectedPillText.text = $"Total: {medicines.SelectedCost} gold";
+            giveButton.interactable = allowEmpty || SelectedMedicineIds.Count > 0;
         }
-        private void OnGive() { if (SelectedMedicineId != null) GiveRequested?.Invoke(); }
+        private void Give() { if (giveButton.interactable) GiveRequested?.Invoke(); }
+        private void Decline() => DeclineRequested?.Invoke();
+        private void Close() => CloseRequested?.Invoke();
         private void OnDestroy()
         {
             if (!initialized) return;
-            if (giveButton != null) giveButton.onClick.RemoveListener(OnGive);
-            for (int i = 0; i < selectionHandlers.Count; i++)
-                if (options[i].button != null) options[i].button.onClick.RemoveListener(selectionHandlers[i]);
+            medicines.SelectionChanged -= UpdateSelection;
+            giveButton.onClick.RemoveListener(Give); outsideButton.onClick.RemoveListener(Close); closeButton.onClick.RemoveListener(Close);
+            declineButton.onClick.RemoveListener(Decline);
         }
     }
 }

@@ -16,10 +16,9 @@ namespace DoctorHelp
                 highTemperatureSymptomId==lowTemperatureSymptomId || symptoms.Find(highTemperatureSymptomId)==null || symptoms.Find(lowTemperatureSymptomId)==null)
                 throw new InvalidOperationException("Temperature symptom mappings are missing or invalid.");
             if(!npc.HasSickness)return 37;
-            var sickness=medicalData.Find(npc.SicknessId);
-            if(sickness==null)throw new InvalidOperationException("NPC references a missing sickness: "+npc.SicknessId);
+            var resolvedSymptoms=NpcMedicalConditions.Resolve(npc.SicknessIds,medicalData);
             bool high=false,low=false;
-            foreach(var id in sickness.SymptomIds)
+            foreach(var id in resolvedSymptoms)
             {
                 if(symptoms.Find(id)==null)throw new InvalidOperationException("Sickness references a missing symptom: "+id);
                 high |= id==highTemperatureSymptomId;
@@ -33,5 +32,6 @@ namespace DoctorHelp
         }
     }
 }
+
 
 

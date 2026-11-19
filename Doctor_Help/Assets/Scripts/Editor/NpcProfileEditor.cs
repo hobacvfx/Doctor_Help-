@@ -38,6 +38,8 @@ namespace DoctorHelp.Editor
             var picked = (DefaultAsset)EditorGUILayout.ObjectField("NPC Folder", folderAsset, typeof(DefaultAsset), false);
             if (EditorGUI.EndChangeCheck()) folder.stringValue = picked != null ? AssetDatabase.GetAssetPath(picked) : "";
             EditorGUILayout.PropertyField(serializedObject.FindProperty("allSickness"), new GUIContent("Danh mục bệnh"));
+            EditorGUILayout.PropertyField(serializedObject.FindProperty("secondSicknessChance"),
+                new GUIContent("Xác suất bệnh thứ hai", "Áp dụng khi tạo NPC, lưu cố định trong profile; không random mỗi lần khám."));
             serializedObject.ApplyModifiedProperties();
             catalog = (NpcCatalog)EditorGUILayout.ObjectField("Danh sách spawn", catalog, typeof(NpcCatalog), false);
             NpcProfileSynchronization.DrawButtons(profile, catalog, (text, type) =>
@@ -98,6 +100,10 @@ namespace DoctorHelp.Editor
                 EditorGUILayout.PropertyField(entry.FindPropertyRelative("prefab"), new GUIContent("Prefab"));
             }
             EditorGUILayout.PropertyField(entry.FindPropertyRelative("npcName"), new GUIContent("Tên NPC"));
+            int difficulty = entry.FindPropertyRelative("sicknessIds").arraySize;
+            EditorGUILayout.LabelField("Diff", difficulty == 0 ? "Chưa gán bệnh" : difficulty.ToString());
+            EditorGUILayout.PropertyField(entry.FindPropertyRelative("difficulty"),
+                new GUIContent("Độ khó đuổi ma", "Điều khiển số lượng và tốc độ ma trong Office."));
             var dialogue = entry.FindPropertyRelative("dialogueAsset");
             EditorGUILayout.PropertyField(dialogue, new GUIContent("Asset hội thoại"));
             if (dialogue.objectReferenceValue == null)
@@ -127,12 +133,72 @@ namespace DoctorHelp.Editor
                 { Selection.activeObject = conversation; EditorGUIUtility.PingObject(conversation); }
             }
             EditorGUILayout.HelpBox("Chỉnh nội dung ngay tại đây. Không gán asset hoặc nội dung trống thì NPC không nói.", MessageType.Info);
-            var sickness = entry.FindPropertyRelative("sicknessId");
-            var ids = new List<string> { "" };
-            var names = new List<string> { "Không bệnh" };
+            DrawSicknesses(entry, profile);
+            var prefab = entry.FindPropertyRelative("prefab").objectReferenceValue as GameObject;
+            if (prefab == null)
+            {
+                ClearPreview();
+                EditorGUILayout.HelpBox("Prefab đã bị xóa hoặc bị thiếu. Khôi phục asset cùng file .meta rồi Load NPC để nối lại đúng ID.", MessageType.Error);
+                return;
+            }
+            if (GUILayout.Button("Mở prefab NPC")) AssetDatabase.OpenAsset(prefab);
+            DrawPreview(prefab);
+        }
+
+        private void DrawSicknesses(SerializedProperty entry, NpcProfile profile)
+        {
+            var diseases = entry.FindPropertyRelative("sicknessIds");
+            int remove = -1;
+            for (int slot = 0; slot < diseases.arraySize; slot++)
+            {
+                var sickness = diseases.GetArrayElementAtIndex(slot);
+                using (new EditorGUILayout.HorizontalScope())
+                {
+                    DrawSicknessSlot(diseases, sickness, slot, profile);
+                    if (GUILayout.Button("X", GUILayout.Width(25))) remove = slot;
+                }
+            }
+            if (remove >= 0) diseases.DeleteArrayElementAtIndex(remove);
+            var selected = new List<string>();
+            for (int i = 0; i < diseases.arraySize; i++) selected.Add(diseases.GetArrayElementAtIndex(i).stringValue);
+            string candidate = null;
+            if (profile.AllSickness != null && diseases.arraySize < DifficultyProfile.MaxDifficulty)
+            {
+                var proposed = new List<string>(selected) { null };
+                foreach (var disease in profile.AllSickness.Sicknesses)
+                {
+                    if (disease == null || string.IsNullOrEmpty(disease.Id)) continue;
+                    proposed[proposed.Count - 1] = disease.Id;
+                    if (NpcMedicalConditions.CanCombine(proposed, profile.AllSickness, out _))
+                    { candidate = disease.Id; break; }
+                }
+            }
+            using (new EditorGUI.DisabledScope(candidate == null))
+                if (GUILayout.Button("Thêm bệnh"))
+                {
+                    diseases.InsertArrayElementAtIndex(diseases.arraySize);
+                    diseases.GetArrayElementAtIndex(diseases.arraySize - 1).stringValue = candidate;
+                    selected.Add(candidate);
+                }
+            try { NpcMedicalConditions.Resolve(selected, profile.AllSickness); }
+            catch (InvalidOperationException error) { EditorGUILayout.HelpBox(error.Message, MessageType.Error); }
+            if (profile.AllSickness == null) EditorGUILayout.HelpBox("Gán AllSickness để chọn bệnh.", MessageType.Warning);
+            EditorGUILayout.HelpBox("Diff bằng số bệnh đã gán. Office dùng NPC có 1–4 bệnh tương thích.", MessageType.Info);
+        }
+
+        private void DrawSicknessSlot(SerializedProperty diseases, SerializedProperty sickness, int slot, NpcProfile profile)
+        {
+            var ids = new List<string>();
+            var names = new List<string>();
+            var proposed = new string[diseases.arraySize];
+            for (int i = 0; i < proposed.Length; i++)
+                proposed[i] = diseases.GetArrayElementAtIndex(i).stringValue;
             if (profile.AllSickness != null) foreach (var disease in profile.AllSickness.Sicknesses)
             {
                 if (disease == null || string.IsNullOrEmpty(disease.Id)) continue;
+                proposed[slot] = disease.Id;
+                if (disease.Id != sickness.stringValue &&
+                    !NpcMedicalConditions.CanCombine(proposed, profile.AllSickness, out _)) continue;
                 ids.Add(disease.Id);
                 names.Add(disease.DisplayName);
             }
@@ -144,17 +210,12 @@ namespace DoctorHelp.Editor
                 names.Add("Thiếu bệnh: " + sickness.stringValue);
                 EditorGUILayout.HelpBox("Bệnh không còn trong danh mục nguồn. Liên kết được giữ nguyên; hãy chọn lại bệnh.", MessageType.Error);
             }
-            int chosen = EditorGUILayout.Popup("Bệnh", current, names.ToArray());
+            int chosen = EditorGUILayout.Popup("Bệnh " + (slot + 1), current, names.ToArray());
             if (chosen != current) sickness.stringValue = ids[chosen];
-            if (profile.AllSickness == null) EditorGUILayout.HelpBox("Gán AllSickness để chọn bệnh.", MessageType.Warning);
-            var prefab = entry.FindPropertyRelative("prefab").objectReferenceValue as GameObject;
-            if (prefab == null)
-            {
-                ClearPreview();
-                EditorGUILayout.HelpBox("Prefab đã bị xóa hoặc bị thiếu. Khôi phục asset cùng file .meta rồi Load NPC để nối lại đúng ID.", MessageType.Error);
-                return;
-            }
-            if (GUILayout.Button("Mở prefab NPC")) AssetDatabase.OpenAsset(prefab);
+        }
+
+        private void DrawPreview(GameObject prefab)
+        {
             if (preview == null || previewPrefab != prefab)
             {
                 ClearPreview();

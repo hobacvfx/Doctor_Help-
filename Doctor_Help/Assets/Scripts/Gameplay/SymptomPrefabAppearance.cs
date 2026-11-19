@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -17,6 +18,8 @@ namespace DoctorHelp
         }
         [SerializeField] private Binding[] bindings;
         [SerializeField, HideInInspector] private List<GameObject> spawned = new List<GameObject>();
+        private const float SharedAnchorDisplaySeconds = 1f;
+        private Coroutine sharedAnchorCycle;
 
         public void Initialize(NpcDefinition npc, AllSickness medicalData)
         {
@@ -31,9 +34,8 @@ namespace DoctorHelp
             var symptoms = new HashSet<string>();
             if (npc.HasSickness)
             {
-                var sickness = medicalData.Find(npc.SicknessId);
-                if (sickness == null) throw new InvalidOperationException("NPC references a missing sickness: " + npc.SicknessId);
-                foreach (var symptomId in sickness.SymptomIds)
+                var resolvedSymptoms = NpcMedicalConditions.Resolve(npc.SicknessIds, medicalData);
+                foreach (var symptomId in resolvedSymptoms)
                 {
                     if (medicalData.SymptomProfile.Find(symptomId) == null)
                         throw new InvalidOperationException("Sickness references a missing symptom: " + symptomId);
@@ -43,19 +45,51 @@ namespace DoctorHelp
             ClearSpawned();
             try
             {
+                var byAnchor = new Dictionary<Transform, List<GameObject>>();
                 foreach (var binding in bindings)
                 {
                     if (!symptoms.Contains(binding.symptomId)) continue;
                     var instance = Instantiate(binding.prefab, binding.position, false);
                     spawned.Add(instance);
                     instance.transform.localPosition = Vector3.zero;
+                    if (!byAnchor.TryGetValue(binding.position, out var group))
+                        byAnchor.Add(binding.position, group = new List<GameObject>());
+                    if (group.Count > 0) instance.SetActive(false);
+                    group.Add(instance);
                 }
+                var sharedAnchors = new List<List<GameObject>>();
+                foreach (var group in byAnchor.Values)
+                    if (group.Count > 1) sharedAnchors.Add(group);
+                if (Application.isPlaying && sharedAnchors.Count > 0)
+                    sharedAnchorCycle = StartCoroutine(AlternateSharedAnchors(sharedAnchors));
             }
             catch { ClearSpawned(); throw; }
         }
 
+        private static IEnumerator AlternateSharedAnchors(List<List<GameObject>> groups)
+        {
+            var delay = new WaitForSeconds(SharedAnchorDisplaySeconds);
+            var activeIndices = new int[groups.Count];
+            while (true)
+            {
+                yield return delay;
+                for (int i = 0; i < groups.Count; i++)
+                {
+                    var group = groups[i];
+                    group[activeIndices[i]].SetActive(false);
+                    activeIndices[i] = (activeIndices[i] + 1) % group.Count;
+                    group[activeIndices[i]].SetActive(true);
+                }
+            }
+        }
+
         private void ClearSpawned()
         {
+            if (sharedAnchorCycle != null)
+            {
+                StopCoroutine(sharedAnchorCycle);
+                sharedAnchorCycle = null;
+            }
             foreach (var instance in spawned)
             {
                 if (instance == null) continue;
@@ -67,4 +101,5 @@ namespace DoctorHelp
         }
     }
 }
+
 

@@ -18,11 +18,24 @@ namespace DoctorHelp
             Screen.autorotateToLandscapeRight = false;
             Screen.orientation = ScreenOrientation.Portrait;
 
+            bool preview = false, tutorialPreview = false;
+#if UNITY_EDITOR
+            tutorialPreview = TutorialPreviewSession.IsActive;
+            preview = !tutorialPreview && UnityEditor.SessionState.GetBool("DoctorHelp.PlayerHomePreview", false);
+#endif
+
             var root = new GameObject("Game Services");
             DontDestroyOnLoad(root);
             root.AddComponent<PlayerProfileService>();
+            root.AddComponent<GameAudio>();
             root.AddComponent<GameBootstrap>();
-            root.AddComponent<DailyGameLoop>();
+            if (!preview && !tutorialPreview)
+            {
+                root.AddComponent<DayEndInterstitialService>();
+                root.AddComponent<DoctorHelpFirebaseService>();
+            }
+            root.AddComponent<DailyGameLoop>().SkipOnboarding = preview;
+            root.AddComponent<FirstRunTutorial>();
         }
 
         private void OnApplicationFocus(bool focused)

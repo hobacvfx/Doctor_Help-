@@ -1,0 +1,7 @@
+# Shuffled Victorian clinic street
+
+Edited with built-in ImageGen from VictorianClinicStreet_4000x2800.png. The 1498 × 1050 px output was resampled to 4000 × 2800 px.
+
+## Edit prompt
+
+Edit the provided Doctor Help street image with one compositional change. Treat the six original storefronts as six complete vertical architectural bays, numbered 1 to 6 by their CURRENT positions left to right. Rearrange them in this exact NEW left-to-right order: 4, 1, 5, 2, 6, 3. The final street starts with oxblood carved wood, then the visibly shabby soot-black brick with cracked gray plank door, then the elite deep teal shop with its triangular pediment, then the modest plain russet brick and ochre plaque, then the most luxurious black marble and ornate gold arched pediment, then the respectable burgundy brick with its walnut door, ivory plaque and amber fanlight. Keep each building's roof profile, upper windows, original materials and ornament, entrance, and sign together. Six distinctly separated full facades, six doors, exactly six signs that all read “DOCTOR HELP”. Make adjacent roof and party-wall seams plausible and integrate the pieces into one continuous London Victorian terrace. Preserve the strict frontal orthographic side-scroller view, aspect ratio 10:7, crop, scale, golden window light, dark slate sky, crisp hand-drawn pencil/cel texture and muted palette. Preserve the straight continuous sidewalk and curb with open walkable space. No level numbers, collage frames, new objects, people or UI.

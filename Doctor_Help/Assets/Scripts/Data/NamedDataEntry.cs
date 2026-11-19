@@ -5,7 +5,7 @@ using UnityEngine;
 namespace DoctorHelp
 {
     [Serializable]
-    public sealed class NamedDataEntry
+    public class NamedDataEntry
     {
         [SerializeField] private string id;
         [SerializeField] private string displayName;

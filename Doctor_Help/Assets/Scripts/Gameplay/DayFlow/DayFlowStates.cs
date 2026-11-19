@@ -4,20 +4,28 @@ using System.Threading.Tasks;
 
 namespace DoctorHelp
 {
-    public enum GameScene { Home, Office }
+    public enum GameScene { Office, Player_Home }
 
     public interface IDayFlowView
     {
         event Action OpenRequested;
         event Action TreatmentRequested;
-        event Action GiveRequested;
-        event Action ResultsCompleted;
+        event Action DecisionConfirmed;
+        event Action DeclineRequested;
+        event Action EndDayRequested;
         event Action RetryRequested;
-        string SelectedMedicineId { get; }
+        event Action CancelTreatmentRequested;
+        System.Collections.Generic.IReadOnlyList<string> SelectedMedicineIds { get; }
+        TreatmentDecisionKind DecisionKind { get; }
+        PoliceReportReason SelectedReportReason { get; }
+        void ShowTreatmentError(string message);
         void ShowPreparation(int day);
+        void ShowPreparationNavigationError(string message);
+        Task RevealSceneAsync(CancellationToken token);
+        Task FadeToBlackAsync(CancellationToken token);
         void ShowExamination(int day);
         void ShowTreatment(int day);
-        void ShowResults();
+        Task PresentResultsAsync(DayTreatmentResult result, CancellationToken token);
         void HideAll();
         void ShowFlowError(string message);
     }
@@ -25,18 +33,26 @@ namespace DoctorHelp
     public interface IDaySceneService
     {
         IDayFlowView CurrentView { get; }
+        INeighborhoodView CurrentNeighborhood { get; }
         Task<IDayFlowView> LoadAsync(GameScene scene, CancellationToken cancellation);
+        Task<INeighborhoodView> LoadNeighborhoodAsync(string destination, CancellationToken cancellation);
+    }
+
+    public interface INeighborhoodView
+    {
+        event Action<string> TravelRequested;
     }
 
     public interface IDayProfile
     {
         int CurrentDay { get; }
-        bool CompleteDay();
+        bool CompleteDay(int incorrectPatients, int goldDelta, float? dailyRating, bool hadConsultations, int goldEarned);
     }
 
     public interface IPatientService { void EnsurePatient(); }
     public interface IAnimatedPatientService : IPatientService
     {
+        bool HasRemainingPatients { get; }
         Task WaitForArrivalAsync(CancellationToken token);
         Task DepartAsync(CancellationToken token);
     }
@@ -45,6 +61,7 @@ namespace DoctorHelp
     {
         void ShowPatientArrival(int day);
         void ShowPatientDeparture(int day);
+        void ShowWaitingForPatient();
     }
 
     // One checkpoint per completed day, even when results entry is retried after a scene failure.
@@ -52,13 +69,22 @@ namespace DoctorHelp
     {
         private readonly IDayProfile profile;
         private int? completedDay;
-        public DayCompletionService(IDayProfile profile) => this.profile = profile;
-        public void Complete(int day)
+        private readonly Func<int, DayTreatmentResult> evaluate;
+        private DayTreatmentResult completedResult;
+        public DayTreatmentResult LatestResult => completedResult;
+        public DayCompletionService(IDayProfile profile, Func<int, DayTreatmentResult> evaluate)
+        { this.profile = profile; this.evaluate = evaluate; }
+        public DayTreatmentResult Complete(int day)
         {
-            if (completedDay == day) return;
+            if (completedDay == day) return completedResult;
             if (profile.CurrentDay != day) throw new InvalidOperationException("Unexpected day when creating checkpoint.");
-            if (!profile.CompleteDay()) throw new InvalidOperationException("Không thể lưu cuối ngày. Bấm Thử lại.");
+            var result = evaluate(day); // History still exists until the checkpoint succeeds.
+            if (!profile.CompleteDay(result.IncorrectPatients, result.NetGold, result.DailyRating,
+                result.HasCompletedConsultations, result.TotalEarn))
+                throw new InvalidOperationException("Không thể lưu cuối ngày. Bấm Thử lại.");
+            completedResult = result;
             completedDay = day;
+            return completedResult;
         }
     }
 
@@ -69,16 +95,94 @@ namespace DoctorHelp
         private readonly IDayProfile profile;
         private readonly Action advance;
         private IDayFlowView view;
+        private INeighborhoodView neighborhood;
+        private CancellationToken lifetime;
+        public bool IsNavigating { get; private set; }
+
         public PreparationState(IDaySceneService scenes, IDayProfile profile, Action advance)
-        { this.scenes = scenes; this.profile = profile; this.advance = advance; }
-        public async Task EnterAsync(CancellationToken token)
         {
-            view = await scenes.LoadAsync(GameScene.Home, token);
-            view.OpenRequested += advance;
-            view.ShowPreparation(profile.CurrentDay);
+            this.scenes = scenes;
+            this.profile = profile;
+            this.advance = advance;
         }
+
+        public Task EnterAsync(CancellationToken token)
+        {
+            lifetime = token;
+            return ShowNeighborhoodAsync(nameof(GameScene.Player_Home), token);
+        }
+
+        private async Task ShowNeighborhoodAsync(string destination, CancellationToken token)
+        {
+            var next = await scenes.LoadNeighborhoodAsync(destination, token);
+            DetachPreparation();
+            DetachNeighborhood();
+            neighborhood = next;
+            neighborhood.TravelRequested += Travel;
+            view = scenes.CurrentView;
+            if (view != null)
+            {
+                view.OpenRequested += OpenClinic;
+                view.ShowPreparation(profile.CurrentDay);
+                await view.RevealSceneAsync(token);
+            }
+        }
+
+        private void OpenClinic()
+        {
+            if (!IsNavigating) advance();
+        }
+
+        private async void Travel(string destination) => await NavigateAsync(destination);
+
+        private async Task NavigateAsync(string destination)
+        {
+            if (IsNavigating || lifetime.IsCancellationRequested) return;
+            IsNavigating = true;
+            try
+            {
+                await ShowNeighborhoodAsync(destination, lifetime);
+            }
+            catch (OperationCanceledException) when (lifetime.IsCancellationRequested) { }
+            catch (Exception error)
+            {
+                UnityEngine.Debug.LogException(error);
+                if (scenes.CurrentView == null && scenes.CurrentNeighborhood == null &&
+                    !lifetime.IsCancellationRequested)
+                {
+                    // If the destination replaced the scene but could not bind its view, return to Preparation.
+                    DetachPreparation();
+                    DetachNeighborhood();
+                    try { await ShowNeighborhoodAsync(nameof(GameScene.Player_Home), lifetime); }
+                    catch (OperationCanceledException) when (lifetime.IsCancellationRequested) { }
+                    catch (Exception recoveryError) { UnityEngine.Debug.LogException(recoveryError); }
+                }
+                if (view != null && ReferenceEquals(view, scenes.CurrentView))
+                    view.ShowPreparationNavigationError("Không thể chuyển cảnh. Hãy thử lại.");
+            }
+            finally { IsNavigating = false; }
+        }
+
+        private void DetachPreparation()
+        {
+            if (view == null) return;
+            view.OpenRequested -= OpenClinic;
+            if (view is not UnityEngine.Object component || component != null) view.HideAll();
+            view = null;
+        }
+
+        private void DetachNeighborhood()
+        {
+            if (neighborhood == null) return;
+            neighborhood.TravelRequested -= Travel;
+            neighborhood = null;
+        }
+
         public void Exit()
-        { if (view == null) return; view.OpenRequested -= advance; view.HideAll(); view = null; }
+        {
+            DetachPreparation();
+            DetachNeighborhood();
+        }
     }
 
     public sealed class ExaminationState : IDayFlowState
@@ -88,20 +192,57 @@ namespace DoctorHelp
         private readonly IDayProfile profile;
         private readonly IPatientService patients;
         private readonly Action advance;
+        private readonly Action endDay;
+        private readonly Action onExamStarted;
+        private readonly Func<PatientExaminationProfile, string> recordRockHit;
         private IDayFlowView view;
-        public ExaminationState(IDaySceneService scenes, IDayProfile profile, IPatientService patients, Action advance)
-        { this.scenes = scenes; this.profile = profile; this.patients = patients; this.advance = advance; }
+        private OfficeHaunting haunting;
+        internal bool RockHitRecorded { get; private set; }
+        public ExaminationState(IDaySceneService scenes, IDayProfile profile, IPatientService patients,
+            Action advance, Action endDay, Action onExamStarted = null,
+            Func<PatientExaminationProfile, string> recordRockHit = null)
+        {
+            this.scenes = scenes; this.profile = profile; this.patients = patients;
+            this.advance = advance; this.endDay = endDay; this.onExamStarted = onExamStarted;
+            this.recordRockHit = recordRockHit;
+        }
         public async Task EnterAsync(CancellationToken token)
         {
             view = await scenes.LoadAsync(GameScene.Office, token);
+            RockHitRecorded = false;
+            onExamStarted?.Invoke();
+            view.EndDayRequested += endDay;
             if (view is IPatientMotionView motionView) motionView.ShowPatientArrival(profile.CurrentDay);
             patients.EnsurePatient();
             if (patients is IAnimatedPatientService animated) await animated.WaitForArrivalAsync(token);
             view.TreatmentRequested += advance;
+            haunting = (view as SceneGameplayUI)?.OfficeHaunting;
+            if (haunting != null) haunting.PatientStruck += OnPatientStruck;
             view.ShowExamination(profile.CurrentDay);
         }
+        private void OnPatientStruck(PatientExaminationProfile patient)
+        {
+            string error = recordRockHit?.Invoke(patient);
+            if (error != null)
+            {
+                UnityEngine.Object.Destroy(patient.RockReaction.gameObject);
+                patient.RockReaction = null;
+                view.ShowPreparationNavigationError(error);
+                return;
+            }
+            RockHitRecorded = true;
+            advance();
+        }
         public void Exit()
-        { if (view == null) return; view.TreatmentRequested -= advance; view.HideAll(); view = null; }
+        {
+            if (haunting != null) haunting.PatientStruck -= OnPatientStruck;
+            haunting = null;
+            if (view == null) return;
+            view.EndDayRequested -= endDay;
+            view.TreatmentRequested -= advance;
+            view.HideAll();
+            view = null;
+        }
     }
 
     public sealed class TreatmentDecisionState : IDayFlowState
@@ -110,25 +251,64 @@ namespace DoctorHelp
         private readonly IDaySceneService scenes;
         private readonly IDayProfile profile;
         private readonly Action advance;
+        private readonly Action cancel;
+        private readonly Func<System.Collections.Generic.IReadOnlyList<string>, string> confirm;
+        private readonly Func<PoliceReportReason, string> report;
+        private readonly Func<string> decline;
+        private bool committed;
         private IDayFlowView view;
-        public string SelectedMedicineId { get; private set; }
-        public TreatmentDecisionState(IDaySceneService scenes, IDayProfile profile, Action advance)
-        { this.scenes = scenes; this.profile = profile; this.advance = advance; }
+        public System.Collections.Generic.IReadOnlyList<string> SelectedMedicineIds { get; private set; } = Array.Empty<string>();
+        public TreatmentDecisionState(IDaySceneService scenes, IDayProfile profile, Action advance,
+            Action cancel, Func<System.Collections.Generic.IReadOnlyList<string>, string> confirm, Func<PoliceReportReason, string> report,
+            Func<string> decline)
+        { this.scenes = scenes; this.profile = profile; this.advance = advance; this.cancel = cancel; this.confirm = confirm; this.report = report; this.decline = decline; }
         public async Task EnterAsync(CancellationToken token)
         {
-            SelectedMedicineId = null;
+            SelectedMedicineIds = Array.Empty<string>();
+            committed = false;
             view = await scenes.LoadAsync(GameScene.Office, token);
-            view.GiveRequested += ConfirmTreatment;
+            view.DecisionConfirmed += ConfirmTreatment;
+            view.DeclineRequested += ConfirmDecline;
+            view.CancelTreatmentRequested += cancel;
             view.ShowTreatment(profile.CurrentDay);
         }
         private void ConfirmTreatment()
         {
-            if (string.IsNullOrWhiteSpace(view.SelectedMedicineId)) return;
-            SelectedMedicineId = view.SelectedMedicineId;
+            if (committed) return;
+            if (view.DecisionKind == TreatmentDecisionKind.ReportToPolice)
+            {
+                if (view.SelectedReportReason == PoliceReportReason.None) return;
+                string reportError = report(view.SelectedReportReason);
+                if (reportError != null) { view.ShowTreatmentError(reportError); return; }
+                committed = true;
+                advance();
+                return;
+            }
+            // Keep a snapshot of the confirmed selection as the popup closes.
+            var ids = new System.Collections.Generic.List<string>(view.SelectedMedicineIds);
+            string error = confirm(ids);
+            if (error != null) { view.ShowTreatmentError(error); return; }
+            committed = true;
+            SelectedMedicineIds = ids.AsReadOnly();
+            advance();
+        }
+        private void ConfirmDecline()
+        {
+            if (committed) return;
+            string error = decline();
+            if (error != null) { view.ShowTreatmentError(error); return; }
+            committed = true;
             advance();
         }
         public void Exit()
-        { if (view == null) return; view.GiveRequested -= ConfirmTreatment; view.HideAll(); view = null; }
+        {
+            if (view == null) return;
+            view.DecisionConfirmed -= ConfirmTreatment;
+            view.DeclineRequested -= ConfirmDecline;
+            view.CancelTreatmentRequested -= cancel;
+            view.HideAll();
+            view = null;
+        }
     }
 
     public sealed class PatientDepartureState : IDayFlowState
@@ -137,17 +317,40 @@ namespace DoctorHelp
         private readonly IDaySceneService scenes;
         private readonly IDayProfile profile;
         private readonly IAnimatedPatientService patients;
+        private readonly ClinicClock clock;
+        private readonly Func<bool> acceptingPatients;
+        private readonly Func<int> signLevel;
+        private readonly Action endDay;
         private IDayFlowView view;
-        public PatientDepartureState(IDaySceneService scenes, IDayProfile profile, IAnimatedPatientService patients)
-        { this.scenes = scenes; this.profile = profile; this.patients = patients; }
+        public PatientDepartureState(IDaySceneService scenes, IDayProfile profile, IAnimatedPatientService patients,
+            Action endDay, ClinicClock clock, Func<bool> acceptingPatients, Func<int> signLevel)
+        { this.scenes = scenes; this.profile = profile; this.patients = patients; this.endDay = endDay; this.clock = clock; this.acceptingPatients = acceptingPatients; this.signLevel = signLevel; }
         public async Task EnterAsync(CancellationToken token)
         {
             view = await scenes.LoadAsync(GameScene.Office, token);
-            if (view is IPatientMotionView departureView) departureView.ShowPatientDeparture(profile.CurrentDay);
+            view.EndDayRequested += endDay;
+            var motion = view as IPatientMotionView;
+            motion?.ShowPatientDeparture(profile.CurrentDay);
             await patients.DepartAsync(token);
+            if (!acceptingPatients()) return;
+
+            double delay = patients.HasRemainingPatients
+                ? ClinicDemand.NextPatientDelay(signLevel(), UnityEngine.Random.value, UnityEngine.Random.value)
+                : double.PositiveInfinity;
+            if (delay <= 0) return;
+
+            motion?.ShowWaitingForPatient();
+            double nextArrival = clock.ElapsedSeconds + delay;
+            while (acceptingPatients() && clock.ElapsedSeconds < nextArrival)
+                await UnityEngine.Awaitable.NextFrameAsync(token);
         }
         public void Exit()
-        { view?.HideAll(); view = null; }
+        {
+            if (view == null) return;
+            view.EndDayRequested -= endDay;
+            view.HideAll();
+            view = null;
+        }
     }
 
     public sealed class DayResultsState : IDayFlowState
@@ -156,23 +359,26 @@ namespace DoctorHelp
         private readonly IDaySceneService scenes;
         private readonly IDayProfile profile;
         private readonly DayCompletionService completion;
-        private readonly Action advance;
+        private readonly IDayEndAdvertisement advertisement;
         private IDayFlowView view;
         private int? closingDay;
-        public DayResultsState(IDaySceneService scenes, IDayProfile profile, DayCompletionService completion, Action advance)
-        { this.scenes = scenes; this.profile = profile; this.completion = completion; this.advance = advance; }
+        public DayResultsState(IDaySceneService scenes, IDayProfile profile, DayCompletionService completion,
+            IDayEndAdvertisement advertisement = null)
+        { this.scenes = scenes; this.profile = profile; this.completion = completion; this.advertisement = advertisement; }
         public async Task EnterAsync(CancellationToken token)
         {
             if (!closingDay.HasValue) closingDay = profile.CurrentDay;
-            // Apply future nightly calculations before this checkpoint, once per closing day.
-            completion.Complete(closingDay.Value);
-            view = await scenes.LoadAsync(GameScene.Home, token);
-            view.ResultsCompleted += FinishPresentation;
-            view.ShowResults();
+            if (scenes.CurrentView != null) await scenes.CurrentView.FadeToBlackAsync(token);
+            var result = completion.Complete(closingDay.Value);
+            await scenes.LoadNeighborhoodAsync(nameof(GameScene.Player_Home), token);
+            view = scenes.CurrentView;
+            await view.PresentResultsAsync(result, token);
+            UnityEngine.Debug.Log($"[Test Ads] Day {result.Day}: presentation completed; ad service present={advertisement != null}.");
+            if (advertisement != null) await advertisement.ShowAfterResultsAsync(result.Day, token);
+            closingDay = null;
         }
-        private void FinishPresentation() { closingDay = null; advance(); }
         public void Exit()
-        { if (view == null) return; view.ResultsCompleted -= FinishPresentation; view.HideAll(); view = null; }
+        { if (view == null) return; view.HideAll(); view = null; }
     }
 }
 

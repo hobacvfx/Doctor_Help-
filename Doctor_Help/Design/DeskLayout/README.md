@@ -1,0 +1,29 @@
+# Desk actions and portrait aspect ratios
+
+Open, Shop, Inventory, News and Give entry points are now scene-owned `DeskActionButton` sprite/collider objects beneath **Desk**. They are independent of the screen Canvas and retain their local positions when the screen changes. Their saved prefabs are in `Assets/Prefabs/Desk`. Move the scene instances to change where the actions sit on the desk; edit SpriteRenderer, Label/TextMesh and collider for their appearance and hit areas. News retains its previous unconnected placeholder behavior.
+
+The new buttons reuse the existing parchment button artwork; Give reuses the existing Cho thuoc sprite. Popup-internal buttons remain part of their popup UI. `SceneGameplayUI` and `StoreInventoryUI` subscribe to desk action events; flow transitions and medicine transactions still belong to the existing state/service layer. Mouse/touch presses must start and finish on the action, and screen UI blocks world actions. Desk hit areas also block examination gestures, including gestures started on a button and dragged onto the patient.
+
+## Press and click feedback
+
+Every desk action dims its sprite and caption while pressed, then fades back on release or when dragged outside. Edit **Pressed Brightness** (0.6), **Press Fade Seconds** (0.06) and **Release Fade Seconds** (0.14) on its DeskActionButton prefab. Disabled actions keep their disabled appearance. The animation uses unscaled time and resets when disabled or focus is lost.
+
+Home and Office each contain a saved instance of `Assets/Resources/UI/ClickFeedback.prefab`. Its non-raycasting overlay displays the native animated particle mesh from `Assets/VFX/VFX_Click.prefab` above popup, fade and result-video UI. Each new mouse press or finger contact emits once at its screen position, including contacts over UI; holding or dragging does not emit repeatedly. Edit the source VFX prefab/texture for the animation. ClickFeedback references the scene camera and its own scene-owned Particle Instances container; it does not create persistent UI or modify the source particle/material assets. Finished instances and baked meshes are released, with at most 32 effects active. Particle playback also uses unscaled time.
+
+Main Camera in Home/Office has **OrthographicSceneFraming**. Minimum Width (6.4 world units) preserves space for the existing tools on narrow phones; Minimum Height (10 world units) preserves the portrait composition on tablets. The camera expands the other dimension rather than stretching the scene. Only the backdrop scales to cover exposed edges; Desk, tools and action objects keep their world transforms. The unused examination magnifier in Home is hidden.
+
+Office's moving magnifier has **MagnifierLens**, with an explicitly assigned **Lens Center** child and editable local radius. The current Kinh_Lup sprite is calibrated to local center (0, 1.52), radius 2.38, inside the dark rim. ClothSeeThroughController projects that geometry through the current camera every LateUpdate, supplying `_Cutout_Position`, `_CUtout_Size` and zero `_Cutout_Offset` through a MaterialPropertyBlock. The existing graph uses isotropic screen-width units. This removes the old portrait-only screen offset and fixed UV radius without modifying shared materials or the graph. Magnifier movement intersects a world XY plane rather than assuming camera depth.
+
+ScreenSafeArea clamps Unity's safe rectangle to the current screen and is used by scene UI and NPC dialogue. This handles Simulator/Game view changes where the old device's safe rectangle can temporarily be larger than the new screen. PopupPanelFit constrains the existing popup panels within that area.
+
+The saved `Assets/VFX/ClickFeedbackOverlay.mat` uses a small UI-compatible shader with the source VFX's additive blend factors, so the black background in the source sheet does not cover the scene. It is assigned directly to the overlay Graphic.
+
+Click feedback verification passed 36 focused Play Mode checks at 1536×2048 and 1080×1920, covering mouse/two simultaneous touches, button darkening/release/drag-out/disabled states, popup and black-cover clicks, unscaled playback, scene transition, unchanged button actions, correct pointer projection/flipbook UVs and particle/mesh cleanup. Actual renders were inspected, including additive transparency over popup UI. The real player save was unchanged. No physical-device build was tested. Temporary runners and captures were removed; scene backups remain in `Logs/ClickFeedbackBackup`.
+
+## Verification
+
+181 focused Play Mode checks passed on 1080×1920, 1536×2048, 1668×2388 and 1080×2400. Checks included fixed desk parents/transforms, visible action bounds, Shop/Inventory/Give opening, popup bounds, popup blocking Open, simulated iPad touch input, selecting/holding/releasing X-ray, projected shader parameters, and two Give/departure/next-patient cycles. Render comparisons sampled the affected patient renderer before/after X-ray and detected no changed samples beyond the projected lens radius (with a four-pixel edge tolerance) at any of the four resolutions. The real player save was confirmed unchanged; test transactions used an isolated in-memory session that rejected checkpoints.
+
+The PNG files here are camera renders of the actual Play Mode scene with isolated test data. Scene, tool, button and X-ray appearance were visually inspected. Test cameras temporarily composited overlay UI in camera space for offscreen capture; saved UI remains Screen Space Overlay. These renders are layout evidence, not performance benchmarks. Physical Android/iPad hardware and builds were not tested.
+
+Temporary migration/validation code, input fixtures and screenshots were removed after verification. Backups of the live Home/Office scenes remain in `Logs/DeskLayoutBackup`; existing user edits were preserved through Unity's scene/prefab APIs.

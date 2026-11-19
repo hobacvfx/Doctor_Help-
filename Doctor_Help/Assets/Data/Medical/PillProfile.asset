@@ -15,21 +15,51 @@ MonoBehaviour:
   pills:
   - id: 9dd8971170f5435fbc2ec9d6f5e67d5e
     displayName: Bone Growth Medicine
+    price: 5
+    description: Used to treat <disease>Trauma</disease>.
+    sprite: {fileID: 21300000, guid: aed161046f7313e4891b303d44678346, type: 3}
   - id: cd848fd4d4304e0f99d6903dfa56dbcf
     displayName: Sedative
+    price: 5
+    description: Used to treat <disease>Delusional Disorder</disease>.
+    sprite: {fileID: 21300000, guid: cfbe4686ea3a8934096f5c914d3511ad, type: 3}
   - id: 7bc8b2b6c8d04eb1a087ea2e3d20088c
     displayName: Deworming Medicine
+    price: 5
+    description: 'Used for <disease>Worm Infestation</disease> '
+    sprite: {fileID: 21300000, guid: 060e3186675f8f04dae43e44c0381e4b, type: 3}
   - id: f28b5d916b004668917d979c81c16845
     displayName: Heart Medicine
+    price: 5
+    description: Used to treat <disease>Heart Disease</disease>.
+    sprite: {fileID: 21300000, guid: 04e90d2cf9c4e8d43b589d0f54f5e70b, type: 3}
   - id: 4ee993c1be3f451e8182c7b5b1738c5c
     displayName: Antibiotics
+    price: 10
+    description: Used to treat <disease>Flu</disease>.
+    sprite: {fileID: 21300000, guid: 1c8e9d300abf92e4394957370941ccca, type: 3}
   - id: 805ed576a42147a9abc3e1db7a95846b
     displayName: Brain Medicine
+    price: 7
+    description: Used to treat <disease>Brain Disease</disease>.
+    sprite: {fileID: 21300000, guid: c7e22d5919338604dbc59fc6a4e99518, type: 3}
   - id: e1cee539c6534c3282c542886a04ed50
     displayName: Vaccine
+    price: 13
+    description: Used for <disease>CoroNONO Virus Infection</disease>.
+    sprite: {fileID: 21300000, guid: a21de6ac89f967741b6bcd8156e0ab82, type: 3}
   - id: fc01649f4eb642c6a83cf02f10de4b02
     displayName: Science Book
+    price: 7
+    description: A remedy for <disease>Brain Rot</disease>.
+    sprite: {fileID: 21300000, guid: 05ffe7503059a024db35269344b67dbf, type: 3}
   - id: 57f7fce15a1440d0b6ca9262d504f77d
     displayName: Calcium
+    price: 5
+    description: Used to treat <disease>Brittle Bone Disease</disease>.
+    sprite: {fileID: 21300000, guid: 62cc0a16c4f22e14fb99ee36839d2685, type: 3}
   - id: 8a7b42b468154a2fb8fc7c9971c598b5
     displayName: Organs_Detox_Pill
+    price: 8
+    description: An organ detoxification remedy.
+    sprite: {fileID: 21300000, guid: 3bf969d8f40e2e5418fff5d3ebe8d74b, type: 3}

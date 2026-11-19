@@ -30,7 +30,8 @@ namespace DoctorHelp
         public static bool IsOverButton(Vector2 point, Camera camera)
         {
             foreach (var button in active)
-                if (button != null && button.isActiveAndEnabled && camera != null && button.gameObject.scene == camera.gameObject.scene && button.Hit(point, camera)) return true;
+                if (button != null && button.isActiveAndEnabled && camera != null && button.gameObject.scene == camera.gameObject.scene &&
+                    FirstRunTutorial.AllowsWorld(button) && button.Hit(point, camera)) return true;
             return false;
         }
         private bool OverUI(Vector2 point)
@@ -42,11 +43,12 @@ namespace DoctorHelp
         private void Update()
         {
             bool held = ReadPointer(out var point, out int id);
-            if (held && !wasHeld) { pointerId = id; armed = Hit(point, Camera.main) && !OverUI(point); }
+            bool allowed = FirstRunTutorial.AllowsWorld(this);
+            if (held && !wasHeld) { pointerId = id; armed = allowed && Hit(point, Camera.main) && !OverUI(point); }
             if (armed && held && id != pointerId) armed = false;
             if (wasHeld && !held)
             {
-                bool click = armed && id == pointerId && Hit(point, Camera.main) && !OverUI(point);
+                bool click = armed && allowed && id == pointerId && Hit(point, Camera.main) && !OverUI(point);
                 armed = false;
                 if (click && dialogue != null) dialogue.Next();
             }

@@ -12,6 +12,7 @@ namespace DoctorHelp
         [SerializeField] private Transform[] positions;
         [SerializeField] private GameObject[] wormPrefabs;
         [SerializeField, HideInInspector] private List<GameObject> spawnedWorms = new List<GameObject>();
+        internal SpriteRenderer SpawnedWorm { get; private set; }
 
         public void Initialize(NpcDefinition npc, AllSickness medicalData)
         {
@@ -21,9 +22,8 @@ namespace DoctorHelp
             bool infected = false;
             if (npc.HasSickness)
             {
-                var sickness = medicalData.Find(npc.SicknessId);
-                if (sickness == null) throw new InvalidOperationException("NPC references a missing sickness: " + npc.SicknessId);
-                foreach (var symptomId in sickness.SymptomIds)
+                var resolvedSymptoms = NpcMedicalConditions.Resolve(npc.SicknessIds, medicalData);
+                foreach (var symptomId in resolvedSymptoms)
                 {
                     if (medicalData.SymptomProfile.Find(symptomId) == null)
                         throw new InvalidOperationException("Sickness references a missing symptom: " + symptomId);
@@ -48,6 +48,7 @@ namespace DoctorHelp
                 var prefab = wormPrefabs[UnityEngine.Random.Range(0, wormPrefabs.Length)];
                 var worm = Instantiate(prefab, position, false);
                 spawnedWorms.Add(worm);
+                SpawnedWorm = worm.GetComponentInChildren<SpriteRenderer>();
                 worm.transform.localPosition = Vector3.zero;
                 // Preserve prefab rotation, scale, layers, materials and renderer settings.
             }
@@ -56,6 +57,7 @@ namespace DoctorHelp
 
         private void ClearSpawned()
         {
+            SpawnedWorm = null;
             foreach (var worm in spawnedWorms)
             {
                 if (worm == null) continue;
@@ -67,5 +69,6 @@ namespace DoctorHelp
         }
     }
 }
+
 
 

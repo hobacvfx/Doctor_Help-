@@ -31,7 +31,7 @@ namespace DoctorHelp.Editor
                     if (selected != current) mapping.stringValue = selected == 0 ? "" : source.Symptoms[selected - 1].Id;
                 }
             }
-            EditorGUILayout.HelpBox("Mỗi triệu chứng hiện có sinh prefab tại đúng slot đã gắn. Các liên kết độc lập, không random hoặc đổi trạng thái khi đổi dụng cụ.", MessageType.Info);
+            EditorGUILayout.HelpBox("Triệu chứng hiện ở đúng slot. Nếu nhiều triệu chứng dùng chung slot, các hình luân phiên mỗi giây. Các slot khác vẫn hiển thị độc lập.", MessageType.Info);
             serializedObject.ApplyModifiedProperties();
         }
     }

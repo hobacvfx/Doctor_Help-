@@ -8,6 +8,8 @@ namespace DoctorHelp
         [SerializeField] private ExaminationToolSelection selection;
         [SerializeField] private PatientSpawnPoint patients;
         [SerializeField] private ThermometerDisplay display;
+        [SerializeField] private SpriteRenderer puffAnchor;
+        [SerializeField] private ParticleSystem visibilityPuff;
         [SerializeField] private TemperatureRules temperatureRules=new TemperatureRules();
         [SerializeField, Min(0.01f)] private float measurementSeconds=2;
         private PatientExaminationProfile measuredPatient;
@@ -19,10 +21,10 @@ namespace DoctorHelp
         private void Update()
         {
             if(selection==null || !selection.IsUsingThermometer)
-            { StopMeasurement(); return; }
+            { StopMeasurement(playPuff: true); return; }
             if(rejectedGesture)return;
             var patient=patients!=null?patients.CurrentPatient:null;
-            if(measuring && patient!=measuredPatient)StopMeasurement();
+            if(measuring && patient!=measuredPatient)StopMeasurement(playPuff: true);
             try
             {
                 if(!measuring)
@@ -35,6 +37,7 @@ namespace DoctorHelp
                     display.SetTemperature(ThermometerDisplay.MinimumCelsius);
                     display.gameObject.SetActive(true);
                     measuring=true;
+                    PlayPuff();
                 }
                 float elapsed=(float)(Time.timeAsDouble-startedAt);
                 display.SetTemperature(Mathf.Lerp(ThermometerDisplay.MinimumCelsius,TargetCelsius,
@@ -42,12 +45,19 @@ namespace DoctorHelp
             }
             catch(InvalidOperationException error)
             {
-                StopMeasurement();rejectedGesture=true;
+                StopMeasurement(playPuff: true);rejectedGesture=true;
                 Debug.LogError(error.Message,this);
             }
         }
-        private void StopMeasurement()
+        private void PlayPuff()
         {
+            if (puffAnchor != null && display != null)
+                ExaminationPuff.Play(visibilityPuff, display.gameObject, puffAnchor.bounds.center);
+        }
+
+        private void StopMeasurement(bool playPuff = false)
+        {
+            if (playPuff && measuring) PlayPuff();
             measuring=false;rejectedGesture=false;measuredPatient=null;
             if(display!=null && display.gameObject.activeSelf)display.gameObject.SetActive(false);
         }

@@ -1,0 +1,14 @@
+Use case: precise-object-edit. Input is the ORIGINAL Giun_1.png, the sole design reference. Produce ONE transparent game sprite sheet, exactly 9 frames in a perfectly regular 3x3 square grid, read left-right top-bottom. Each tile repeats the SAME TWO original worms, same scale and thick chunky proportions throughout. Large S-shaped worm left, small short chubby worm lower right. Preserve original dusty salmon pink, charcoal hand-drawn outline, chunky body, original bulging eyes, segment count and cartoon character. The small worm must remain SHORT AND THICK exactly like the reference, not a skinny long snake. Its arc length is about 35% of large worm length, thickness about 75% of large worm thickness.
+ANIMATION: large worm gently wriggles in place. Small worm CRAWLS FORWARD CLOCKWISE around one small fixed circular track in the lower-right of each tile, head leads along tangent, each successive body section follows the SAME track previously occupied by the head. No side slipping, no teleporting, no independent floating poses, no rigid spinning prop. Animate subtle sequential muscular contraction passing head to tail, thickness and curve vary slightly but volume and identity stay consistent. Nine even samples of ONE periodic cycle, 40 degrees apart. Fixed orbit center at (74% tile width,70% tile height), orbit radius 10% tile width. HEAD CENTER ANCHORS for each tile (local normalized coordinates, crucial):
+frame1 (84%,70%), head pointing down;
+frame2 (81.66%,76.43%), head pointing down-left;
+frame3 (75.74%,79.85%), head pointing left;
+frame4 (69%,78.66%), head pointing up-left;
+frame5 (64.60%,73.42%), head pointing up;
+frame6 (64.60%,66.58%), head pointing up-right;
+frame7 (69%,61.34%), head pointing up-right;
+frame8 (75.74%,60.15%), head pointing right;
+frame9 (81.66%,63.57%), head pointing down-right.
+Small worm body trails BEHIND its head counterclockwise along that circle, smoothly curled, never sticks out in front of the head. Frame9 to frame1 continues exactly same 40 degree forward advance, no reset in position or heading. Entire orbit stays lower right, separate from large worm. Both worms consistently registered and same dimensions every tile. Keep small worm visually as chunky and recognizable as original, not thinner from frame to frame. Maintain consistent large worm layout on left and generous transparent margins. Transparent alpha background, no white fill, no haze, no shadows, no glow, no grid lines, no labels or numbers, no circles or arrows. Flat crisp sprite art. Uniform 3x3 grid.
+
+Workflow: built-in imagegen, followed by head-anchor registration and per-pose orientation correction. Nine distinct generated poses; not rotations of a single sprite. Final atlas 1254x1254, 3x3 tiles of 418x418. Preview 130ms per frame, infinite loop. Head anchors follow a circle centered at (325,295) within each tile, radius 42, clockwise step 40 degrees.

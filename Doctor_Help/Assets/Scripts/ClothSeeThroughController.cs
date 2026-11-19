@@ -11,6 +11,8 @@ public class ClothSeeThroughController : MonoBehaviour
 {
     static readonly int HoldId = Shader.PropertyToID("_Hold");
     static readonly int CutoutPositionId = Shader.PropertyToID("_Cutout_Position");
+    static readonly int CutoutOffsetId = Shader.PropertyToID("_Cutout_Offset");
+    static readonly int CutoutSizeId = Shader.PropertyToID("_CUtout_Size");
 
     [Tooltip("Pointer magnifier, resolved from the scene examination selection service.")]
     [SerializeField] Transform magnifier;
@@ -26,6 +28,7 @@ public class ClothSeeThroughController : MonoBehaviour
     MaterialPropertyBlock _propertyBlock;
     bool _isHolding;
     float _magnifierWorldZ;
+    MagnifierLens _lens;
 
     void Awake()
     {
@@ -36,19 +39,22 @@ public class ClothSeeThroughController : MonoBehaviour
         SetMagnifierActive(false);
     }
 
-    void Update()
+    void LateUpdate()
     {
         if (_selection != null && _selection.IsUsingXray)
         {
-            Vector2 screenPos = _selection.ScreenPosition;
+            Vector2 screenPos = _selection.MagnifierScreenPosition;
             float w = Screen.width;
             float h = Screen.height;
             if (w <= 0f || h <= 0f)
                 return;
 
-            Vector2 screenUv = new Vector2(screenPos.x / w, screenPos.y / h);
-            Apply(true, screenUv);
             MoveMagnifier(screenPos);
+            if (_lens == null || !_lens.TryProject(targetCamera, out var screenUv, out float radius))
+            {
+                ApplyHold(false); SetMagnifierActive(false); return;
+            }
+            Apply(true, screenUv, radius);
             SetMagnifierActive(true);
             _isHolding = true;
         }
@@ -81,15 +87,16 @@ public class ClothSeeThroughController : MonoBehaviour
             magnifier = selection.Magnifier;
             break;
         }
-        if (magnifier != null) _magnifierWorldZ = magnifier.position.z;
+        if (magnifier != null) { _magnifierWorldZ = magnifier.position.z; _lens = magnifier.GetComponent<MagnifierLens>(); }
     }
     void MoveMagnifier(Vector2 screenPos)
     {
         if (magnifier == null || targetCamera == null)
             return;
 
-        float depth = _magnifierWorldZ - targetCamera.transform.position.z;
-        Vector3 world = targetCamera.ScreenToWorldPoint(new Vector3(screenPos.x, screenPos.y, depth));
+        var ray = targetCamera.ScreenPointToRay(screenPos);
+        if (!new Plane(Vector3.forward, new Vector3(0, 0, _magnifierWorldZ)).Raycast(ray, out float depth)) return;
+        Vector3 world = ray.GetPoint(depth);
         magnifier.position = new Vector3(
             world.x + magnifierOffset.x,
             world.y + magnifierOffset.y,
@@ -102,13 +109,15 @@ public class ClothSeeThroughController : MonoBehaviour
             magnifier.gameObject.SetActive(active);
     }
 
-    void Apply(bool hold, Vector2 screenUv)
+    void Apply(bool hold, Vector2 screenUv, float radius)
     {
         // Managed helper objects are recreated after a Play Mode script reload.
         _propertyBlock ??= new MaterialPropertyBlock();
         _renderer.GetPropertyBlock(_propertyBlock);
         _propertyBlock.SetFloat(HoldId, hold ? 1f : 0f);
         _propertyBlock.SetVector(CutoutPositionId, new Vector4(screenUv.x, screenUv.y, 0f, 0f));
+        _propertyBlock.SetVector(CutoutOffsetId, Vector4.zero);
+        _propertyBlock.SetFloat(CutoutSizeId, radius);
         _renderer.SetPropertyBlock(_propertyBlock);
     }
 

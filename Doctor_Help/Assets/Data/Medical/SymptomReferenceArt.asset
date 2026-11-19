@@ -1,0 +1,48 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 41b54d0cbfafcf549ab01063d0f2f568, type: 3}
+  m_Name: SymptomReferenceArt
+  m_EditorClassIdentifier: Assembly-CSharp::DoctorHelp.SymptomReferenceArt
+  source: {fileID: 11400000, guid: fd6823cbade36444ab4130a73f177fd6, type: 2}
+  illustrations:
+  - symptomId: 3faa1f876c2a48f783d453e90ad80866
+    sprite: {fileID: 21300000, guid: 8231307f672e573449cef573f3946bbc, type: 3}
+  - symptomId: bc866d1df5cc48cba1fbe4dcaa873633
+    sprite: {fileID: 0}
+  - symptomId: d3a6ab2e13704c59b818be21248e9a2e
+    sprite: {fileID: 21300000, guid: 95b3120ad0308cf4384b726a886f7bea, type: 3}
+  - symptomId: 868f3555805749b391b6641bd163f651
+    sprite: {fileID: 21300000, guid: abaec40d171df904f86df1b5edab9688, type: 3}
+  - symptomId: e40ba4b660b94711a7935deae8b2602c
+    sprite: {fileID: 21300000, guid: 1d8387cbe2cae6546b797b057cda4905, type: 3}
+  - symptomId: ba01540c62484c209e3ec60d8200cd10
+    sprite: {fileID: 0}
+  - symptomId: d0b701a64ef14b1b891b7163abb92c71
+    sprite: {fileID: 21300000, guid: 83a8c085348043745b560152a5ac4c0c, type: 3}
+  - symptomId: 99740cad57794442b282b9c1caddbbe0
+    sprite: {fileID: 0}
+  - symptomId: 642f83d862cb41cc8d242ec08a901cd2
+    sprite: {fileID: 0}
+  - symptomId: 0856d09d9e1a480ea6b6e272e92cff3b
+    sprite: {fileID: 0}
+  - symptomId: ec557b40a6ed406fbb270e751a04cb18
+    sprite: {fileID: 0}
+  - symptomId: eedde69cc36140329b7308ccdeb34f92
+    sprite: {fileID: 0}
+  - symptomId: dc3b1e5abee94c1d9b4c5a184fd22ada
+    sprite: {fileID: 0}
+  - symptomId: 22eaad3867e2482cb6baaf07d3a04bd3
+    sprite: {fileID: 0}
+  - symptomId: 81086fbd9e514e13b5674857847a7ead
+    sprite: {fileID: 0}
+  - symptomId: 22e04f4290ee46c9b4bacad833c5b7d3
+    sprite: {fileID: 1619667673, guid: f973a41bfff00974d8ad8654c02958a3, type: 3}

@@ -17,55 +17,93 @@ MonoBehaviour:
   sicknesses:
   - id: e5c336e89c4145a7a647c6813adbbb2e
     displayName: Physical Injury
+    referenceDescription: <symptom>Broken bones</symptom> visible on X-ray.
     treatment: 0
     symptomIds:
     - 3faa1f876c2a48f783d453e90ad80866
     pillIds:
     - 9dd8971170f5435fbc2ec9d6f5e67d5e
+    ghostSpeedDiff1: 0.6
+    ghostSpeedDiff2: 0.85
+    ghostSpeedDiff3: 1.1
+    ghostSpeedDiff4: 1.45
   - id: 779507f7a91843d8bbe143a5a2400021
     displayName: Delusional Disorder
+    referenceDescription: Speech is <symptom>confused and incoherent</symptom>. An <symptom>abnormal brain</symptom> is visible on X-ray.
     treatment: 0
     symptomIds:
     - bc866d1df5cc48cba1fbe4dcaa873633
+    - 22e04f4290ee46c9b4bacad833c5b7d3
     pillIds:
     - cd848fd4d4304e0f99d6903dfa56dbcf
+    ghostSpeedDiff1: 0.6
+    ghostSpeedDiff2: 0.85
+    ghostSpeedDiff3: 1.1
+    ghostSpeedDiff4: 1.45
   - id: 811bcfba402245e7b53ea5c5a6938fc9
     displayName: Worm Infestation
+    referenceDescription: <symptom>Worms</symptom> are visible inside the body.
     treatment: 0
     symptomIds:
     - d3a6ab2e13704c59b818be21248e9a2e
     pillIds:
     - 7bc8b2b6c8d04eb1a087ea2e3d20088c
+    ghostSpeedDiff1: 0.6
+    ghostSpeedDiff2: 0.85
+    ghostSpeedDiff3: 1.1
+    ghostSpeedDiff4: 1.45
   - id: ab5cf45d3497440c8483faf8d964c7af
     displayName: Internal Organ Disease
+    referenceDescription: <symptom>Abnormal internal organs</symptom> on X-ray.
     treatment: 0
     symptomIds:
     - 868f3555805749b391b6641bd163f651
     pillIds:
     - 8a7b42b468154a2fb8fc7c9971c598b5
+    ghostSpeedDiff1: 0.6
+    ghostSpeedDiff2: 0.85
+    ghostSpeedDiff3: 1.1
+    ghostSpeedDiff4: 1.45
   - id: 051fba9345c84e7488e692592100bb6d
     displayName: Heart Disease
+    referenceDescription: An <symptom>abnormal heart</symptom> is visible on X-ray.
     treatment: 0
     symptomIds:
     - e40ba4b660b94711a7935deae8b2602c
     pillIds:
     - f28b5d916b004668917d979c81c16845
+    ghostSpeedDiff1: 0.6
+    ghostSpeedDiff2: 0.85
+    ghostSpeedDiff3: 1.1
+    ghostSpeedDiff4: 1.45
   - id: b5e06d1d7b2e459380ace3a0fe06b3d3
     displayName: Flu
+    referenceDescription: A <symptom>high temperature</symptom> is detected.
     treatment: 0
     symptomIds:
     - ba01540c62484c209e3ec60d8200cd10
     pillIds:
     - 4ee993c1be3f451e8182c7b5b1738c5c
+    ghostSpeedDiff1: 0.6
+    ghostSpeedDiff2: 0.85
+    ghostSpeedDiff3: 1.1
+    ghostSpeedDiff4: 1.45
   - id: 43e85a3e33844988b968395fcb46a51e
     displayName: Brain Disease
+    referenceDescription: An <symptom>abnormal brain</symptom> is visible on X-ray.
     treatment: 0
     symptomIds:
     - d0b701a64ef14b1b891b7163abb92c71
     pillIds:
     - 805ed576a42147a9abc3e1db7a95846b
+    ghostSpeedDiff1: 0.6
+    ghostSpeedDiff2: 0.85
+    ghostSpeedDiff3: 1.1
+    ghostSpeedDiff4: 1.45
   - id: 25be672cbb8c4af5ba855e99d8f8133b
     displayName: CoroNONO Virus Infection
+    referenceDescription: <symptom>Shortness of breath</symptom>, <symptom>high temperature</symptom>
+      and <symptom>rapid heartbeat</symptom>.
     treatment: 0
     symptomIds:
     - 99740cad57794442b282b9c1caddbbe0
@@ -73,8 +111,14 @@ MonoBehaviour:
     - ba01540c62484c209e3ec60d8200cd10
     pillIds:
     - e1cee539c6534c3282c542886a04ed50
+    ghostSpeedDiff1: 0.6
+    ghostSpeedDiff2: 0.85
+    ghostSpeedDiff3: 1.1
+    ghostSpeedDiff4: 1.45
   - id: 42ee7a9a38694d838b495736ea12cb20
     displayName: Brain Rot
+    referenceDescription: <symptom>Headache</symptom>, <symptom>slow heartbeat</symptom>
+      and a <symptom>distinctive brain abnormality</symptom>.
     treatment: 0
     symptomIds:
     - 0856d09d9e1a480ea6b6e272e92cff3b
@@ -82,27 +126,58 @@ MonoBehaviour:
     - eedde69cc36140329b7308ccdeb34f92
     pillIds:
     - fc01649f4eb642c6a83cf02f10de4b02
+    ghostSpeedDiff1: 0.6
+    ghostSpeedDiff2: 0.85
+    ghostSpeedDiff3: 1.1
+    ghostSpeedDiff4: 1.45
   - id: 7f12a9d40bea47f5b5284f48762375b1
     displayName: Brittle Bone Disease
+    referenceDescription: <symptom>Bone fractures</symptom> with a <symptom>high
+      temperature</symptom>.
     treatment: 0
     symptomIds:
     - 3faa1f876c2a48f783d453e90ad80866
     - ba01540c62484c209e3ec60d8200cd10
     pillIds:
     - 57f7fce15a1440d0b6ca9262d504f77d
+    ghostSpeedDiff1: 0.6
+    ghostSpeedDiff2: 0.85
+    ghostSpeedDiff3: 1.1
+    ghostSpeedDiff4: 1.45
   - id: b09d50f81fe14efab382c302f5b19ef0
     displayName: Zombie Infection
+    referenceDescription: <symptom>Nausea</symptom>, <symptom>high temperature</symptom>
+      and <symptom>worms inside the body</symptom>.
     treatment: 1
     symptomIds:
     - d3a6ab2e13704c59b818be21248e9a2e
     - ba01540c62484c209e3ec60d8200cd10
     - dc3b1e5abee94c1d9b4c5a184fd22ada
     pillIds: []
+    ghostSpeedDiff1: 0.6
+    ghostSpeedDiff2: 0.85
+    ghostSpeedDiff3: 1.1
+    ghostSpeedDiff4: 1.45
   - id: e659156e77fa4a84b852a36f23090055
     displayName: Vampire Infection
+    referenceDescription: <symptom>no heartbeat</symptom> and <symptom>low temperature</symptom>.
     treatment: 1
     symptomIds:
-    - e40ba4b660b94711a7935deae8b2602c
     - 22eaad3867e2482cb6baaf07d3a04bd3
     - 81086fbd9e514e13b5674857847a7ead
     pillIds: []
+    ghostSpeedDiff1: 0.6
+    ghostSpeedDiff2: 0.85
+    ghostSpeedDiff3: 1.1
+    ghostSpeedDiff4: 1.45
+  - id: 420888271cbf4de8947e7ef841c5e315
+    displayName: Haunted
+    referenceDescription: There are ghosts haunts and flies around patient
+    treatment: 2
+    symptomIds:
+    - 8439037532414cfe808eec0c66b75c5e
+    pillIds: []
+    ghostSpeedDiff1: 0.15
+    ghostSpeedDiff2: 0.25
+    ghostSpeedDiff3: 0.35
+    ghostSpeedDiff4: 0.45

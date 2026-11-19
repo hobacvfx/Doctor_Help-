@@ -26,9 +26,8 @@ namespace DoctorHelp
             bool abnormal = false;
             if (npc.HasSickness)
             {
-                var sickness = medicalData.Find(npc.SicknessId);
-                if (sickness == null) throw new InvalidOperationException("NPC references a missing sickness: " + npc.SicknessId);
-                foreach (var symptomId in sickness.SymptomIds)
+                var resolvedSymptoms = NpcMedicalConditions.Resolve(npc.SicknessIds, medicalData);
+                foreach (var symptomId in resolvedSymptoms)
                 {
                     if (medicalData.SymptomProfile.Find(symptomId) == null)
                         throw new InvalidOperationException("Sickness references a missing symptom: " + symptomId);
@@ -39,11 +38,11 @@ namespace DoctorHelp
             {
                 if (organs == null || organs.Length == 0)
                     throw new InvalidOperationException("Assign organ prefab/position pairs on the NPC prefab.");
-                var positions = new HashSet<Transform>();
+                var options = new HashSet<(GameObject, Transform)>();
                 foreach (var organ in organs)
                     if (organ == null || organ.prefab == null || organ.position == null ||
-                        !organ.position.IsChildOf(transform) || !positions.Add(organ.position))
-                        throw new InvalidOperationException("Each organ requires a prefab and a distinct child anchor of this patient.");
+                        !organ.position.IsChildOf(transform) || !options.Add((organ.prefab, organ.position)))
+                        throw new InvalidOperationException("Each organ option requires a unique prefab/child anchor pair on this patient.");
             }
             ClearSpawned();
             if (!abnormal) return;
@@ -63,4 +62,5 @@ namespace DoctorHelp
         }
     }
 }
+
 

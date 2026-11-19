@@ -9,7 +9,7 @@ namespace DoctorHelp.Editor
     public static class NpcBatchGenerator
     {
         public static IReadOnlyList<GameObject> Generate(GameObject template, NpcProfile profile,
-            NpcCatalog catalog, int firstSeed, int count, bool keepLockedSlots = false)
+            NpcCatalog catalog, int firstSeed, int count, bool keepLockedSlots = false, int difficulty = 0)
         {
             if (EditorApplication.isPlayingOrWillChangePlaymode)
                 throw new InvalidOperationException("Dừng Play Mode trước khi tạo NPC.");
@@ -43,6 +43,10 @@ namespace DoctorHelp.Editor
                 if (!string.IsNullOrEmpty(AssetDatabase.AssetPathToGUID(path, AssetPathToGUIDOptions.OnlyExistingAssets)) || System.IO.File.Exists(path) || System.IO.File.Exists(path + ".meta"))
                     throw new InvalidOperationException($"Đã có {path}. Chọn seed khác; tool không ghi đè NPC cũ.");
             }
+
+            var compatibleSets = difficulty == 0 ? null : NpcSicknessAssignment.FindCompatibleSets(profile.AllSickness, difficulty);
+            if (compatibleSets?.Count == 0)
+                throw new InvalidOperationException($"Danh mục không có tổ hợp {difficulty} bệnh tương thích.");
 
             string profileBefore = EditorJsonUtility.ToJson(profile);
             string catalogBefore = catalog != null ? EditorJsonUtility.ToJson(catalog) : null;
@@ -90,7 +94,10 @@ namespace DoctorHelp.Editor
                     entry.FindPropertyRelative("prefab").objectReferenceValue = prefab;
                     entry.FindPropertyRelative("npcName").stringValue = prefab.name;
                     entry.FindPropertyRelative("dialogueAsset").objectReferenceValue = null;
-                    entry.FindPropertyRelative("sicknessId").stringValue = sicknesses[random.Next(sicknesses.Count)].Id;
+                    entry.FindPropertyRelative("difficulty").intValue = 1;
+                    NpcSicknessAssignment.Write(entry, compatibleSets == null
+                        ? NpcSicknessAssignment.Create(profile, random)
+                        : compatibleSets[random.Next(compatibleSets.Count)]);
                 }
                 serialized.ApplyModifiedPropertiesWithoutUndo();
                 if (catalog != null)

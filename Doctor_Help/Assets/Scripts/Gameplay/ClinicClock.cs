@@ -8,12 +8,27 @@ namespace DoctorHelp
         public const int OpeningMinute = 8 * 60;
         public const int ClosingMinute = 21 * 60;
         public double ElapsedSeconds { get; private set; }
-        public double OperatingSeconds { get; private set; } = 720;
+        public const int DefaultOperatingSeconds = 180;
+        public double OperatingSeconds { get; private set; } = DefaultOperatingSeconds;
         public bool IsRunning { get; private set; }
         public bool IsClosed => ElapsedSeconds >= OperatingSeconds;
         public int MinuteOfDay => Math.Min(ClosingMinute, OpeningMinute +
             (int)Math.Floor(ElapsedSeconds / OperatingSeconds * (ClosingMinute - OpeningMinute)));
-        public string DisplayTime => $"{MinuteOfDay / 60:00}:{MinuteOfDay % 60:00}";
+        private int displayedMinute = -1;
+        private string displayTime;
+        public string DisplayTime
+        {
+            get
+            {
+                int minute = MinuteOfDay;
+                if (minute != displayedMinute)
+                {
+                    displayTime = $"{minute / 60:00}:{minute % 60:00}";
+                    displayedMinute = minute;
+                }
+                return displayTime;
+            }
+        }
 
         public void Open(double operatingSeconds)
         {

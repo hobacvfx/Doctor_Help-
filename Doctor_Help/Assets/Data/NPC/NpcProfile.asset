@@ -14,9 +14,969 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::DoctorHelp.NpcProfile
   npcFolder: Assets/2D_Assets/NPC
   allSickness: {fileID: 11400000, guid: 51b3b5f1533ba3a46a9fa7191b539dfb, type: 2}
+  secondSicknessChance: 0.3
   npcs:
   - id: 159bf944cab738d4cbdde0226ce62abe
     prefab: {fileID: 751323018708344177, guid: 159bf944cab738d4cbdde0226ce62abe, type: 3}
     npcName: NPC_0
-    sicknessId: 43e85a3e33844988b968395fcb46a51e
+    sicknessIds:
+    - 43e85a3e33844988b968395fcb46a51e
+    - b5e06d1d7b2e459380ace3a0fe06b3d3
     dialogueAsset: {fileID: 11400000, guid: 4545cda7c46f9a84ba7a88bf21d781f7, type: 2}
+    difficulty: 1
+  - id: 28ef4242967ba93478e5b4b0cec718c5
+    prefab: {fileID: 2214276912730676295, guid: 28ef4242967ba93478e5b4b0cec718c5, type: 3}
+    npcName: NPC_Dracu
+    sicknessIds:
+    - b5e06d1d7b2e459380ace3a0fe06b3d3
+    dialogueAsset: {fileID: 11400000, guid: 294cec164d2c5314c82d590143fb11e3, type: 2}
+    difficulty: 1
+  - id: 70a1873c4e6a2d24e9bc6544a0cf3877
+    prefab: {fileID: 6506602027932096564, guid: 70a1873c4e6a2d24e9bc6544a0cf3877, type: 3}
+    npcName: Sherlock Holmes
+    sicknessIds:
+    - 42ee7a9a38694d838b495736ea12cb20
+    dialogueAsset: {fileID: 11400000, guid: 097be4947248f8c4d8da75f5553631d2, type: 2}
+    difficulty: 1
+  - id: ba5cf1d152462254c80190e1cb0d3b32
+    prefab: {fileID: 1493136799006660427, guid: ba5cf1d152462254c80190e1cb0d3b32, type: 3}
+    npcName: Frankenstein's Creature
+    sicknessIds:
+    - 779507f7a91843d8bbe143a5a2400021
+    - 811bcfba402245e7b53ea5c5a6938fc9
+    dialogueAsset: {fileID: 11400000, guid: 4aace4bf9991b474590a251e7aefee53, type: 2}
+    difficulty: 1
+  - id: 7dd1c41a73b5bf54987300a5e6d5c4cc
+    prefab: {fileID: 1238555517865936744, guid: 7dd1c41a73b5bf54987300a5e6d5c4cc, type: 3}
+    npcName: Tattooed Rapper
+    sicknessIds:
+    - 43e85a3e33844988b968395fcb46a51e
+    - 779507f7a91843d8bbe143a5a2400021
+    dialogueAsset: {fileID: 11400000, guid: 449a7b7dadbf70f4d83919e4aa77e243, type: 2}
+    difficulty: 1
+  - id: b0a3bce159cbbcc4f80a242cb475f7a2
+    prefab: {fileID: 3021744004799465806, guid: b0a3bce159cbbcc4f80a242cb475f7a2, type: 3}
+    npcName: The Mummy
+    sicknessIds:
+    - 811bcfba402245e7b53ea5c5a6938fc9
+    dialogueAsset: {fileID: 11400000, guid: 8796d500fb051a54ab0dad66cb9e1eeb, type: 2}
+    difficulty: 1
+  - id: 651575b6675397d48b2eb85dad17b882
+    prefab: {fileID: 6662077483007277962, guid: 651575b6675397d48b2eb85dad17b882, type: 3}
+    npcName: Victorian Noblewoman
+    sicknessIds:
+    - e5c336e89c4145a7a647c6813adbbb2e
+    dialogueAsset: {fileID: 11400000, guid: 2c98c16f5dfe0274fadfd8dc329f89a0, type: 2}
+    difficulty: 1
+  - id: a71b8e0265ebc424a9eca9bce3cb5408
+    prefab: {fileID: 5782601497975595177, guid: a71b8e0265ebc424a9eca9bce3cb5408, type: 3}
+    npcName: Victorian Courtesan
+    sicknessIds:
+    - 779507f7a91843d8bbe143a5a2400021
+    dialogueAsset: {fileID: 11400000, guid: 6fa89eca69301e4498b1078ffcc09d1a, type: 2}
+    difficulty: 1
+  - id: 44d4ac39e19b9f0468fb9aa3a4e518f6
+    prefab: {fileID: 4931161206482653340, guid: 44d4ac39e19b9f0468fb9aa3a4e518f6, type: 3}
+    npcName: NPC_2
+    sicknessIds:
+    - 811bcfba402245e7b53ea5c5a6938fc9
+    dialogueAsset: {fileID: 11400000, guid: 4e376220970c4ce99e0773856a6803ae, type: 2}
+    difficulty: 1
+  - id: 2956912485e786a479e3170add7199cc
+    prefab: {fileID: 6965231222242985174, guid: 2956912485e786a479e3170add7199cc, type: 3}
+    npcName: NPC_3
+    sicknessIds:
+    - 7f12a9d40bea47f5b5284f48762375b1
+    dialogueAsset: {fileID: 11400000, guid: e3cb8452b36f4173aa022c777330a580, type: 2}
+    difficulty: 1
+  - id: de9a45719f7714d42972bc4a331b3773
+    prefab: {fileID: 2073473889608972954, guid: de9a45719f7714d42972bc4a331b3773, type: 3}
+    npcName: NPC_4
+    sicknessIds:
+    - 42ee7a9a38694d838b495736ea12cb20
+    dialogueAsset: {fileID: 11400000, guid: 51dd63f0baec4a0a923a049247d4c679, type: 2}
+    difficulty: 1
+  - id: b3c9ca8ad9d689a4282dd8e9a12227ba
+    prefab: {fileID: 1405462039419247024, guid: b3c9ca8ad9d689a4282dd8e9a12227ba, type: 3}
+    npcName: NPC_5
+    sicknessIds:
+    - e659156e77fa4a84b852a36f23090055
+    dialogueAsset: {fileID: 11400000, guid: 6528397c3a21467991697f4944f2eba6, type: 2}
+    difficulty: 1
+  - id: 68b0b93f8a9c9444db82494c395c1dfd
+    prefab: {fileID: 1969463263867948386, guid: 68b0b93f8a9c9444db82494c395c1dfd, type: 3}
+    npcName: NPC_6
+    sicknessIds:
+    - 42ee7a9a38694d838b495736ea12cb20
+    dialogueAsset: {fileID: 11400000, guid: 2bdd964f20a844ac9ffeee6b0d3c3037, type: 2}
+    difficulty: 1
+  - id: 94be04e47cbecd74dabab61673c4d390
+    prefab: {fileID: 8939454576541736826, guid: 94be04e47cbecd74dabab61673c4d390, type: 3}
+    npcName: NPC_7
+    sicknessIds:
+    - 051fba9345c84e7488e692592100bb6d
+    dialogueAsset: {fileID: 11400000, guid: cab6b3a0700d4d8db5a5589bd160bc77, type: 2}
+    difficulty: 1
+  - id: 8ab1c880d543505439c7c8bf11c9f644
+    prefab: {fileID: 8678442935439067292, guid: 8ab1c880d543505439c7c8bf11c9f644, type: 3}
+    npcName: NPC_8
+    sicknessIds:
+    - ab5cf45d3497440c8483faf8d964c7af
+    - 420888271cbf4de8947e7ef841c5e315
+    dialogueAsset: {fileID: 11400000, guid: 4380f57b7c5d4dd39a72d61bba5a5da4, type: 2}
+    difficulty: 1
+  - id: dd0bc5b497df4bb4a9ba61540dd36571
+    prefab: {fileID: 2386705766229828806, guid: dd0bc5b497df4bb4a9ba61540dd36571, type: 3}
+    npcName: NPC_9
+    sicknessIds:
+    - 779507f7a91843d8bbe143a5a2400021
+    dialogueAsset: {fileID: 11400000, guid: 404452cd7d664c70b610f15ef51f25eb, type: 2}
+    difficulty: 1
+  - id: 44045fb5410bb6b438f102591a569928
+    prefab: {fileID: 2600967708402728734, guid: 44045fb5410bb6b438f102591a569928, type: 3}
+    npcName: NPC_10
+    sicknessIds:
+    - ab5cf45d3497440c8483faf8d964c7af
+    dialogueAsset: {fileID: 11400000, guid: 87239aad9e734f499a98683ece3a5113, type: 2}
+    difficulty: 1
+  - id: ef5bc64fc8e632d458b1f652aaff6d21
+    prefab: {fileID: 254108994576403778, guid: ef5bc64fc8e632d458b1f652aaff6d21, type: 3}
+    npcName: NPC_11
+    sicknessIds:
+    - b5e06d1d7b2e459380ace3a0fe06b3d3
+    - b09d50f81fe14efab382c302f5b19ef0
+    dialogueAsset: {fileID: 11400000, guid: e14fbb79365845d8bf8f0a37a0e53182, type: 2}
+    difficulty: 1
+  - id: 9c42af4314489b049bde5a26665e638b
+    prefab: {fileID: 1658421383962480220, guid: 9c42af4314489b049bde5a26665e638b, type: 3}
+    npcName: NPC_12
+    sicknessIds:
+    - 43e85a3e33844988b968395fcb46a51e
+    dialogueAsset: {fileID: 11400000, guid: 2fc2896e857944aaa919ea56391cae60, type: 2}
+    difficulty: 1
+  - id: 53acb88f5643d5a408140817161bb63b
+    prefab: {fileID: 8857690866002237528, guid: 53acb88f5643d5a408140817161bb63b, type: 3}
+    npcName: NPC_13
+    sicknessIds:
+    - 811bcfba402245e7b53ea5c5a6938fc9
+    dialogueAsset: {fileID: 11400000, guid: 0bc970356a6f4207b84388ab408fe243, type: 2}
+    difficulty: 1
+  - id: ed236577f7f52234abe5be06867d8476
+    prefab: {fileID: 1742956745554499250, guid: ed236577f7f52234abe5be06867d8476, type: 3}
+    npcName: NPC_14
+    sicknessIds:
+    - b09d50f81fe14efab382c302f5b19ef0
+    dialogueAsset: {fileID: 11400000, guid: 47d8326655c841e09e98644ef2240a5c, type: 2}
+    difficulty: 1
+  - id: ddd4b4120edf29342a594942ca84355f
+    prefab: {fileID: 1937086769607048065, guid: ddd4b4120edf29342a594942ca84355f, type: 3}
+    npcName: NPC_15
+    sicknessIds:
+    - 25be672cbb8c4af5ba855e99d8f8133b
+    dialogueAsset: {fileID: 11400000, guid: b0826f818e9c4655a52626b9a778c654, type: 2}
+    difficulty: 1
+  - id: 6b6c702b27b5918459973e911f9dd667
+    prefab: {fileID: 9110646050742041627, guid: 6b6c702b27b5918459973e911f9dd667, type: 3}
+    npcName: NPC_16
+    sicknessIds:
+    - 42ee7a9a38694d838b495736ea12cb20
+    dialogueAsset: {fileID: 11400000, guid: 74af9bb0a934482d9c64aed023a49927, type: 2}
+    difficulty: 1
+  - id: 2c3b496ceb24f86439342b045cabddb8
+    prefab: {fileID: 3287849415015600255, guid: 2c3b496ceb24f86439342b045cabddb8, type: 3}
+    npcName: NPC_17
+    sicknessIds:
+    - 25be672cbb8c4af5ba855e99d8f8133b
+    - 420888271cbf4de8947e7ef841c5e315
+    dialogueAsset: {fileID: 11400000, guid: 11966dc584734942a8df04fd36b06aff, type: 2}
+    difficulty: 2
+  - id: 76f6e4a0318c14e4c8dff0ec991e05bd
+    prefab: {fileID: 2513424707803643302, guid: 76f6e4a0318c14e4c8dff0ec991e05bd, type: 3}
+    npcName: NPC_18
+    sicknessIds:
+    - e659156e77fa4a84b852a36f23090055
+    dialogueAsset: {fileID: 11400000, guid: 687f28ac6cb942a782cf955322b7613e, type: 2}
+    difficulty: 1
+  - id: 6d6a6152c416b24408415cf6aaf6a3c0
+    prefab: {fileID: 6045218799625017787, guid: 6d6a6152c416b24408415cf6aaf6a3c0, type: 3}
+    npcName: NPC_19
+    sicknessIds:
+    - e659156e77fa4a84b852a36f23090055
+    dialogueAsset: {fileID: 11400000, guid: 78f3aaf223fe4ef9b0e3033fa377b24b, type: 2}
+    difficulty: 1
+  - id: f2cfbb909b207fc41b2ef234ee2e67c9
+    prefab: {fileID: 3451051981505474375, guid: f2cfbb909b207fc41b2ef234ee2e67c9, type: 3}
+    npcName: NPC_20
+    sicknessIds:
+    - e659156e77fa4a84b852a36f23090055
+    - 811bcfba402245e7b53ea5c5a6938fc9
+    dialogueAsset: {fileID: 11400000, guid: f253c84067664d68b7cea08766c340ba, type: 2}
+    difficulty: 1
+  - id: a6cd5abe7e29ac64d9d50c4c544a848f
+    prefab: {fileID: 8164462818667003718, guid: a6cd5abe7e29ac64d9d50c4c544a848f, type: 3}
+    npcName: NPC_21
+    sicknessIds:
+    - 43e85a3e33844988b968395fcb46a51e
+    - ab5cf45d3497440c8483faf8d964c7af
+    dialogueAsset: {fileID: 11400000, guid: e7f78e79911847f4bc94ffc7e1f53a63, type: 2}
+    difficulty: 1
+  - id: 8fe4518acc27b8744b1743c9b7721ea2
+    prefab: {fileID: 5940909116975186381, guid: 8fe4518acc27b8744b1743c9b7721ea2, type: 3}
+    npcName: NPC_22
+    sicknessIds:
+    - 7f12a9d40bea47f5b5284f48762375b1
+    dialogueAsset: {fileID: 11400000, guid: 0fed8754c47641179a6aa2f2847fcc2a, type: 2}
+    difficulty: 1
+  - id: 8219d98a031c76049aa36b31a494ca7a
+    prefab: {fileID: 7109287666815454428, guid: 8219d98a031c76049aa36b31a494ca7a, type: 3}
+    npcName: NPC_23
+    sicknessIds:
+    - e659156e77fa4a84b852a36f23090055
+    dialogueAsset: {fileID: 11400000, guid: 18d87c4e2f87434086b7cb416012456e, type: 2}
+    difficulty: 1
+  - id: 2d3206ccb76b917498ca3a2626f2fdc4
+    prefab: {fileID: 6815784902738330275, guid: 2d3206ccb76b917498ca3a2626f2fdc4, type: 3}
+    npcName: NPC_24
+    sicknessIds:
+    - 051fba9345c84e7488e692592100bb6d
+    dialogueAsset: {fileID: 11400000, guid: 8db9bb1ded77458caa487563a9121681, type: 2}
+    difficulty: 1
+  - id: 54c1bb776a8302f409f42ca0d5188ffb
+    prefab: {fileID: 6726408234665985862, guid: 54c1bb776a8302f409f42ca0d5188ffb, type: 3}
+    npcName: NPC_25
+    sicknessIds:
+    - e5c336e89c4145a7a647c6813adbbb2e
+    dialogueAsset: {fileID: 11400000, guid: f78c15a35bca47d9b97874485398922d, type: 2}
+    difficulty: 1
+  - id: 7917e2759c34c004ea8ab7520b28aea4
+    prefab: {fileID: 5626138590107253493, guid: 7917e2759c34c004ea8ab7520b28aea4, type: 3}
+    npcName: NPC_26
+    sicknessIds:
+    - b5e06d1d7b2e459380ace3a0fe06b3d3
+    - 420888271cbf4de8947e7ef841c5e315
+    dialogueAsset: {fileID: 11400000, guid: eabca6a7dacb40a48b5b1b1cc335ad5f, type: 2}
+    difficulty: 3
+  - id: 99d93d1ce5254d24ea389cc35c0a10d6
+    prefab: {fileID: 7064090548288474106, guid: 99d93d1ce5254d24ea389cc35c0a10d6, type: 3}
+    npcName: NPC_27
+    sicknessIds:
+    - e659156e77fa4a84b852a36f23090055
+    dialogueAsset: {fileID: 11400000, guid: 9c33fa9d5ae946688fa34be35aadd3e8, type: 2}
+    difficulty: 1
+  - id: 326cd1e937e3a7c4bbe58a445f48a719
+    prefab: {fileID: 1740078131621712171, guid: 326cd1e937e3a7c4bbe58a445f48a719, type: 3}
+    npcName: NPC_28
+    sicknessIds:
+    - 42ee7a9a38694d838b495736ea12cb20
+    - b5e06d1d7b2e459380ace3a0fe06b3d3
+    dialogueAsset: {fileID: 11400000, guid: 869be10e38c147e884602844a76f5e1c, type: 2}
+    difficulty: 1
+  - id: d453ddb91789c0c4f9e6e1810be72b24
+    prefab: {fileID: 4098171952879944629, guid: d453ddb91789c0c4f9e6e1810be72b24, type: 3}
+    npcName: NPC_29
+    sicknessIds:
+    - b09d50f81fe14efab382c302f5b19ef0
+    dialogueAsset: {fileID: 11400000, guid: b403fda037f7408cbcf3df6018c8508f, type: 2}
+    difficulty: 1
+  - id: 53fac6ee36fb95c4bac517432cb05f48
+    prefab: {fileID: 2518751699199763912, guid: 53fac6ee36fb95c4bac517432cb05f48, type: 3}
+    npcName: NPC_30
+    sicknessIds:
+    - e659156e77fa4a84b852a36f23090055
+    dialogueAsset: {fileID: 11400000, guid: 045a95df05be4a7c8565f8acfef0a71d, type: 2}
+    difficulty: 1
+  - id: 686ccb1d46a39334e9e69dbb3eddf0e9
+    prefab: {fileID: 7640763963781495292, guid: 686ccb1d46a39334e9e69dbb3eddf0e9, type: 3}
+    npcName: NPC_31
+    sicknessIds:
+    - 42ee7a9a38694d838b495736ea12cb20
+    dialogueAsset: {fileID: 11400000, guid: a7d531272a8b44d482f80936e07992ac, type: 2}
+    difficulty: 1
+  - id: 4198d6860dc352446bf349975338d8eb
+    prefab: {fileID: 3735493506107860559, guid: 4198d6860dc352446bf349975338d8eb, type: 3}
+    npcName: NPC_32
+    sicknessIds:
+    - ab5cf45d3497440c8483faf8d964c7af
+    dialogueAsset: {fileID: 11400000, guid: efecef4b339a4db79ac2ac08d7ecd594, type: 2}
+    difficulty: 1
+  - id: 40e12aee815eb714489a47d603cb65a8
+    prefab: {fileID: 5975215197017182276, guid: 40e12aee815eb714489a47d603cb65a8, type: 3}
+    npcName: NPC_33
+    sicknessIds:
+    - 7f12a9d40bea47f5b5284f48762375b1
+    dialogueAsset: {fileID: 11400000, guid: 046ea3ae275147cf98a13081e7cdb8bf, type: 2}
+    difficulty: 1
+  - id: 08c36dcbd5c67e44daad8f8227b8f007
+    prefab: {fileID: 9209598146619866483, guid: 08c36dcbd5c67e44daad8f8227b8f007, type: 3}
+    npcName: NPC_34
+    sicknessIds:
+    - 811bcfba402245e7b53ea5c5a6938fc9
+    - 779507f7a91843d8bbe143a5a2400021
+    dialogueAsset: {fileID: 11400000, guid: 02de21b446ec4da084e7f4887c844253, type: 2}
+    difficulty: 1
+  - id: 3c1b1bd6da8df2342b5f1d21cd4eaa33
+    prefab: {fileID: 6860639752297134279, guid: 3c1b1bd6da8df2342b5f1d21cd4eaa33, type: 3}
+    npcName: NPC_35
+    sicknessIds:
+    - ab5cf45d3497440c8483faf8d964c7af
+    dialogueAsset: {fileID: 11400000, guid: b5ad1dd2d2be468284df07ebe1762e81, type: 2}
+    difficulty: 1
+  - id: 34cad75fa7a2c8b48982078fd3c72891
+    prefab: {fileID: 3650890705385442705, guid: 34cad75fa7a2c8b48982078fd3c72891, type: 3}
+    npcName: NPC_36
+    sicknessIds:
+    - 779507f7a91843d8bbe143a5a2400021
+    dialogueAsset: {fileID: 11400000, guid: 4a7ed6f0af0d4ea292e49f6c5859682d, type: 2}
+    difficulty: 1
+  - id: 1fafa4abdda057642a218fc7e40dee97
+    prefab: {fileID: 1815470447140815097, guid: 1fafa4abdda057642a218fc7e40dee97, type: 3}
+    npcName: NPC_37
+    sicknessIds:
+    - 43e85a3e33844988b968395fcb46a51e
+    - e659156e77fa4a84b852a36f23090055
+    dialogueAsset: {fileID: 11400000, guid: 7aa281ab25e345afb7ec95f0d4974ae9, type: 2}
+    difficulty: 1
+  - id: 3bd0c6fdf8bd12047b7da859fe09a5ee
+    prefab: {fileID: 347349243674209458, guid: 3bd0c6fdf8bd12047b7da859fe09a5ee, type: 3}
+    npcName: NPC_38
+    sicknessIds:
+    - 25be672cbb8c4af5ba855e99d8f8133b
+    dialogueAsset: {fileID: 11400000, guid: 76a72de514e34690adcf22f13ce3e001, type: 2}
+    difficulty: 1
+  - id: 3161725609f3b4d47913f0ea48a55be9
+    prefab: {fileID: 5012717181351514338, guid: 3161725609f3b4d47913f0ea48a55be9, type: 3}
+    npcName: NPC_39
+    sicknessIds:
+    - 779507f7a91843d8bbe143a5a2400021
+    dialogueAsset: {fileID: 11400000, guid: f6f245f3b3ba4b7392e726431d7298dc, type: 2}
+    difficulty: 1
+  - id: ebc6025bed0cada4f8e2e56d5478f541
+    prefab: {fileID: 8457512381585581891, guid: ebc6025bed0cada4f8e2e56d5478f541, type: 3}
+    npcName: NPC_40
+    sicknessIds:
+    - 42ee7a9a38694d838b495736ea12cb20
+    dialogueAsset: {fileID: 11400000, guid: 3d2ee81f1fef4bfb90ef81a10b8e5a66, type: 2}
+    difficulty: 1
+  - id: 8e82926bb0ab8a546990c8c4b927e173
+    prefab: {fileID: 3450544045413696901, guid: 8e82926bb0ab8a546990c8c4b927e173, type: 3}
+    npcName: NPC_41
+    sicknessIds:
+    - b09d50f81fe14efab382c302f5b19ef0
+    - 811bcfba402245e7b53ea5c5a6938fc9
+    dialogueAsset: {fileID: 11400000, guid: d4f98051d7f94da6974793a1ef1c6811, type: 2}
+    difficulty: 1
+  - id: 7e0bcc5a1836e6145941c18efca49a81
+    prefab: {fileID: 840659245414443726, guid: 7e0bcc5a1836e6145941c18efca49a81, type: 3}
+    npcName: NPC_42
+    sicknessIds:
+    - e5c336e89c4145a7a647c6813adbbb2e
+    - 420888271cbf4de8947e7ef841c5e315
+    dialogueAsset: {fileID: 11400000, guid: b68407ae4cb74672a96373459f3d61fd, type: 2}
+    difficulty: 4
+  - id: d173e4b6b34f11e4091f710600c13fcc
+    prefab: {fileID: 2035605541491082824, guid: d173e4b6b34f11e4091f710600c13fcc, type: 3}
+    npcName: NPC_43
+    sicknessIds:
+    - 25be672cbb8c4af5ba855e99d8f8133b
+    dialogueAsset: {fileID: 11400000, guid: 13759517338e429c9bdd0cbd6380dd09, type: 2}
+    difficulty: 1
+  - id: c71a22449f3d96a48a89df9e08cc5d17
+    prefab: {fileID: 2523339956886561270, guid: c71a22449f3d96a48a89df9e08cc5d17, type: 3}
+    npcName: NPC_44
+    sicknessIds:
+    - b09d50f81fe14efab382c302f5b19ef0
+    - 779507f7a91843d8bbe143a5a2400021
+    dialogueAsset: {fileID: 11400000, guid: c2eafe1aa64a47cbaf8ddf4d1dc21495, type: 2}
+    difficulty: 1
+  - id: f34d33457673a8141984553035714b49
+    prefab: {fileID: 2306691868392020100, guid: f34d33457673a8141984553035714b49, type: 3}
+    npcName: NPC_45
+    sicknessIds:
+    - ab5cf45d3497440c8483faf8d964c7af
+    - 25be672cbb8c4af5ba855e99d8f8133b
+    dialogueAsset: {fileID: 11400000, guid: b5ee4bfd7bc9491d80a0650412595eff, type: 2}
+    difficulty: 1
+  - id: ba27b637f60934e4ebdeb648f57893d9
+    prefab: {fileID: 5407411405322462409, guid: ba27b637f60934e4ebdeb648f57893d9, type: 3}
+    npcName: NPC_46
+    sicknessIds:
+    - 051fba9345c84e7488e692592100bb6d
+    dialogueAsset: {fileID: 11400000, guid: 2004ad542b9041eabbe5bdbc1b7ed7f3, type: 2}
+    difficulty: 1
+  - id: cd7d0920ddca571479ff38a1ac2123e9
+    prefab: {fileID: 8465824852864674433, guid: cd7d0920ddca571479ff38a1ac2123e9, type: 3}
+    npcName: NPC_47
+    sicknessIds:
+    - e659156e77fa4a84b852a36f23090055
+    - 051fba9345c84e7488e692592100bb6d
+    dialogueAsset: {fileID: 11400000, guid: 097ba5f3044049d3aecb3257b6746d16, type: 2}
+    difficulty: 1
+  - id: 4e83abacd9ae1ca49a4288969c3976ee
+    prefab: {fileID: 6829348730746127247, guid: 4e83abacd9ae1ca49a4288969c3976ee, type: 3}
+    npcName: NPC_48
+    sicknessIds:
+    - 811bcfba402245e7b53ea5c5a6938fc9
+    dialogueAsset: {fileID: 11400000, guid: a886bf0c88574335a5f28b910fbb8d89, type: 2}
+    difficulty: 1
+  - id: 666e14c9e77481c479d584f4c4596d4a
+    prefab: {fileID: 2842324790383582399, guid: 666e14c9e77481c479d584f4c4596d4a, type: 3}
+    npcName: NPC_49
+    sicknessIds:
+    - e659156e77fa4a84b852a36f23090055
+    dialogueAsset: {fileID: 11400000, guid: 83dc7c69ab1a435397d669cb99a9b398, type: 2}
+    difficulty: 1
+  - id: f41ee36d2b82fdc4c8fe8dfad8355143
+    prefab: {fileID: 2899921561508656218, guid: f41ee36d2b82fdc4c8fe8dfad8355143, type: 3}
+    npcName: NPC_50
+    sicknessIds:
+    - 42ee7a9a38694d838b495736ea12cb20
+    - ab5cf45d3497440c8483faf8d964c7af
+    dialogueAsset: {fileID: 11400000, guid: c29c8889352740878690facae9830790, type: 2}
+    difficulty: 1
+  - id: 4bd47f167457d5740bc2f32a49456e97
+    prefab: {fileID: 3848876647222391527, guid: 4bd47f167457d5740bc2f32a49456e97, type: 3}
+    npcName: NPC_51
+    sicknessIds:
+    - 779507f7a91843d8bbe143a5a2400021
+    dialogueAsset: {fileID: 11400000, guid: 5bd09d4cf0fc4949be7d2552997a436f, type: 2}
+    difficulty: 1
+  - id: 990ceeb4b4ee89745b24c51156093c0a
+    prefab: {fileID: 5148602768085582268, guid: 990ceeb4b4ee89745b24c51156093c0a, type: 3}
+    npcName: NPC_52
+    sicknessIds:
+    - 779507f7a91843d8bbe143a5a2400021
+    - 43e85a3e33844988b968395fcb46a51e
+    dialogueAsset: {fileID: 11400000, guid: 67384a51f6d74dacbf2611789a006ced, type: 2}
+    difficulty: 1
+  - id: 524ecbd1dd037d24eb34fb0df2cf7e41
+    prefab: {fileID: 8969889881061646467, guid: 524ecbd1dd037d24eb34fb0df2cf7e41, type: 3}
+    npcName: NPC_53
+    sicknessIds:
+    - e5c336e89c4145a7a647c6813adbbb2e
+    - 811bcfba402245e7b53ea5c5a6938fc9
+    dialogueAsset: {fileID: 11400000, guid: b112fadd6f96443e9fb178899005cdd2, type: 2}
+    difficulty: 1
+  - id: 04e8d4389fe40b549bcbf3d39f9e224c
+    prefab: {fileID: 2675692024726987349, guid: 04e8d4389fe40b549bcbf3d39f9e224c, type: 3}
+    npcName: NPC_54
+    sicknessIds:
+    - 779507f7a91843d8bbe143a5a2400021
+    - 7f12a9d40bea47f5b5284f48762375b1
+    dialogueAsset: {fileID: 11400000, guid: 5c92d423f4ca42058352d8897964e17e, type: 2}
+    difficulty: 1
+  - id: 9856dba5328eee34b92457a2aeed77dc
+    prefab: {fileID: 1242585436304865973, guid: 9856dba5328eee34b92457a2aeed77dc, type: 3}
+    npcName: NPC_55
+    sicknessIds:
+    - ab5cf45d3497440c8483faf8d964c7af
+    - b09d50f81fe14efab382c302f5b19ef0
+    dialogueAsset: {fileID: 11400000, guid: fd222f3ccd7d4acaa14f67848b90ada3, type: 2}
+    difficulty: 1
+  - id: 97c10b878cb1b8643b4c098b4a2f8de1
+    prefab: {fileID: 1974667053065721261, guid: 97c10b878cb1b8643b4c098b4a2f8de1, type: 3}
+    npcName: NPC_56
+    sicknessIds:
+    - e5c336e89c4145a7a647c6813adbbb2e
+    - b09d50f81fe14efab382c302f5b19ef0
+    dialogueAsset: {fileID: 11400000, guid: e964f18eab1c4b8a81fc0fdc699b03cd, type: 2}
+    difficulty: 1
+  - id: 9847d24091237be41b5e434a2bd406a5
+    prefab: {fileID: 5418851969074252486, guid: 9847d24091237be41b5e434a2bd406a5, type: 3}
+    npcName: NPC_57
+    sicknessIds:
+    - 43e85a3e33844988b968395fcb46a51e
+    - 7f12a9d40bea47f5b5284f48762375b1
+    dialogueAsset: {fileID: 11400000, guid: b92b2eda588b4ae99861c538aeca3929, type: 2}
+    difficulty: 1
+  - id: 09807cfa3aa571d4f8ecaa2409676b23
+    prefab: {fileID: 270365214807402804, guid: 09807cfa3aa571d4f8ecaa2409676b23, type: 3}
+    npcName: NPC_58
+    sicknessIds:
+    - b5e06d1d7b2e459380ace3a0fe06b3d3
+    - 43e85a3e33844988b968395fcb46a51e
+    dialogueAsset: {fileID: 11400000, guid: 65ab4562e0174e23b54f071906a48c03, type: 2}
+    difficulty: 1
+  - id: da9cd15f962dd8c45bcf439a17ab5ad4
+    prefab: {fileID: 6195790558849938564, guid: da9cd15f962dd8c45bcf439a17ab5ad4, type: 3}
+    npcName: NPC_59
+    sicknessIds:
+    - 43e85a3e33844988b968395fcb46a51e
+    - b09d50f81fe14efab382c302f5b19ef0
+    dialogueAsset: {fileID: 11400000, guid: 50cb9f8f03ec4d5bbde1b94cf767079a, type: 2}
+    difficulty: 1
+  - id: 71495f56b02858243836c16ad4dbb1a2
+    prefab: {fileID: 7663942213910197411, guid: 71495f56b02858243836c16ad4dbb1a2, type: 3}
+    npcName: NPC_60
+    sicknessIds:
+    - ab5cf45d3497440c8483faf8d964c7af
+    - 051fba9345c84e7488e692592100bb6d
+    dialogueAsset: {fileID: 11400000, guid: 6e68252273bb4880ac75fd5e325258da, type: 2}
+    difficulty: 1
+  - id: 9c70386af25b29d44bacd87849a5045b
+    prefab: {fileID: 2776681761887458180, guid: 9c70386af25b29d44bacd87849a5045b, type: 3}
+    npcName: NPC_61
+    sicknessIds:
+    - ab5cf45d3497440c8483faf8d964c7af
+    - 25be672cbb8c4af5ba855e99d8f8133b
+    dialogueAsset: {fileID: 11400000, guid: 63ef19fafc96490f84a284b910a97e31, type: 2}
+    difficulty: 1
+  - id: 608c109cd23ccc240974ea62cd93c733
+    prefab: {fileID: 1107832707096274883, guid: 608c109cd23ccc240974ea62cd93c733, type: 3}
+    npcName: NPC_62
+    sicknessIds:
+    - b5e06d1d7b2e459380ace3a0fe06b3d3
+    - b09d50f81fe14efab382c302f5b19ef0
+    dialogueAsset: {fileID: 11400000, guid: d0caecd58fa24d5aa6945570d37deed7, type: 2}
+    difficulty: 1
+  - id: f8a49129a6361404f8efaf8f0260d2be
+    prefab: {fileID: 1312310475181655386, guid: f8a49129a6361404f8efaf8f0260d2be, type: 3}
+    npcName: NPC_63
+    sicknessIds:
+    - 25be672cbb8c4af5ba855e99d8f8133b
+    - 7f12a9d40bea47f5b5284f48762375b1
+    dialogueAsset: {fileID: 11400000, guid: 95fd6caf01a547079210c7506bc606ef, type: 2}
+    difficulty: 1
+  - id: 0e2f8cac76156664aa686ee482e87255
+    prefab: {fileID: 7935172364259926, guid: 0e2f8cac76156664aa686ee482e87255, type: 3}
+    npcName: NPC_64
+    sicknessIds:
+    - 811bcfba402245e7b53ea5c5a6938fc9
+    - 42ee7a9a38694d838b495736ea12cb20
+    dialogueAsset: {fileID: 11400000, guid: 38db1c0a5558499b885d8f64b483f9e2, type: 2}
+    difficulty: 1
+  - id: f6766c621ab611748a348d4c00997e09
+    prefab: {fileID: 7797186489806946696, guid: f6766c621ab611748a348d4c00997e09, type: 3}
+    npcName: NPC_65
+    sicknessIds:
+    - b5e06d1d7b2e459380ace3a0fe06b3d3
+    - 42ee7a9a38694d838b495736ea12cb20
+    dialogueAsset: {fileID: 11400000, guid: 1d16918ad9884f4493216c88c2e10ef3, type: 2}
+    difficulty: 1
+  - id: f0d72e4048d4a4048bbf234b91f32bd6
+    prefab: {fileID: 8033657893117988169, guid: f0d72e4048d4a4048bbf234b91f32bd6, type: 3}
+    npcName: NPC_66
+    sicknessIds:
+    - 811bcfba402245e7b53ea5c5a6938fc9
+    - 420888271cbf4de8947e7ef841c5e315
+    dialogueAsset: {fileID: 11400000, guid: 901eecc19fe148f4bbb4ac85f9dcfe3b, type: 2}
+    difficulty: 1
+  - id: 0c3e22593643e5543ae9e3d8fa4cda4e
+    prefab: {fileID: 2154399633525061192, guid: 0c3e22593643e5543ae9e3d8fa4cda4e, type: 3}
+    npcName: NPC_67
+    sicknessIds:
+    - 051fba9345c84e7488e692592100bb6d
+    - 25be672cbb8c4af5ba855e99d8f8133b
+    dialogueAsset: {fileID: 11400000, guid: 94d2b7950cf1407b9038e1d5c168eb5f, type: 2}
+    difficulty: 1
+  - id: 5a495a86c7249384f919b020ae2c9ccc
+    prefab: {fileID: 6214920365639112058, guid: 5a495a86c7249384f919b020ae2c9ccc, type: 3}
+    npcName: NPC_68
+    sicknessIds:
+    - 779507f7a91843d8bbe143a5a2400021
+    - 25be672cbb8c4af5ba855e99d8f8133b
+    dialogueAsset: {fileID: 11400000, guid: 7878349b0fca4fe0b93b4e417050c0f8, type: 2}
+    difficulty: 1
+  - id: f660a9a66aaa17b4facd494d7b1dddae
+    prefab: {fileID: 7693226451703401975, guid: f660a9a66aaa17b4facd494d7b1dddae, type: 3}
+    npcName: NPC_69
+    sicknessIds:
+    - b5e06d1d7b2e459380ace3a0fe06b3d3
+    - 7f12a9d40bea47f5b5284f48762375b1
+    dialogueAsset: {fileID: 11400000, guid: af8b753b98ab4a1682684e6b0fe639f9, type: 2}
+    difficulty: 1
+  - id: 7b5f7a2fab20a3a43b0e2e4551ad782f
+    prefab: {fileID: 735562645442410849, guid: 7b5f7a2fab20a3a43b0e2e4551ad782f, type: 3}
+    npcName: NPC_70
+    sicknessIds:
+    - 051fba9345c84e7488e692592100bb6d
+    - 43e85a3e33844988b968395fcb46a51e
+    dialogueAsset: {fileID: 11400000, guid: 5be2ef2e7a3f4b9ea48af2a6b1f08f9d, type: 2}
+    difficulty: 1
+  - id: 43eb61b5c0e61aa4584f9479b344fefa
+    prefab: {fileID: 1833879459493896377, guid: 43eb61b5c0e61aa4584f9479b344fefa, type: 3}
+    npcName: NPC_71
+    sicknessIds:
+    - 051fba9345c84e7488e692592100bb6d
+    - 420888271cbf4de8947e7ef841c5e315
+    dialogueAsset: {fileID: 11400000, guid: b1a4973c5c014c05beacea64701d7f95, type: 2}
+    difficulty: 1
+  - id: 0c543abb89ecb7d40afdecd302719713
+    prefab: {fileID: 1143602101667303014, guid: 0c543abb89ecb7d40afdecd302719713, type: 3}
+    npcName: NPC_72
+    sicknessIds:
+    - 25be672cbb8c4af5ba855e99d8f8133b
+    - 42ee7a9a38694d838b495736ea12cb20
+    - e659156e77fa4a84b852a36f23090055
+    dialogueAsset: {fileID: 11400000, guid: 0736a85ce46d44ac9291c8c58402c542, type: 2}
+    difficulty: 1
+  - id: 1fb513da2cbe3964b834c16a0b4a65f7
+    prefab: {fileID: 6013554629421156000, guid: 1fb513da2cbe3964b834c16a0b4a65f7, type: 3}
+    npcName: NPC_73
+    sicknessIds:
+    - 779507f7a91843d8bbe143a5a2400021
+    - 811bcfba402245e7b53ea5c5a6938fc9
+    - 051fba9345c84e7488e692592100bb6d
+    dialogueAsset: {fileID: 11400000, guid: 4a3dd79488084bc1a382079ee6b5c6be, type: 2}
+    difficulty: 1
+  - id: a24b32a9e8589604aa4a2a0fed779e13
+    prefab: {fileID: 7428997238929012978, guid: a24b32a9e8589604aa4a2a0fed779e13, type: 3}
+    npcName: NPC_74
+    sicknessIds:
+    - 811bcfba402245e7b53ea5c5a6938fc9
+    - 051fba9345c84e7488e692592100bb6d
+    - e659156e77fa4a84b852a36f23090055
+    dialogueAsset: {fileID: 11400000, guid: 1c46ef387d6b43908623dad3e43874f7, type: 2}
+    difficulty: 1
+  - id: 71e6cc7879bea22439af8e07e1e2ab9d
+    prefab: {fileID: 3740308836670713120, guid: 71e6cc7879bea22439af8e07e1e2ab9d, type: 3}
+    npcName: NPC_75
+    sicknessIds:
+    - 051fba9345c84e7488e692592100bb6d
+    - b5e06d1d7b2e459380ace3a0fe06b3d3
+    - 25be672cbb8c4af5ba855e99d8f8133b
+    dialogueAsset: {fileID: 11400000, guid: eb55a722c6224323ae9c60e56a5bbcb1, type: 2}
+    difficulty: 1
+  - id: ba7cde93effad864aa3d5436745bc701
+    prefab: {fileID: 8078184717678289869, guid: ba7cde93effad864aa3d5436745bc701, type: 3}
+    npcName: NPC_76
+    sicknessIds:
+    - b5e06d1d7b2e459380ace3a0fe06b3d3
+    - 43e85a3e33844988b968395fcb46a51e
+    - 420888271cbf4de8947e7ef841c5e315
+    dialogueAsset: {fileID: 11400000, guid: 47892a79b73544e88d64b2fb83e8b408, type: 2}
+    difficulty: 1
+  - id: 14394577aaaadba4f928343c03be2782
+    prefab: {fileID: 3204698606844606081, guid: 14394577aaaadba4f928343c03be2782, type: 3}
+    npcName: NPC_77
+    sicknessIds:
+    - 779507f7a91843d8bbe143a5a2400021
+    - b5e06d1d7b2e459380ace3a0fe06b3d3
+    - e659156e77fa4a84b852a36f23090055
+    dialogueAsset: {fileID: 11400000, guid: 31b2b3a7e71d40379827bfe3aa40efa8, type: 2}
+    difficulty: 1
+  - id: 7f5c4d62e954c974ab2e5f29bdfbf315
+    prefab: {fileID: 7695663991690181631, guid: 7f5c4d62e954c974ab2e5f29bdfbf315, type: 3}
+    npcName: NPC_78
+    sicknessIds:
+    - 811bcfba402245e7b53ea5c5a6938fc9
+    - ab5cf45d3497440c8483faf8d964c7af
+    - 42ee7a9a38694d838b495736ea12cb20
+    dialogueAsset: {fileID: 11400000, guid: 16daebcbae6045a988d07ec52ec8a508, type: 2}
+    difficulty: 1
+  - id: 9c5b169736a563e43862b19297c18a88
+    prefab: {fileID: 6839794537159731063, guid: 9c5b169736a563e43862b19297c18a88, type: 3}
+    npcName: NPC_79
+    sicknessIds:
+    - e5c336e89c4145a7a647c6813adbbb2e
+    - 811bcfba402245e7b53ea5c5a6938fc9
+    - 420888271cbf4de8947e7ef841c5e315
+    dialogueAsset: {fileID: 11400000, guid: ff059a6d56054ebc892b2adb019cdcd7, type: 2}
+    difficulty: 1
+  - id: 3e629cfe73e9e194cb8113f39bb01408
+    prefab: {fileID: 4566276327961672605, guid: 3e629cfe73e9e194cb8113f39bb01408, type: 3}
+    npcName: NPC_80
+    sicknessIds:
+    - e5c336e89c4145a7a647c6813adbbb2e
+    - b5e06d1d7b2e459380ace3a0fe06b3d3
+    - 25be672cbb8c4af5ba855e99d8f8133b
+    dialogueAsset: {fileID: 11400000, guid: 66701253f9c44f568261bdc291c57884, type: 2}
+    difficulty: 1
+  - id: e556af0974bea4545838b10371676ab6
+    prefab: {fileID: 4067926302937173661, guid: e556af0974bea4545838b10371676ab6, type: 3}
+    npcName: NPC_81
+    sicknessIds:
+    - 779507f7a91843d8bbe143a5a2400021
+    - 25be672cbb8c4af5ba855e99d8f8133b
+    - 7f12a9d40bea47f5b5284f48762375b1
+    dialogueAsset: {fileID: 11400000, guid: fb8a01d6896e41c89c65c2f38a8a4540, type: 2}
+    difficulty: 1
+  - id: a6bbbfa0d071e4d4fae73437fe7809e2
+    prefab: {fileID: 3335076724782592511, guid: a6bbbfa0d071e4d4fae73437fe7809e2, type: 3}
+    npcName: NPC_82
+    sicknessIds:
+    - 051fba9345c84e7488e692592100bb6d
+    - b09d50f81fe14efab382c302f5b19ef0
+    - 420888271cbf4de8947e7ef841c5e315
+    dialogueAsset: {fileID: 11400000, guid: 6306eea5fa9b4affa9f60936902cd42f, type: 2}
+    difficulty: 1
+  - id: 229ca22088ad1c94188f9183c8862067
+    prefab: {fileID: 1656957395028378519, guid: 229ca22088ad1c94188f9183c8862067, type: 3}
+    npcName: NPC_83
+    sicknessIds:
+    - 811bcfba402245e7b53ea5c5a6938fc9
+    - 7f12a9d40bea47f5b5284f48762375b1
+    - e659156e77fa4a84b852a36f23090055
+    dialogueAsset: {fileID: 11400000, guid: d33ae0f70adf4ee0b635eda5c2a12357, type: 2}
+    difficulty: 1
+  - id: 4e3243d5d22a3e640b4c97fe71059a77
+    prefab: {fileID: 235139196418682330, guid: 4e3243d5d22a3e640b4c97fe71059a77, type: 3}
+    npcName: NPC_84
+    sicknessIds:
+    - 779507f7a91843d8bbe143a5a2400021
+    - 051fba9345c84e7488e692592100bb6d
+    - 7f12a9d40bea47f5b5284f48762375b1
+    dialogueAsset: {fileID: 11400000, guid: 60c0007229544f4e984c1ba7ec5f757e, type: 2}
+    difficulty: 1
+  - id: 2d09773cfc018374ba0af1c55f160ca7
+    prefab: {fileID: 4730095545742968393, guid: 2d09773cfc018374ba0af1c55f160ca7, type: 3}
+    npcName: NPC_85
+    sicknessIds:
+    - e5c336e89c4145a7a647c6813adbbb2e
+    - 42ee7a9a38694d838b495736ea12cb20
+    - e659156e77fa4a84b852a36f23090055
+    dialogueAsset: {fileID: 11400000, guid: 059e79c60cf34ae6a406b437e1df888e, type: 2}
+    difficulty: 1
+  - id: 937547b3984d5024f97ec175d0970d6a
+    prefab: {fileID: 6150202290472673596, guid: 937547b3984d5024f97ec175d0970d6a, type: 3}
+    npcName: NPC_86
+    sicknessIds:
+    - 779507f7a91843d8bbe143a5a2400021
+    - ab5cf45d3497440c8483faf8d964c7af
+    - 051fba9345c84e7488e692592100bb6d
+    dialogueAsset: {fileID: 11400000, guid: 4c547583668246e5a46bc74e4d52c322, type: 2}
+    difficulty: 1
+  - id: 0277cf74389187f4d9913be4fe3a4562
+    prefab: {fileID: 8894660751318677636, guid: 0277cf74389187f4d9913be4fe3a4562, type: 3}
+    npcName: NPC_87
+    sicknessIds:
+    - 811bcfba402245e7b53ea5c5a6938fc9
+    - 42ee7a9a38694d838b495736ea12cb20
+    - 7f12a9d40bea47f5b5284f48762375b1
+    dialogueAsset: {fileID: 11400000, guid: 4fc8aa42b6fa49ccb283e1cb1b47660c, type: 2}
+    difficulty: 1
+  - id: e0df63dee3fdff44e9e9c6be8c2f2a0c
+    prefab: {fileID: 1332362090176936185, guid: e0df63dee3fdff44e9e9c6be8c2f2a0c, type: 3}
+    npcName: NPC_88
+    sicknessIds:
+    - 25be672cbb8c4af5ba855e99d8f8133b
+    - b09d50f81fe14efab382c302f5b19ef0
+    - 420888271cbf4de8947e7ef841c5e315
+    dialogueAsset: {fileID: 11400000, guid: c085197eb3204938bec1ff695f9d11c9, type: 2}
+    difficulty: 1
+  - id: e0999411b4dc8e84490abc2aeb317642
+    prefab: {fileID: 8987439283335854932, guid: e0999411b4dc8e84490abc2aeb317642, type: 3}
+    npcName: NPC_89
+    sicknessIds:
+    - 051fba9345c84e7488e692592100bb6d
+    - 25be672cbb8c4af5ba855e99d8f8133b
+    - b09d50f81fe14efab382c302f5b19ef0
+    dialogueAsset: {fileID: 11400000, guid: 78342cc1b81b4cb9a84171901ecacd59, type: 2}
+    difficulty: 1
+  - id: 91da00f75880135469bdec4ee248f555
+    prefab: {fileID: 6745350284132576612, guid: 91da00f75880135469bdec4ee248f555, type: 3}
+    npcName: NPC_90
+    sicknessIds:
+    - 811bcfba402245e7b53ea5c5a6938fc9
+    - 25be672cbb8c4af5ba855e99d8f8133b
+    - 420888271cbf4de8947e7ef841c5e315
+    dialogueAsset: {fileID: 11400000, guid: 0c6b6a325c654cc286d07e11eab147ee, type: 2}
+    difficulty: 1
+  - id: bc870210f719e584fa2e00d36f52da68
+    prefab: {fileID: 6831936541889564538, guid: bc870210f719e584fa2e00d36f52da68, type: 3}
+    npcName: NPC_91
+    sicknessIds:
+    - 779507f7a91843d8bbe143a5a2400021
+    - 7f12a9d40bea47f5b5284f48762375b1
+    - b09d50f81fe14efab382c302f5b19ef0
+    dialogueAsset: {fileID: 11400000, guid: 57bb5904cae740f9a39b88988478b9f0, type: 2}
+    difficulty: 1
+  - id: 6342625b6f32d37449c86c65084a20c0
+    prefab: {fileID: 8701766909000273175, guid: 6342625b6f32d37449c86c65084a20c0, type: 3}
+    npcName: NPC_92
+    sicknessIds:
+    - 811bcfba402245e7b53ea5c5a6938fc9
+    - ab5cf45d3497440c8483faf8d964c7af
+    - 051fba9345c84e7488e692592100bb6d
+    - 420888271cbf4de8947e7ef841c5e315
+    dialogueAsset: {fileID: 11400000, guid: 3e72cbcd04d34805af5f5e499718d9d8, type: 2}
+    difficulty: 1
+  - id: e4afe52b7fd3cfe4da4ba494b05e4af2
+    prefab: {fileID: 5136037493409548960, guid: e4afe52b7fd3cfe4da4ba494b05e4af2, type: 3}
+    npcName: NPC_93
+    sicknessIds:
+    - e5c336e89c4145a7a647c6813adbbb2e
+    - ab5cf45d3497440c8483faf8d964c7af
+    - 25be672cbb8c4af5ba855e99d8f8133b
+    - 420888271cbf4de8947e7ef841c5e315
+    dialogueAsset: {fileID: 11400000, guid: edcd1b4cdaa84c25afb0be0d6a4b55d4, type: 2}
+    difficulty: 1
+  - id: 0273e0f7cd0df2f46960ec74d10196d3
+    prefab: {fileID: 6402956385936551855, guid: 0273e0f7cd0df2f46960ec74d10196d3, type: 3}
+    npcName: NPC_94
+    sicknessIds:
+    - 811bcfba402245e7b53ea5c5a6938fc9
+    - ab5cf45d3497440c8483faf8d964c7af
+    - 43e85a3e33844988b968395fcb46a51e
+    - 420888271cbf4de8947e7ef841c5e315
+    dialogueAsset: {fileID: 11400000, guid: 4acc82990f9f443d9a4944dd0205ac39, type: 2}
+    difficulty: 1
+  - id: 5070d1599728ef9439dfed597d68e462
+    prefab: {fileID: 5490289228832817969, guid: 5070d1599728ef9439dfed597d68e462, type: 3}
+    npcName: NPC_95
+    sicknessIds:
+    - ab5cf45d3497440c8483faf8d964c7af
+    - 43e85a3e33844988b968395fcb46a51e
+    - 25be672cbb8c4af5ba855e99d8f8133b
+    - b09d50f81fe14efab382c302f5b19ef0
+    dialogueAsset: {fileID: 11400000, guid: 47e0757adcb04b878d6d460d761ddc62, type: 2}
+    difficulty: 1
+  - id: 166f3b575b53b0444b424dceccddb9b8
+    prefab: {fileID: 2227791676695943283, guid: 166f3b575b53b0444b424dceccddb9b8, type: 3}
+    npcName: NPC_96
+    sicknessIds:
+    - 779507f7a91843d8bbe143a5a2400021
+    - 25be672cbb8c4af5ba855e99d8f8133b
+    - 7f12a9d40bea47f5b5284f48762375b1
+    - 420888271cbf4de8947e7ef841c5e315
+    dialogueAsset: {fileID: 11400000, guid: 9727870630b44cf4918f62052d16c9c4, type: 2}
+    difficulty: 1
+  - id: 9788dc4df881f76429cbc0473bbe835f
+    prefab: {fileID: 6217720928392273268, guid: 9788dc4df881f76429cbc0473bbe835f, type: 3}
+    npcName: NPC_97
+    sicknessIds:
+    - b5e06d1d7b2e459380ace3a0fe06b3d3
+    - 42ee7a9a38694d838b495736ea12cb20
+    - 7f12a9d40bea47f5b5284f48762375b1
+    - 420888271cbf4de8947e7ef841c5e315
+    dialogueAsset: {fileID: 11400000, guid: 58f93aa36ac64cc9a3bf5b5201bbee7a, type: 2}
+    difficulty: 1
+  - id: af92d87396ee2b541ae8ce53ac712f03
+    prefab: {fileID: 1755003205181504254, guid: af92d87396ee2b541ae8ce53ac712f03, type: 3}
+    npcName: NPC_98
+    sicknessIds:
+    - 779507f7a91843d8bbe143a5a2400021
+    - 43e85a3e33844988b968395fcb46a51e
+    - 42ee7a9a38694d838b495736ea12cb20
+    - e659156e77fa4a84b852a36f23090055
+    dialogueAsset: {fileID: 11400000, guid: 2c777ed249cc4f86bad35df6d577750f, type: 2}
+    difficulty: 1
+  - id: 4612560a3d1415a47be4c1a8a97046b8
+    prefab: {fileID: 6581462377152759581, guid: 4612560a3d1415a47be4c1a8a97046b8, type: 3}
+    npcName: NPC_99
+    sicknessIds:
+    - 779507f7a91843d8bbe143a5a2400021
+    - ab5cf45d3497440c8483faf8d964c7af
+    - 25be672cbb8c4af5ba855e99d8f8133b
+    - e659156e77fa4a84b852a36f23090055
+    dialogueAsset: {fileID: 11400000, guid: d0a5ed52f82844eb923a2588b9a4a757, type: 2}
+    difficulty: 1
+  - id: 6d6caa7936c80cf4a8c99631cd7cbb04
+    prefab: {fileID: 8994311767110333545, guid: 6d6caa7936c80cf4a8c99631cd7cbb04, type: 3}
+    npcName: NPC_100
+    sicknessIds:
+    - 779507f7a91843d8bbe143a5a2400021
+    - ab5cf45d3497440c8483faf8d964c7af
+    - 42ee7a9a38694d838b495736ea12cb20
+    - 420888271cbf4de8947e7ef841c5e315
+    dialogueAsset: {fileID: 11400000, guid: 940f59f6ebac4b1d8d3504a82bc53832, type: 2}
+    difficulty: 1
+  - id: b74a30ca538af9941af62f53ffc201d7
+    prefab: {fileID: 2318312236483321485, guid: b74a30ca538af9941af62f53ffc201d7, type: 3}
+    npcName: NPC_101
+    sicknessIds:
+    - 811bcfba402245e7b53ea5c5a6938fc9
+    - 051fba9345c84e7488e692592100bb6d
+    - 43e85a3e33844988b968395fcb46a51e
+    - 7f12a9d40bea47f5b5284f48762375b1
+    dialogueAsset: {fileID: 11400000, guid: 5231da3c813a4d4783c9f85986c47250, type: 2}
+    difficulty: 1
+  - id: 3929ab750be982b4f97061019b457edc
+    prefab: {fileID: 8288991993963850963, guid: 3929ab750be982b4f97061019b457edc, type: 3}
+    npcName: NPC_102
+    sicknessIds:
+    - ab5cf45d3497440c8483faf8d964c7af
+    - b5e06d1d7b2e459380ace3a0fe06b3d3
+    - 7f12a9d40bea47f5b5284f48762375b1
+    - 420888271cbf4de8947e7ef841c5e315
+    dialogueAsset: {fileID: 11400000, guid: bdfb0bb7e0fa4028a39b0aebe13b425f, type: 2}
+    difficulty: 1
+  - id: 358a0295e90ec18458b03296aaec0cf5
+    prefab: {fileID: 7853484092701862920, guid: 358a0295e90ec18458b03296aaec0cf5, type: 3}
+    npcName: NPC_103
+    sicknessIds:
+    - e5c336e89c4145a7a647c6813adbbb2e
+    - 43e85a3e33844988b968395fcb46a51e
+    - 25be672cbb8c4af5ba855e99d8f8133b
+    - b09d50f81fe14efab382c302f5b19ef0
+    dialogueAsset: {fileID: 11400000, guid: 41c14edc246e48978de8c78f0ef98475, type: 2}
+    difficulty: 1
+  - id: fc8c82ba478fa0846b0d747d9379ff52
+    prefab: {fileID: 3059010005321813477, guid: fc8c82ba478fa0846b0d747d9379ff52, type: 3}
+    npcName: NPC_104
+    sicknessIds:
+    - 811bcfba402245e7b53ea5c5a6938fc9
+    - 43e85a3e33844988b968395fcb46a51e
+    - 42ee7a9a38694d838b495736ea12cb20
+    - e659156e77fa4a84b852a36f23090055
+    dialogueAsset: {fileID: 11400000, guid: 5ec9f6b2e1714da78f26e3636e4deb83, type: 2}
+    difficulty: 1
+  - id: da459713c3dd0d94ea5afcb3f9f5e7ad
+    prefab: {fileID: 8775006817071672297, guid: da459713c3dd0d94ea5afcb3f9f5e7ad, type: 3}
+    npcName: NPC_105
+    sicknessIds:
+    - e5c336e89c4145a7a647c6813adbbb2e
+    - b5e06d1d7b2e459380ace3a0fe06b3d3
+    - 25be672cbb8c4af5ba855e99d8f8133b
+    - b09d50f81fe14efab382c302f5b19ef0
+    dialogueAsset: {fileID: 11400000, guid: dc40c7c2cf2d4a848886cb39b3b3a1a8, type: 2}
+    difficulty: 1
+  - id: 34744b95aac151048ad27e27d684d077
+    prefab: {fileID: 4189148841112011055, guid: 34744b95aac151048ad27e27d684d077, type: 3}
+    npcName: NPC_106
+    sicknessIds:
+    - 779507f7a91843d8bbe143a5a2400021
+    - ab5cf45d3497440c8483faf8d964c7af
+    - 43e85a3e33844988b968395fcb46a51e
+    - e659156e77fa4a84b852a36f23090055
+    dialogueAsset: {fileID: 11400000, guid: c61f5b3fad7c43b58493fba25b053385, type: 2}
+    difficulty: 1
+  - id: 93d6dc14ea0537f4f80dd63f601e44a4
+    prefab: {fileID: 8189923616699068244, guid: 93d6dc14ea0537f4f80dd63f601e44a4, type: 3}
+    npcName: NPC_107
+    sicknessIds:
+    - e5c336e89c4145a7a647c6813adbbb2e
+    - 779507f7a91843d8bbe143a5a2400021
+    - 811bcfba402245e7b53ea5c5a6938fc9
+    - 7f12a9d40bea47f5b5284f48762375b1
+    dialogueAsset: {fileID: 11400000, guid: f8095052722049f0a50bf12272b2942c, type: 2}
+    difficulty: 1
+  - id: d18c26af487941542bd2f8515c3d6fd6
+    prefab: {fileID: 7033350197836751592, guid: d18c26af487941542bd2f8515c3d6fd6, type: 3}
+    npcName: NPC_108
+    sicknessIds:
+    - b5e06d1d7b2e459380ace3a0fe06b3d3
+    - 43e85a3e33844988b968395fcb46a51e
+    - 7f12a9d40bea47f5b5284f48762375b1
+    - e659156e77fa4a84b852a36f23090055
+    dialogueAsset: {fileID: 11400000, guid: 6065850191ff444485dffe4249b7fc89, type: 2}
+    difficulty: 1
+  - id: 529b6f69fb2b42f4788c4b8df562a2c4
+    prefab: {fileID: 8348743364501465221, guid: 529b6f69fb2b42f4788c4b8df562a2c4, type: 3}
+    npcName: NPC_109
+    sicknessIds:
+    - b5e06d1d7b2e459380ace3a0fe06b3d3
+    - 25be672cbb8c4af5ba855e99d8f8133b
+    - e659156e77fa4a84b852a36f23090055
+    - 420888271cbf4de8947e7ef841c5e315
+    dialogueAsset: {fileID: 11400000, guid: 937215b59b63442890741fc26060e382, type: 2}
+    difficulty: 1
+  - id: 7007f8f772289dd4eb95bf4683875ab4
+    prefab: {fileID: 1811009606495052776, guid: 7007f8f772289dd4eb95bf4683875ab4, type: 3}
+    npcName: NPC_110
+    sicknessIds:
+    - 779507f7a91843d8bbe143a5a2400021
+    - 811bcfba402245e7b53ea5c5a6938fc9
+    - 051fba9345c84e7488e692592100bb6d
+    - 25be672cbb8c4af5ba855e99d8f8133b
+    dialogueAsset: {fileID: 11400000, guid: 77ed4270f1704360925b7573b620be2d, type: 2}
+    difficulty: 1
+  - id: a5d13f6e465d2dc4087df92c7259f284
+    prefab: {fileID: 9082241483775265610, guid: a5d13f6e465d2dc4087df92c7259f284, type: 3}
+    npcName: NPC_111
+    sicknessIds:
+    - e5c336e89c4145a7a647c6813adbbb2e
+    - 779507f7a91843d8bbe143a5a2400021
+    - 051fba9345c84e7488e692592100bb6d
+    - b09d50f81fe14efab382c302f5b19ef0
+    dialogueAsset: {fileID: 11400000, guid: b93b8e5932a540fa96c459c7534d93f4, type: 2}
+    difficulty: 1

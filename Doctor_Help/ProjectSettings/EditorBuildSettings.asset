@@ -6,11 +6,29 @@ EditorBuildSettings:
   serializedVersion: 2
   m_Scenes:
   - enabled: 1
-    path: Assets/Scenes/Home.unity
-    guid: 7e55fac756d25544d8e70a0cb0a7dd9c
+    path: Assets/Scenes/Player_Home.unity
+    guid: 4f3e14c537adc1d40a76d84a5a9310b5
   - enabled: 1
     path: Assets/Scenes/Office.unity
     guid: 99c9720ab356a0642a771bea13969a05
+  - enabled: 1
+    path: Assets/Scenes/Street.unity
+    guid: ce4b7116a37f57246988a43e36cb0c3d
+  - enabled: 1
+    path: Assets/Scenes/Lantern_Surgery.unity
+    guid: eac13951375458e4e9050124aa757126
+  - enabled: 1
+    path: Assets/Scenes/Ashbury_Clinic.unity
+    guid: 528e6bf2c1822c04db9f7a14b3ee928d
+  - enabled: 1
+    path: Assets/Scenes/Bramwell_Clinic.unity
+    guid: b574401c812f5fa4dae023c323f8616d
+  - enabled: 1
+    path: Assets/Scenes/Ivy_Clinic.unity
+    guid: e3bc39559c3821f44bc30926721fe245
+  - enabled: 1
+    path: Assets/Scenes/Crown_Clinic.unity
+    guid: bf6ef7ae97092924db99789edbcc4bc3
   m_configObjects:
     com.unity.input.settings.actions: {fileID: -944628639613478452, guid: 052faaac586de48259a63d0c4782560b, type: 3}
   m_UseUCBPForAssetBundles: 0

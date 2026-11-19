@@ -18,8 +18,17 @@ namespace DoctorHelp
     public sealed class DayFlowPlan
     {
         private readonly DayStep[] steps;
-        private DayStep repeatFrom, repeatTo;
-        private Func<bool> shouldRepeat;
+        private readonly Dictionary<DayStep, (DayStep target, Func<bool> condition)> branches =
+            new Dictionary<DayStep, (DayStep, Func<bool>)>();
+        private readonly Dictionary<DayStep, DayStep> returnTargets = new Dictionary<DayStep, DayStep>();
+        public void AllowReturn(DayStep from, DayStep to)
+        {
+            if (Array.IndexOf(steps, from) <= 0 || Array.IndexOf(steps, to) <= 0)
+                throw new ArgumentException("Return must stay within the working day.");
+            returnTargets.Add(from, to);
+        }
+        public DayStep ReturnTarget(DayStep from) => returnTargets.TryGetValue(from, out var target)
+            ? target : throw new InvalidOperationException("No return registered for " + from);
         public DayStep Initial => steps[0];
         public IReadOnlyList<DayStep> Steps => Array.AsReadOnly(steps);
 
@@ -38,16 +47,22 @@ namespace DoctorHelp
             int start = Array.IndexOf(steps, to), end = Array.IndexOf(steps, from);
             if (start <= 0 || end < start || end >= steps.Length - 1 || condition == null)
                 throw new ArgumentException("A repeat must stay between Preparation and DayResults.");
-            repeatFrom = from;
-            repeatTo = to;
-            shouldRepeat = condition;
+            branches.Add(from, (to, condition));
+        }
+
+        public void SkipWhile(DayStep from, DayStep to, Func<bool> condition)
+        {
+            int start = Array.IndexOf(steps, from), end = Array.IndexOf(steps, to);
+            if (start <= 0 || end <= start + 1 || end >= steps.Length - 1 || condition == null)
+                throw new ArgumentException("A skip must stay between Preparation and DayResults.");
+            branches.Add(from, (to, condition));
         }
 
         public DayStep Next(DayStep current)
         {
             int index = Array.IndexOf(steps, current);
             if (index < 0) throw new ArgumentException("Step is not in this flow: " + current);
-            if (shouldRepeat != null && current == repeatFrom && shouldRepeat()) return repeatTo;
+            if (branches.TryGetValue(current, out var branch) && branch.condition()) return branch.target;
             return steps[(index + 1) % steps.Length];
         }
     }
@@ -86,6 +101,8 @@ namespace DoctorHelp
 
         public Task<bool> RetryAsync(CancellationToken token) =>
             FailedStep.HasValue ? TransitionAsync(FailedStep.Value, token) : Task.FromResult(false);
+        public Task<bool> ReturnAsync(CancellationToken token) => CurrentStep.HasValue && !FailedStep.HasValue
+            ? TransitionAsync(plan.ReturnTarget(CurrentStep.Value), token) : Task.FromResult(false);
 
         private async Task<bool> TransitionAsync(DayStep target, CancellationToken token)
         {

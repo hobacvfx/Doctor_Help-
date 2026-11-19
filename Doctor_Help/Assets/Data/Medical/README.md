@@ -5,7 +5,7 @@ Imported from the user's color-coded design diagram on 2026-10-26. Names are tra
 ## Disease mappings
 
 - **Trauma** (Chấn thương): Bone Fracture → Bone Growth Medicine.
-- **Delusional Disorder** (Bệnh hoang tưởng): Incoherent Speech → Sedative.
+- **Delusional Disorder** (Bệnh hoang tưởng): Incoherent Speech, Abnormal Brain → Sedative.
 - **Worm Infestation** (Bệnh giun): Worm Infestation → Deworming Medicine.
 - **Internal Organ Disease** (Bệnh nội tạng): Internal Organ Abnormality → Deworming Medicine.
 - **Heart Disease** (Bệnh tim): Heart Abnormality → Heart Medicine.

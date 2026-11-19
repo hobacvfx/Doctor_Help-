@@ -12,6 +12,7 @@ namespace DoctorHelp
         [SerializeField] private GameObject heartCheck;
         [SerializeField] private ParticleSystem feedbackVfx;
         [SerializeField] private ParticleSystem soundVfx;
+        [SerializeField] private ParticleSystem visibilityPuff;
         [SerializeField] private AudioSource heartbeatAudio;
         [SerializeField] private AudioClip heartbeatClip;
         [SerializeField] private HeartbeatRhythm rhythm = new HeartbeatRhythm();
@@ -49,24 +50,24 @@ namespace DoctorHelp
             if (heartCheck != null && heartCheck.activeSelf != selected) heartCheck.SetActive(selected);
             if (!selected || !selection.IsUsingStethoscope)
             {
-                if (listening) StopListening();
+                if (listening) StopListening(playPuff: true);
                 return;
             }
             CaptureSizes();
             if (heartCheck == null || feedbackVfx == null || soundVfx == null || heartbeatAudio == null || heartbeatClip == null || targetCamera == null)
             {
                 ReportError("Heartbeat examination has missing scene references.");
-                StopListening();
+                StopListening(playPuff: true);
                 return;
             }
             var patient = patients != null ? patients.CurrentPatient : null;
             if (patient == null || patient.Heart == null)
             {
                 ReportError("The current patient has no examination profile or Heart anchor.");
-                StopListening();
+                StopListening(playPuff: true);
                 return;
             }
-            if (listenedPatient != patient) listening = false;
+            if (listening && listenedPatient != patient) StopListening(playPuff: true);
             listenedPatient = patient;
             if (!listening)
             {
@@ -94,6 +95,7 @@ namespace DoctorHelp
             {
                 listening = true;
                 nextBeatTime = now;
+                PlayPuff();
                 if (CurrentBpm <= 0) ShowStaticFeedback();
             }
             if (CurrentBpm <= 0 || now < nextBeatTime) return;
@@ -146,8 +148,15 @@ namespace DoctorHelp
             effect.Stop(false, ParticleSystemStopBehavior.StopEmittingAndClear);
             effect.Play(false);
         }
-        private void StopListening()
+        private void PlayPuff()
         {
+            if (feedbackVfx != null)
+                ExaminationPuff.Play(visibilityPuff, heartCheck, feedbackVfx.transform.position);
+        }
+
+        private void StopListening(bool playPuff = false)
+        {
+            if (playPuff && listening) PlayPuff();
             listening = false;
             CurrentBpm = CurrentGain = previousGain = 0;
             if (feedbackVfx != null) feedbackVfx.Stop(false, ParticleSystemStopBehavior.StopEmittingAndClear);

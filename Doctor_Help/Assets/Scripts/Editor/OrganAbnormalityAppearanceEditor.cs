@@ -24,7 +24,7 @@ namespace DoctorHelp.Editor
                 int selected = EditorGUILayout.Popup("Organ symptom", current, names);
                 if (selected != current) mapping.stringValue = selected == 0 ? "" : source.Symptoms[selected - 1].Id;
             }
-            EditorGUILayout.HelpBox("One random organ per consultation, placed at its paired anchor. Reinitializing replaces only the generated organ. Prefab layers, materials and scale are preserved.", MessageType.Info);
+            EditorGUILayout.HelpBox("One random prefab per consultation, placed at its paired anchor. Different prefabs can share an anchor. Reinitializing replaces only the generated organ.", MessageType.Info);
             serializedObject.ApplyModifiedProperties();
         }
     }

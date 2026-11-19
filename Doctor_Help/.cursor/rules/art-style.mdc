@@ -1,0 +1,10 @@
+---
+description: Chuẩn render và ghép sprite cho NPC, thuốc, triệu chứng và UI Doctor Help
+globs: Assets/2D_Assets/**,Assets/Art/**,Design/**
+alwaysApply: false
+---
+
+Trước khi tạo hoặc chỉnh hình, đọc `Design/Art/STYLE_GUIDE.md` và xem các ảnh mẫu được dẫn trong đó.
+Dùng NPC_0 để xác định anatomy, tỷ lệ và vị trí; dùng bộ thuốc được duyệt để xác định cách render.
+Giữ sprite thành phần độc lập. Kiểm tra material và ClothSeeThroughController trên mọi lớp cần xuyên khi soi.
+Khi bàn giao, phân biệt kiểm chứng Edit Mode, Play Mode và thiết bị; không dùng save thật để test.
