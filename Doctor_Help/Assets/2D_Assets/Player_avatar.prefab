@@ -1153,6 +1153,7 @@ GameObject:
   - component: {fileID: 3844859526081371180}
   - component: {fileID: 7712073932265925276}
   - component: {fileID: 7389216584840794004}
+  - component: {fileID: 5070183650160681338}
   m_Layer: 0
   m_Name: Player_avatar
   m_TagString: Untagged
@@ -1228,10 +1229,13 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DoctorHelp.PatientExaminationProfile
   heart: {fileID: 5138049581810106813}
+  treasureBody: {fileID: 0}
   profile: {fileID: 0}
   npcId: 
   hasConsultationTemperature: 0
   consultationTemperature: 0
+  hasConsultationHeartbeat: 0
+  consultationHeartbeat: 0
   consultationId: 
 --- !u!114 &4000944904687179585
 MonoBehaviour:
@@ -1328,14 +1332,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c190b494b7803a5409071caa266cf4c0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DoctorHelp.NpcDialogue
-  patientAnimator: {fileID: 5231943393757721171}
   chatBox: {fileID: 1979860570140014085}
+  chatBoxClip: {fileID: 0}
   dialogueText: {fileID: 2264899517929987656}
   nextObject: {fileID: 1371439694595986280}
   lips: {fileID: 6151264374062066090}
   charactersPerSecond: 30
+  ambientHoldSeconds: 5
   fitInViewport: 1
-  maximumViewportWidth: 0.38
   screenPadding: 16
 --- !u!114 &6151264374062066090
 MonoBehaviour:
@@ -1456,6 +1460,23 @@ MonoBehaviour:
   sceneCamera: {fileID: 0}
   guideChest: {fileID: 5138049581810106813}
   moveSpeed: 10
+--- !u!114 &5070183650160681338
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6506602027932096564}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 28b3e6674fd241743a7b8a3b2fc3c548, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::DoctorHelp.PlayerDirtiness
+  smellyEffect: {fileID: 3342197913089542085, guid: 4a635160a89c57e408f36d0c93f8fc18, type: 3}
+  verySmellyEffect: {fileID: 3342197913089542085, guid: 1f5c105b8119e014db46d8b17a503287, type: 3}
+  effectOffset: {x: 0, y: 0, z: 0}
+  slowPenalty: 0.4
+  filthyPenalty: 0.85
 --- !u!1 &6838515250516506731
 GameObject:
   m_ObjectHideFlags: 0

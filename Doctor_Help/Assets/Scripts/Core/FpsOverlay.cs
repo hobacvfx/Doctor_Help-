@@ -10,6 +10,8 @@ namespace DoctorHelp
         private int frames;
         private bool sampleStarted;
         private Text label;
+        [Tooltip("Optional: kept inside the device safe area.")]
+        [SerializeField] private RectTransform safeArea;
 
         private void Awake() => label = GetComponent<Text>();
         private void OnEnable() => ResetSample();
@@ -29,6 +31,8 @@ namespace DoctorHelp
             elapsed = 0f;
             frames = 0;
         }
+
+        private void LateUpdate() => ScreenSafeArea.ApplyTo(safeArea);
 
         private void OnApplicationPause(bool paused) => ResetSample();
 

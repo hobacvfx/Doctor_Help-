@@ -28,9 +28,11 @@ namespace DoctorHelp
 
         public void CompleteDay(int incorrectPatients, int goldDelta, float? dailyRating = null,
             bool hadConsultations = true, float requiredStreakDays = DifficultyProfile.DefaultSuccessStreak,
-            int goldEarned = 0)
+            int goldEarned = 0, int patientsExamined = 0, int electricityUsed = 0)
         {
             if (incorrectPatients < 0) throw new ArgumentOutOfRangeException(nameof(incorrectPatients));
+            if (patientsExamined < 0) throw new ArgumentOutOfRangeException(nameof(patientsExamined));
+            if (electricityUsed < 0) throw new ArgumentOutOfRangeException(nameof(electricityUsed));
             var nextDay = WorkingProfile.Copy();
             if (dailyRating is float value)
             {
@@ -47,6 +49,11 @@ namespace DoctorHelp
             nextDay.walterQuest.CloseDay(nextDay.currentDay);
             nextDay.currentDay = checked(nextDay.currentDay + 1);
             nextDay.playSeconds = 0d;
+            // Every examined patient leaves the doctor half a point dirtier for the next day.
+            nextDay.dirt = Math.Min(PlayerProfileData.MaxDirt,
+                nextDay.dirt + patientsExamined * PlayerProfileData.DirtPerPatient);
+            // The day's furniture electricity is paid when the next day starts; it never goes below zero.
+            nextDay.electricity = Math.Max(0, nextDay.electricity - electricityUsed);
             DifficultyProfile.Advance(nextDay, incorrectPatients, hadConsultations, requiredStreakDays);
             nextDay.clinicDirtDays.RemoveAll(entry => entry.IsExpiredOn(nextDay.currentDay));
             nextDay.ghostNumber = checked(nextDay.ghostNumber + incorrectPatients);

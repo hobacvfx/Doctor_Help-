@@ -55,3 +55,5 @@ MonoBehaviour:
   defaultFurniture: 1
   furnitureLevel: 0
   equippedVisual: {fileID: 176444578778948757, guid: 99e7f4fe9cc5b494c8afc442c9cd41d1, type: 3}
+  movingPart: {fileID: 0}
+  electricityPerDay: 25

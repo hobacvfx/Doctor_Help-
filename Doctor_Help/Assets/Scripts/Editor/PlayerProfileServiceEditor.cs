@@ -19,6 +19,12 @@ namespace DoctorHelp.Editor
             serializedObject.ApplyModifiedProperties();
             int money = EditorGUILayout.IntField("Player Money", profile.Money);
             if (money != profile.Money) profile.SetMoney(money);
+            int water = EditorGUILayout.IntField("Clean Water", profile.Water);
+            if (water != profile.Water) profile.SetWater(water);
+            int electricity = EditorGUILayout.IntField("Electricity", profile.Electricity);
+            if (electricity != profile.Electricity) profile.SetElectricity(electricity);
+            float dirt = EditorGUILayout.Slider("Player Dirt", profile.Dirt, 0f, PlayerProfileData.MaxDirt);
+            if (dirt != profile.Dirt) profile.SetDirt(Mathf.Round(dirt * 2f) / 2f);
             float rating = EditorGUILayout.Slider("Rating", profile.Rating, 0f, PlayerProfileData.MaxRating);
             if (rating != profile.Rating) profile.SetRating(rating);
             profile.SetThrowRock(EditorGUILayout.Toggle("Throw Rock", profile.ThrowRock));

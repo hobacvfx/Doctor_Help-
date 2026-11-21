@@ -1,4 +1,3 @@
-using System.Collections;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -8,7 +7,6 @@ namespace DoctorHelp
     public sealed class TreasureHuntFeedback : MaskableGraphic
     {
         [SerializeField] private Headbar headbar;
-        [SerializeField] private Image coinPrefab;
         [SerializeField] private Color trackColor = new Color(.12f, .09f, .07f, .94f);
         [SerializeField] private Color fillColor = new Color(1f, .78f, .36f, 1f);
         private Vector2? ringCenter;
@@ -37,30 +35,10 @@ namespace DoctorHelp
             SetVerticesDirty();
         }
 
+        // The treasure's VFX_Puff is played by TreasureHunt; the Headbar flies the gold icons.
         internal void FlyGold(Vector2 screenPosition, int amount)
         {
-            if (headbar == null || coinPrefab == null) return;
-            RectTransformUtility.ScreenPointToLocalPointInRectangle(rectTransform, screenPosition, null, out var start);
-            for (int i = 0; i < amount; i++)
-            {
-                var coin = Instantiate(coinPrefab, rectTransform, false).rectTransform;
-                coin.localPosition = start;
-                StartCoroutine(FlyCoin(coin, start, Random.insideUnitCircle * 30f, i * .035f));
-            }
-        }
-
-        private IEnumerator FlyCoin(RectTransform coin, Vector2 start, Vector2 scatter, float delay)
-        {
-            const float duration = .55f;
-            for (float elapsed = -delay; elapsed < duration; elapsed += Time.unscaledDeltaTime)
-            {
-                float t = Mathf.Clamp01(elapsed / duration);
-                var target = headbar.GoldTarget;
-                var end = rectTransform.InverseTransformPoint(target.TransformPoint(target.rect.center));
-                coin.localPosition = Vector2.Lerp(start, end, t * t) + scatter * Mathf.Sin(Mathf.PI * t);
-                yield return null;
-            }
-            Destroy(coin.gameObject);
+            if (headbar != null) headbar.FlyReward(CurrencyKind.Gold, amount, screenPosition);
         }
 
         protected override void OnPopulateMesh(VertexHelper mesh)

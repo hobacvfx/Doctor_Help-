@@ -1,5 +1,4 @@
 using System;
-using System.Collections;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -142,27 +141,12 @@ namespace DoctorHelp
                 conversation.SetActive(false);
                 ResumeGameplay();
                 speaking = false;
-                StartCoroutine(FlyReward());
+                // Puff at the screen center, then the reward flies into the Headbar as gold icons.
+                Vector2 origin = RectTransformUtility.WorldToScreenPoint(null, safeArea.TransformPoint(safeArea.rect.center));
+                headbar.PlayRewardPuff(origin, Camera.main);
+                headbar.FlyReward(CurrencyKind.Gold, WalterQuest.Reward, origin);
+                Close();
             }
-        }
-
-        private IEnumerator FlyReward()
-        {
-            rewardText.text = $"+{WalterQuest.Reward} Gold";
-            rewardText.gameObject.SetActive(true);
-            var rect = rewardText.rectTransform;
-            Vector3 start = safeArea.TransformPoint(safeArea.rect.center);
-            Vector2 screen = RectTransformUtility.WorldToScreenPoint(null, headbar.GoldTarget.position);
-            RectTransformUtility.ScreenPointToWorldPointInRectangle(safeArea, screen, null, out var end);
-            const float duration = .75f;
-            for (float elapsed = 0f; elapsed < duration; elapsed += Time.unscaledDeltaTime)
-            {
-                rect.position = Vector3.Lerp(start, end, Mathf.SmoothStep(0f, 1f, elapsed / duration));
-                yield return null;
-            }
-            rect.position = end;
-            yield return null;
-            Close();
         }
 
         private void ResumeGameplay()

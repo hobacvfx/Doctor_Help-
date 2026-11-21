@@ -11,6 +11,9 @@ namespace DoctorHelp
         public bool IsLoaded => session != null;
         public string SavePath => store.SavePath;
         public int Money => Data.money;
+        public int Water => Data.water;
+        public int Electricity => Data.electricity;
+        public float Dirt => Data.dirt;
         public float Rating => Data.rating;
         public int CurrentDay => Data.currentDay;
         public bool ThrowRock => IsLoaded && Data.throwRock;
@@ -28,6 +31,8 @@ namespace DoctorHelp
         public int PatientsSaved => Data.patientsSaved;
         public int GhostNumber => Data.ghostNumber;
         internal bool IsStreetRockThrowingActive => IsLoaded && Data.IsStreetRockThrowingActive;
+        internal int DartsLeft => IsLoaded ? Data.DartsLeft : 0;
+        internal bool IsDartBalloonPopped(int reward) => IsLoaded && Data.IsDartBalloonPopped(reward);
 
         private PlayerProfileSession session;
         private PlayerProfileStore store;
@@ -126,6 +131,33 @@ namespace DoctorHelp
         }
 
         public void SetMoney(int value) { Data.money = value; Commit(); }
+        public void SetWater(int value) { Data.water = Math.Max(0, value); Commit(); }
+        public void SetElectricity(int value) { Data.electricity = Math.Max(0, value); Commit(); }
+        public void SetDirt(float value) { Data.dirt = Mathf.Clamp(value, 0f, PlayerProfileData.MaxDirt); Commit(); }
+
+        public void AddWater(int amount)
+        {
+            if (!IsLoaded || amount <= 0) return;
+            Data.water = checked(Data.water + amount);
+            Commit();
+        }
+
+        public void AddElectricity(int amount)
+        {
+            if (!IsLoaded || amount <= 0) return;
+            Data.electricity = checked(Data.electricity + amount);
+            Commit();
+        }
+
+        // Pays for a shower and removes its dirt in one save, so quitting mid-shower cannot lose either.
+        internal bool TryShower(int waterCost, float dirtRemoved)
+        {
+            if (!IsLoaded || waterCost < 0 || dirtRemoved < 0f || Data.water < waterCost) return false;
+            Data.water -= waterCost;
+            Data.dirt = Mathf.Max(0f, Data.dirt - dirtRemoved);
+            Commit();
+            return true;
+        }
 
         public void SetThrowRock(bool enabled)
         {
@@ -238,6 +270,32 @@ namespace DoctorHelp
             Commit();
         }
 
+        internal bool TryUseDart()
+        {
+            if (!IsLoaded || Data.DartsLeft <= 0) return false;
+            Data.UseDart();
+            Commit();
+            return true;
+        }
+
+        // Pops a dart balloon once per day; its gold counts as earnings like AddMoney.
+        internal bool TryClaimDartBalloon(int reward, int gold, int water = 0, int electricity = 0)
+        {
+            if (!IsLoaded || reward < 0 || reward >= PlayerProfileData.DartBalloonCount || gold < 0 ||
+                water < 0 || electricity < 0 || Data.IsDartBalloonPopped(reward) || Money > int.MaxValue - gold ||
+                Data.water > int.MaxValue - water || Data.electricity > int.MaxValue - electricity) return false;
+            Data.PopDartBalloon(reward);
+            Data.water += water;
+            Data.electricity += electricity;
+            if (gold > 0)
+            {
+                Data.money += gold;
+                Data.walterQuest.RecordEarnings(gold);
+            }
+            Commit();
+            return true;
+        }
+
         internal bool AcceptWalterQuest()
         {
             if (!IsLoaded || !Data.walterQuest.Accept(CurrentDay)) return false;
@@ -289,6 +347,34 @@ namespace DoctorHelp
             return defaultLevel;
         }
 
+        // Electricity used per day by the item in each furniture slot (the equipped one, else the slot default).
+        internal int DailyElectricityUse
+        {
+            get
+            {
+                if (!IsLoaded) return 0;
+                float total = 0f;
+                var slots = new HashSet<string>();
+                foreach (var item in ShopDefinitions)
+                    if (item != null && item.IsConfigured && item.IsEquippable) slots.Add(item.FurnitureSlot);
+                foreach (string slot in slots)
+                {
+                    string equippedId = EquippedFurnitureId(slot);
+                    ClinicShopItem equipped = null, fallback = null;
+                    foreach (var item in ShopDefinitions)
+                    {
+                        if (item == null || !item.IsConfigured || item.FurnitureSlot != slot) continue;
+                        if (item.Id == equippedId) equipped = item;
+                        else if (item.IsDefaultFurniture) fallback = item;
+                    }
+                    var active = equipped != null ? equipped : fallback;
+                    if (active != null) total += active.ElectricityPerDay;
+                }
+                // Electricity is a whole-number currency: half points round up.
+                return (int)Math.Round(total, MidpointRounding.AwayFromZero);
+            }
+        }
+
         internal bool IsUpgradeUnlocked(ClinicShopItem item) =>
             !item.IsEquippable || session.CanBuyUpgrade(item, ShopDefinitions);
 
@@ -308,10 +394,14 @@ namespace DoctorHelp
         }
 
         public bool CompleteDay(int incorrectPatients, int goldDelta, float? dailyRating = null,
-            bool hadConsultations = true, int goldEarned = 0)
+            bool hadConsultations = true, int goldEarned = 0, int patientsExamined = 0)
         {
             if (!IsLoaded) return false;
-            try { session.CompleteDay(incorrectPatients, goldDelta, dailyRating, hadConsultations, DifficultySettings.SuccessStreak, goldEarned); }
+            try
+            {
+                session.CompleteDay(incorrectPatients, goldDelta, dailyRating, hadConsultations,
+                    DifficultySettings.SuccessStreak, goldEarned, patientsExamined, DailyElectricityUse);
+            }
             catch (Exception ex) { Debug.LogError($"Player profile save failed: {ex}"); return false; }
             // Future patient-result calculations must read history before this checkpoint.
             journal.Clear();

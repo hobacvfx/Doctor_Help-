@@ -56,3 +56,4 @@ MonoBehaviour:
   furnitureLevel: 2
   equippedVisual: {fileID: 176444578778948757, guid: bfed4837f00ad6443a1e2d8867abbfe5, type: 3}
   movingPart: {fileID: 0}
+  electricityPerDay: 25

@@ -240,3 +240,4 @@ MonoBehaviour:
   furnitureLevel: 3
   equippedVisual: {fileID: 0}
   movingPart: {fileID: 0}
+  electricityPerDay: 25

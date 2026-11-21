@@ -55,6 +55,9 @@ MonoBehaviour:
   furnitureSlot: reception-table
   defaultFurniture: 1
   furnitureLevel: 0
+  equippedVisual: {fileID: 0}
+  movingPart: {fileID: 0}
+  electricityPerDay: 25
 --- !u!1 &3778239029169567724
 GameObject:
   m_ObjectHideFlags: 0

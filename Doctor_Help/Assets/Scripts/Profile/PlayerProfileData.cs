@@ -66,7 +66,45 @@ namespace DoctorHelp
         public bool clean;
         // Active play time since the last day result; drives furniture gold per minute.
         public double playSeconds;
+        // Dart minigame state belongs to dartDay; any other day starts with a full set of darts and balloons.
+        public int dartDay;
+        public int dartsUsed;
+        public int dartBalloonsPopped; // Bit per balloon reward index.
+        // Clean water and electricity behave like gold. Saves made before they existed start with the defaults.
+        public int water = DefaultWater;
+        public int electricity = DefaultElectricity;
+        // Hidden player dirtiness, 0..MaxDirt in half points.
+        public float dirt;
+        internal const int DefaultWater = 100;
+        internal const int DefaultElectricity = 100;
+        public const float MaxDirt = 10f;
+        internal const float DirtPerPatient = .5f;
         internal bool IsStreetRockThrowingActive => rockThrowDeaths >= RockThrowDeathThreshold;
+        internal const int DartsPerDay = 3;
+        internal const int DartBalloonCount = 4;
+        internal int DartsLeft => dartDay == currentDay ? DartsPerDay - dartsUsed : DartsPerDay;
+        internal bool IsDartBalloonPopped(int reward) =>
+            dartDay == currentDay && (dartBalloonsPopped & (1 << reward)) != 0;
+
+        internal void UseDart()
+        {
+            StartDartDay();
+            dartsUsed++;
+        }
+
+        internal void PopDartBalloon(int reward)
+        {
+            StartDartDay();
+            dartBalloonsPopped |= 1 << reward;
+        }
+
+        private void StartDartDay()
+        {
+            if (dartDay == currentDay) return;
+            dartDay = currentDay;
+            dartsUsed = 0;
+            dartBalloonsPopped = 0;
+        }
         public List<ClinicDayRating> dayRatings = new List<ClinicDayRating>();
         public List<RivalClinicRating> rivalRatings = new List<RivalClinicRating>();
         public List<ClinicDirtDay> clinicDirtDays = new();
@@ -87,7 +125,9 @@ namespace DoctorHelp
                 diffProgress = diffProgress, diffStreakDays = diffStreakDays, diffStreakMistakeDay = diffStreakMistakeDay,
                 patientsKilled = patientsKilled, patientsSaved = patientsSaved, ghostNumber = ghostNumber,
                 rockThrowDeaths = rockThrowDeaths, rockThrowCleanDays = rockThrowCleanDays,
-                throwRock = throwRock, clean = clean, playSeconds = playSeconds
+                throwRock = throwRock, clean = clean, playSeconds = playSeconds,
+                dartDay = dartDay, dartsUsed = dartsUsed, dartBalloonsPopped = dartBalloonsPopped,
+                water = water, electricity = electricity, dirt = dirt
             };
             foreach (var stock in medicines)
                 copy.medicines.Add(new MedicineStock { medicineId = stock.medicineId, quantity = stock.quantity });
@@ -118,7 +158,10 @@ namespace DoctorHelp
                 rockThrowCleanDays < 0 || rockThrowCleanDays > (IsStreetRockThrowingActive ? 1 : 0) ||
                 dayRatings == null || rivalRatings == null || clinicDirtDays == null ||
                 shopItems == null || equippedFurniture == null || !IsRatingValid(rating) ||
-                !(playSeconds >= 0d) || double.IsInfinity(playSeconds)) return false;
+                !(playSeconds >= 0d) || double.IsInfinity(playSeconds) ||
+                dartDay < 0 || dartDay > currentDay || dartsUsed < 0 || dartsUsed > DartsPerDay ||
+                dartBalloonsPopped < 0 || dartBalloonsPopped >= 1 << DartBalloonCount ||
+                water < 0 || electricity < 0 || !(dirt >= 0f && dirt <= MaxDirt)) return false;
             int previousDay = 0;
             foreach (var entry in dayRatings)
             {

@@ -27,6 +27,9 @@ namespace DoctorHelp
         private float pressTime;
         private bool steering;
         private bool aimingRock;
+        private bool actionLocked;
+        // Dirtiness slows every walk, including automatic ones.
+        internal float SpeedMultiplier { get; set; } = 1f;
         internal bool IsWalkingAutomatically { get; private set; }
         internal bool IsTutorialLocked { get; private set; }
         internal bool IsWalkingManually => body != null && !IsRiding && !IsWalkingAutomatically &&
@@ -48,6 +51,16 @@ namespace DoctorHelp
             body.linearVelocityX = 0f;
         }
         internal bool IsRiding { get; private set; }
+
+        // Holds the player still for scripted actions such as showering.
+        internal void SetActionLocked(bool locked)
+        {
+            actionLocked = locked;
+            ClearGesture();
+            if (!locked) return;
+            destinationX = null;
+            if (body != null && !IsRiding) body.linearVelocityX = 0f;
+        }
         internal void SetShaftEntranceLimit(float? entranceX) => shaftEntranceX = entranceX;
 
         internal void SetTutorialLocked(bool locked)
@@ -94,7 +107,7 @@ namespace DoctorHelp
 
         private void Update()
         {
-            if (IsRiding || aimingRock || IsTutorialLocked || IsWalkingAutomatically || sceneCamera == null)
+            if (IsRiding || aimingRock || actionLocked || IsTutorialLocked || IsWalkingAutomatically || sceneCamera == null)
                 return;
 
             if (steeringPress == null)
@@ -146,6 +159,11 @@ namespace DoctorHelp
         {
             if (IsRiding || aimingRock || IsTutorialLocked)
                 return;
+            if (actionLocked)
+            {
+                body.linearVelocityX = 0f;
+                return;
+            }
 
             if (destinationX.HasValue && shaftEntranceX.HasValue)
                 destinationX = Mathf.Min(destinationX.Value,
@@ -159,7 +177,8 @@ namespace DoctorHelp
                 return;
             }
 
-            body.linearVelocityX = Mathf.Clamp(delta / Time.fixedDeltaTime, -moveSpeed, moveSpeed);
+            float speed = moveSpeed * Mathf.Clamp01(SpeedMultiplier);
+            body.linearVelocityX = Mathf.Clamp(delta / Time.fixedDeltaTime, -speed, speed);
         }
 
         internal void BeginRide()

@@ -37,6 +37,7 @@
 - Unity hiện tại: `6000.3.9f1`; Android package name: `com.doctorhelp.game`.
 - Khóa Portrait, không tự xoay màn hình.
 - Khi test hiệu năng: tắt VSync, đặt mục tiêu 200 FPS và hiển thị FPS cùng thời gian mỗi frame trên Canvas, trong vùng Safe Area. FPS thực tế phụ thuộc thiết bị và tần số quét; cần đánh giá lại cấu hình test trước khi phát hành.
+- Mọi scene trong Build Settings đều có sẵn FPS readout (`FpsOverlay`, Text không raycast). Office dùng object `FPS` có sẵn; các scene còn lại có root `FPS Canvas` (Screen Space Overlay, sorting order 500, không GraphicRaycaster, CanvasScaler như HUD) → `Safe Area` → `FPS`, neo góc phải ngay dưới Headbar. `FpsOverlay.safeArea` (tùy chọn) được cập nhật theo safe area mỗi frame. Scene mới phải thêm FPS Canvas tương tự. Minigame Dart không ẩn canvas chứa `FpsOverlay`.
 
 ## Nén ảnh cho mobile
 
@@ -60,6 +61,21 @@
 - Lưu thất bại không được tăng ngày. Retry sau khi lưu thành công nhưng chuyển scene thất bại không được lưu hoặc tăng ngày lần nữa.
 - Giữ cơ chế backup/recovery; không âm thầm ghi đè dữ liệu bị lỗi hoặc dữ liệu có schema mới hơn bằng profile trắng.
 - Kiểm thử phải dùng dữ liệu riêng, không thay đổi save thật của người chơi.
+
+## Nước sạch, điện và độ bẩn của người chơi
+
+- Profile có thêm `water` (nước sạch) và `electricity` (điện), lưu và cộng/trừ như gold. Tài khoản mới và save cũ chưa có 2 trường này bắt đầu với 100 mỗi loại (`PlayerStartingProfile` chỉnh được). Headbar hiện nước ở slot thứ 2 (icon giọt nước) và điện ở slot thứ 3 (icon tia chớp). Điện được tiêu theo ngày (xem mục cơ chế điện bên dưới).
+- Hiển thị nhận thưởng (gold, nước sạch, điện) thống nhất ở mọi nơi: VFX_Puff 1 lần ở vị trí nhận thưởng, rồi icon của loại tiền đó bay vào slot tương ứng trên Headbar (thay cho chữ số tiền bay lên). Dưới 50: 10 icon; 50–149: 20 icon; từ 150: 30 icon. Icon không spawn cùng lúc mà rải đều trong 1–2 giây (10 icon 1 giây, 30 icon 2 giây), mỗi icon bung theo hướng random rồi cong vào slot với quỹ đạo lệch nhau và tốc độ random. Profile được cộng ngay; Headbar giữ lại phần thưởng và đếm số lên theo từng icon bay tới, icon slot nảy nhẹ mỗi lần nhận.
+  - Code: `Headbar.FlyReward(kind, amount, screenFrom)`, `Headbar.PlayRewardPuff(screen, camera)`, `Headbar.Hold(kind, amount)` (trong `HeadbarRewardFlight.cs`). `Headbar.Current` là Headbar bật gần nhất. Icon bay trong child `Reward Flight` của Headbar.prefab (Canvas lồng, sorting order 450, dưới FPS 500, không raycast); `rewardPuff` = VFX_Puff.
+  - Đang dùng ở: Treasure hunt (puff ở vị trí kho báu), popup thưởng Dart (bấm nhận: puff tại thẻ thưởng, bay vào Headbar của minigame; từ lúc trúng bóng tới lúc bấm nhận Headbar vẫn hiện số cũ), nhận thưởng quest Walter (puff giữa màn hình). Chỗ mới cho người chơi tiền phải gọi cùng API này.
+- Cơ chế điện: mỗi nội thất đang equip trong từng slot (món đã equip, nếu chưa equip món nào thì món mặc định của slot; món không equip không tính) tốn 5 điện mỗi ngày + 2,5 điện cho mỗi cấp nâng cấp (`furnitureLevel`): Lv0 5, Lv1 7,5, … Lv5 17,5 (hằng số `BaseElectricityPerDay`/`ElectricityPerLevel` trong `ClinicShopItem.cs`, áp dụng cho mọi món equip được, kể cả lễ tân). Tổng điện của ngày được làm tròn (,5 làm tròn lên) trước khi trừ. Không trừ theo phút: checkpoint cuối ngày (sang đầu ngày hôm sau) cộng tổng điện của các món đang equip lúc đó và trừ một lần, điện không xuống dưới 0.
+- Đèn Player_Home (`Light_Tang_1`, `Light_Tang_2`, `Light_Nhatam`, shader SG_Lights) do `HomePowerLights` trên object `Light` điều khiển qua property `_Power` (MaterialPropertyBlock, không sửa material): điện ≥ 50 giữ Power gốc của material (hiện là 1); 0 < điện < 50 thì Power 0,5 và cứ random 2–5 giây chập chờn một lần (dao động Power trong ~0,35 giây); điện = 0 thì Power = 0.
+- Office cũng theo cơ chế này: `HomePowerLights` nằm trên `Light_Office` (cùng ngưỡng Power/chập chờn) và có `Power Warning Canvas` riêng ở sorting 99, nằm dưới Gameplay Canvas (100) nên popup của Office che được nó.
+- Ở Player_Home, canvas `Power Warning Canvas` (overlay, sorting 101, không chặn input) hiện thông báo sát đáy màn hình, dưới các nút: điện dưới 50 → "Your electric power is low"; điện = 0 → "Out of electric power"; đủ điện thì ẩn. Thông báo "thở" nhẹ: scale lên xuống ~4% và mờ tới ~65% alpha, chu kỳ ~1,25 giây. `HomePowerLights` điều khiển nội dung và hiệu ứng.
+- `dirt` là stat ẩn 0–10 (bước 0,5). Checkpoint cuối ngày cộng `0,5 × số bệnh nhân đã khám` (mọi kết quả, kể cả trả về) vào ngày hôm sau, tối đa 10.
+- `PlayerDirtiness` nằm trên prefab Player_avatar nên theo người chơi ở mọi scene: từ 4 điểm có VFX_smelly_Player_1; từ 7 điểm VFX_smelly_Player_2 và chậm 40%; ở 10 điểm chậm 85%. Tốc độ chậm áp dụng cả lúc tự đi; animation chạy chậm theo.
+- Phòng tắm Player_Home: `PlayerShower` nằm trên `Curtain`. Bước vào vùng vòi sen (60% bề ngang rèm) thì tắm; muốn tắm lại phải ra khỏi vùng rồi vào lại. Tắm tốn 50 nước, nếu đang sạch (0 điểm) thì 25 nước; thiếu nước thì hiện "Not enough clean water" 10 giây và không tắm.
+- Trình tự tắm: trừ nước và trừ 3 điểm bẩn ngay trong cùng một lần lưu; người chơi tự đi vào giữa vòi sen rồi bị khóa (nút world cũng bị khóa); rèm kéo lại (flipbook chạy từ frame cuối về frame đầu); VFX_WaterPour chảy 2 giây, dừng sinh hạt, 1 giây sau thì xóa; cập nhật VFX/tốc độ theo điểm bẩn mới; rèm mở ra (frame đầu → frame cuối) rồi mới mở khóa. Clip rèm không loop; script điều khiển flipbook bằng tay.
 
 ## Kiến trúc và mở rộng gameplay flow
 
@@ -155,6 +171,17 @@
   - Thang máy: LvN +10N% thời gian kiên nhẫn của bệnh nhân trong Office.
   - Biển quảng cáo: hiệu ứng chờ bệnh nhân và cộng giới hạn bệnh nhân như mục trên.
   - Vàng kinh doanh là vàng nhận từ mỗi bệnh nhân chữa đúng (25 × hệ số, làm tròn). Vàng/phút tính theo phút thật người chơi đang chơi (mọi scene, kể cả Player_Home và Street; app bị pause hoặc chạy nền không tính), cộng dồn từ báo cuối ngày trước tới báo cuối ngày hiện tại và cộng vào Total Earn. Thời gian chơi ngoài ngày làm việc được lưu theo luật lưu; thoát giữa ngày làm việc thì quay về thời gian chơi lúc bấm Open. Kiên nhẫn gốc 45 giây nhân với tổng hệ số kiên nhẫn.
+
+### Minigame Dart (Street)
+
+- Nút `Dart_Button` (DeskActionButton, prefab HomeShopButton) nằm trên rạp `DartBooth_Balloons` trong ngõ ở Street; `DartMinigameEntrance` mở prefab `Assets/Resources/UI/DartMinigame.prefab` sau một frame, giống ClinicShopEntrance. Nút hiện khi profile đã load.
+- Minigame có camera ortho riêng đặt xa Street (`worldPosition`). Khi mở: Street camera tạm `cullingMask = 0`, các Canvas gốc của scene tạm tắt; minigame có Headbar riêng. Đóng thì trả lại nguyên trạng. Background `Background_Wood` phủ kín màn hình theo kiểu cover (không kéo giãn, thừa chiều ngang thì cắt).
+- 4 bóng bay (`DartBalloon`), mỗi bóng treo một thẻ thưởng ở cuối dây; index bóng = index phần thưởng: Gold 50, Gold 200, Water 100, Electricity 100. Bóng trôi chậm trong làn riêng, tốc độ random trong `balloonSpeedRange`. Trúng bóng Water/Electricity thì cộng thật vào nước sạch/điện trong profile.
+- Mỗi ngày có 3 phi tiêu, ngày mới reset về 3 (không cộng dồn). Bóng đã nổ mất tới hết ngày. Profile lưu `dartDay`, `dartsUsed`, `dartBalloonsPopped` (bitmask); khác ngày hiện tại thì coi như đủ phi tiêu và đủ bóng. Phi tiêu bị trừ và lưu ngay khi ném; vàng cộng ngay khi trúng (tính cả vào earnings của Walter như AddMoney).
+- Nút Throw Dart nằm giữa cạnh dưới màn hình, nâng lên để còn chỗ kéo ngón tay; dòng hướng dẫn nằm sát đáy, dưới nút: "Drag from the button to aim, and check the wind!".
+- Ném giống ném đá đuổi ma ở Office: kéo từ nút Throw Dart (StreetRockAimInput), điểm ngắm bắt đầu ở `aimStartViewport`, preview cung nét đứt + marker, phi tiêu 3D (`DartProjectile`, shader `DoctorHelp/DartToon`) thu nhỏ theo `distanceScale` rồi găm lại trên nền tại điểm rơi.
+- Gió: VFX con `VFX_Wind` trong prefab VFX_Wind; mỗi `windChangeSeconds` (3s) random Velocity over Lifetime X và Y trong [-max, max]. Preview bỏ qua gió; điểm rơi thật lệch theo hướng gió, độ lệch lerp 0 → `maxWindDeviation` (1,875) theo độ lớn gió.
+- Trúng bóng: VFX_Puff, ẩn bóng, thẻ rơi, rồi hiện popup thưởng (Popup_Reward). Trượt thì ném tiếp; trượt ở phi tiêu cuối thì hiện Popup_Miss, bấm OK thoát minigame. Nút Exit thoát bất cứ lúc nào; phi tiêu đang bay vẫn được tính kết quả.
 
 ### HUD nhiệm vụ và bảng xếp hạng phòng khám
 

@@ -46,7 +46,8 @@ namespace DoctorHelp
     public interface IDayProfile
     {
         int CurrentDay { get; }
-        bool CompleteDay(int incorrectPatients, int goldDelta, float? dailyRating, bool hadConsultations, int goldEarned);
+        bool CompleteDay(int incorrectPatients, int goldDelta, float? dailyRating, bool hadConsultations, int goldEarned,
+            int patientsExamined);
     }
 
     public interface IPatientService { void EnsurePatient(); }
@@ -82,7 +83,7 @@ namespace DoctorHelp
             if (profile.CurrentDay != day) throw new InvalidOperationException("Unexpected day when creating checkpoint.");
             var result = evaluate(day); // History still exists until the checkpoint succeeds.
             if (!profile.CompleteDay(result.IncorrectPatients, result.NetGold, result.DailyRating,
-                result.HasCompletedConsultations, result.TotalEarn))
+                result.HasCompletedConsultations, result.TotalEarn, result.CorrectPatients + result.IncorrectPatients))
                 throw new InvalidOperationException("Không thể lưu cuối ngày. Bấm Thử lại.");
             completedResult = result;
             completedDay = day;

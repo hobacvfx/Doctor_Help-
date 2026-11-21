@@ -58,6 +58,7 @@ MonoBehaviour:
   furnitureLevel: 2
   equippedVisual: {fileID: 0}
   movingPart: {fileID: 0}
+  electricityPerDay: 25
 --- !u!1 &6052566115066175190
 GameObject:
   m_ObjectHideFlags: 0

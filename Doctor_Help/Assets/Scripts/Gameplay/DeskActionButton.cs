@@ -43,7 +43,14 @@ namespace DoctorHelp
             }
         }
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
-        private static void ResetRegistry() => active.Clear();
+        private static void ResetRegistry()
+        {
+            active.Clear();
+            WorldBlockers = 0;
+        }
+
+        // While above zero (e.g. during a shower) world buttons ignore presses.
+        internal static int WorldBlockers { get; set; }
         private void Awake()
         {
             if (visual != null) authoredColor = visual.color;
@@ -84,7 +91,7 @@ namespace DoctorHelp
         private void Update()
         {
             bool held = ReadPointer(out var point, out int id);
-            bool allowed = interactable && FirstRunTutorial.AllowsWorld(this);
+            bool allowed = interactable && WorldBlockers == 0 && FirstRunTutorial.AllowsWorld(this);
             if (held && !wasHeld)
             {
                 pointerId = id;

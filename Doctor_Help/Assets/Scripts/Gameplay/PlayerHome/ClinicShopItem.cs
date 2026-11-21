@@ -32,6 +32,10 @@ namespace DoctorHelp
         internal Transform MovingPart => movingPart;
         internal bool IsDefaultFurniture => defaultFurniture;
         internal int FurnitureLevel => Mathf.Clamp(furnitureLevel, 0, ClinicDemand.MaxFurnitureLevel);
+        // Electricity used per day while equipped, paid at the start of the next day: 5, plus 2.5 per upgrade level.
+        internal const float BaseElectricityPerDay = 5f;
+        internal const float ElectricityPerLevel = 2.5f;
+        internal float ElectricityPerDay => BaseElectricityPerDay + ElectricityPerLevel * FurnitureLevel;
         internal bool IsConfigured => !string.IsNullOrWhiteSpace(itemId) &&
             !string.IsNullOrWhiteSpace(displayName) && price >= 0 && (!defaultFurniture || IsEquippable);
     }

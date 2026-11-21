@@ -39,6 +39,8 @@ namespace DoctorHelp
         private float expressionEyesUntil;
 
         internal bool FacesRight => facingRight;
+        // Run cycle playback rate; dirtiness slows it with the walk speed.
+        internal float RunSpeedScale { get; set; } = 1f;
         internal bool IsThrowingRock => throwingRock;
         internal bool CanThrowRock => isActiveAndEnabled && animator != null && !throwingRock &&
             animator.HasState(0, ThrowRock);
@@ -147,6 +149,7 @@ namespace DoctorHelp
             var scale = art.localScale;
             scale.x = Mathf.Abs(scale.x) * originalScaleSign * (facingRight == facesRightAtRest ? 1f : -1f);
             art.localScale = scale;
+            animator.speed = moving && !throwingRock ? Mathf.Max(.3f, RunSpeedScale) : 1f;
             UpdateHitTint();
             if (expressionEyes != null && expressionEyes.activeSelf && Time.time >= expressionEyesUntil)
                 RestoreEyes();
