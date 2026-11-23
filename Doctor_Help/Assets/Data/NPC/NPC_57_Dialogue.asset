@@ -12,4 +12,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9a19a6ecd4ed2114c9ccb631dd1f32f4, type: 3}
   m_Name: NPC_57_Dialogue
   m_EditorClassIdentifier: Assembly-CSharp::DoctorHelp.NpcDialogueAsset
-  content: "Afternoon, doctor. I feel much too warm.\nI caught my hand on a shelf, and it hasn't moved right since.\nPerhaps I should have left the high shelves to taller people."
+  content: 'Afternoon, doctor.
+
+    My head is throbbing.
+
+    I hurt my arm when a cart knocked me over.
+
+    I thought you might be able to make sense of it.'

@@ -15,6 +15,7 @@ namespace DoctorHelp
         [SerializeField] private RectTransform safeArea;
         [SerializeField] private Text statusText;
         [SerializeField] private Text clockText;
+        [SerializeField] private ClinicClockPeriodIcon clockPeriodIcon;
         [SerializeField] private Text waitingForPatientText;
         [SerializeField, Min(0)] private float waitingForPatientFadeSeconds = 0.6f;
         [SerializeField] private Button endDayButton;
@@ -49,7 +50,7 @@ namespace DoctorHelp
         public bool IsConfigured => safeArea != null && statusText != null && errorText != null && sceneFade != null && sceneFade.IsConfigured &&
             ((openButton != null && openButton.IsConfigured && resultsVideo != null && resultsVideo.IsConfigured &&
                 homeRoom != null && homeRoom.IsConfigured) ||
-             (givePillsButton != null && givePillsButton.IsConfigured && pillPopup != null && pillPopup.IsConfigured && clockText != null && waitingForPatientText != null &&
+             (givePillsButton != null && givePillsButton.IsConfigured && pillPopup != null && pillPopup.IsConfigured && clockText != null && clockPeriodIcon != null && waitingForPatientText != null &&
                 endDayButton != null && endDayButton.targetGraphic != null && policePopup != null && policePopup.IsConfigured));
         private bool retryMode;
         private DeskActionButton retryLabel;
@@ -63,7 +64,6 @@ namespace DoctorHelp
             if (openButton != null) openButton.Clicked += OnOpen;
             if (givePillsButton != null) givePillsButton.Clicked += OnTreatment;
             if (pillPopup != null) pillPopup.GiveRequested += OnGive;
-            if (pillPopup != null) pillPopup.DeclineRequested += OnDecline;
             if (pillPopup != null) pillPopup.CloseRequested += OnCancelTreatment;
             if (policePopup != null) { policePopup.ReportRequested += OnConfirmDecision; policePopup.CloseRequested += OnCancelTreatment; }
             if (examinationTools != null) examinationTools.ToolSelected += OnToolSelected;
@@ -75,7 +75,11 @@ namespace DoctorHelp
             if (clockText != null && clockText.gameObject.activeSelf)
             {
                 if (gameLoop == null) gameLoop = FindFirstObjectByType<DailyGameLoop>();
-                if (gameLoop != null) clockText.text = gameLoop.Clock.DisplayTime;
+                if (gameLoop != null)
+                {
+                    clockText.text = gameLoop.Clock.DisplayTime;
+                    if (clockPeriodIcon != null) clockPeriodIcon.SetMinute(gameLoop.Clock.MinuteOfDay);
+                }
             }
             ScreenSafeArea.ApplyTo(safeArea);
         }
@@ -151,7 +155,7 @@ namespace DoctorHelp
         {
             DecisionKind = TreatmentDecisionKind.GiveMedicine;
             if (givePillsButton == null) throw new InvalidOperationException("Examination requires an Office treatment button.");
-            HideAll(); ShowClock(); ShowEndDay(); Status("Khám bệnh"); givePillsButton.gameObject.SetActive(true);
+            HideAll(); ShowClock(); ShowEndDay(); givePillsButton.gameObject.SetActive(true);
             givePillsButton.Interactable = true;
             if (examinationTools != null) examinationTools.SetAvailable(true);
             if (officeHaunting != null) officeHaunting.SetAvailable(true);
@@ -166,8 +170,8 @@ namespace DoctorHelp
                 return;
             }
             if (pillPopup == null) throw new InvalidOperationException("Treatment requires SelectPillPopup.");
-            HideAll(); ShowClock(); Status("Cho thuốc");
-            pillPopup.ResetSelection(officeHaunting?.CanConfirmWithoutMedicine == true);
+            HideAll(); ShowClock();
+            pillPopup.PrepareForPatient();
             pillPopup.gameObject.SetActive(true);
         }
         private void ShowClock()
@@ -183,11 +187,11 @@ namespace DoctorHelp
         }
         public void ShowPatientArrival(int day)
         {
-            HideAll(); ShowClock(); ShowEndDay(); Status("Bệnh nhân bước vào");
+            HideAll(); ShowClock(); ShowEndDay();
         }
         public void ShowPatientDeparture(int day)
         {
-            HideAll(); ShowClock(); ShowEndDay(); Status("Bệnh nhân ra về");
+            HideAll(); ShowClock(); ShowEndDay();
         }
         public void ShowWaitingForPatient()
         {
@@ -224,11 +228,11 @@ namespace DoctorHelp
             waitingForPatientFade = null;
         }
 
-        public Task PresentResultsAsync(DayTreatmentResult result, CancellationToken token)
+        public Task PresentResultsAsync(DayTreatmentResult result, bool afterCutscene, CancellationToken token)
         {
             if (resultsVideo == null) throw new InvalidOperationException("DayResults requires the Player Home video presenter.");
             HideAll(); resultsVideo.gameObject.SetActive(true);
-            return resultsVideo.PlayAsync(result, token);
+            return resultsVideo.PlayAsync(result, afterCutscene, token);
         }
         public void ShowFlowError(string message)
         {
@@ -253,7 +257,6 @@ namespace DoctorHelp
             if (openButton != null) openButton.Clicked -= OnOpen;
             if (givePillsButton != null) givePillsButton.Clicked -= OnTreatment;
             if (pillPopup != null) pillPopup.GiveRequested -= OnGive;
-            if (pillPopup != null) pillPopup.DeclineRequested -= OnDecline;
             if (pillPopup != null) pillPopup.CloseRequested -= OnCancelTreatment;
             if (policePopup != null) { policePopup.ReportRequested -= OnConfirmDecision; policePopup.CloseRequested -= OnCancelTreatment; }
             if (examinationTools != null) examinationTools.ToolSelected -= OnToolSelected;

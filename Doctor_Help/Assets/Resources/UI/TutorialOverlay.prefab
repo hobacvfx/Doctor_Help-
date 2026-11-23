@@ -185,7 +185,7 @@ RectTransform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 6032651603519685883}
-  - {fileID: 9200817118000010002}
+  - {fileID: 9200817118000009467}
   m_Father: {fileID: 634198196364581777}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.1, y: 0.5}
@@ -264,8 +264,8 @@ RectTransform:
   m_LocalScale: {x: 0, y: 0, z: 0}
   m_ConstrainProportionsScale: 0
   m_Children:
-  - {fileID: 8300007035287935479}
   - {fileID: 8705501352587067172}
+  - {fileID: 8300007035287935479}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
@@ -336,15 +336,10 @@ MonoBehaviour:
   hand: {fileID: 8300007035287935479}
   caption: {fileID: 8705501352587067172}
   instruction: {fileID: 6385318394800041547}
-  reviewNext: {fileID: 9200817118000010003}
+  reviewNext: {fileID: 9200817118000009468}
   reviewMaskColor: {r: 0, g: 0, b: 0, a: 0.76}
   tapPeriod: 1.1
   tapTravel: 15
-  holdRingRadius: 38
-  holdRingThickness: 9
-  holdRingSideOffset: 140
-  holdRingTrack: {r: 0.12, g: 0.09, b: 0.07, a: 0.94}
-  holdRingFill: {r: 1, g: 0.78, b: 0.36, a: 1}
   tapPose:
     serializedVersion: 2
     m_Curve:
@@ -405,6 +400,36 @@ MonoBehaviour:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
+  dragPeriod: 2.2
+  dragMotion:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    - serializedVersion: 3
+      time: 1
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  holdRingRadius: 38
+  holdRingThickness: 9
+  holdRingSideOffset: 140
+  holdRingTrack: {r: 0.12, g: 0.09, b: 0.07, a: 0.94}
+  holdRingFill: {r: 1, g: 0.78, b: 0.36, a: 1}
 --- !u!222 &962804360911298625
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -453,20 +478,20 @@ PrefabInstance:
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 1002, guid: 788b8266d3bb4ce589d3dfccf9b227c6, type: 3}
-      propertyPath: m_AnchorMin.y
-      value: 0
+      propertyPath: m_Pivot.y
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1002, guid: 788b8266d3bb4ce589d3dfccf9b227c6, type: 3}
+      propertyPath: m_RootOrder
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 1002, guid: 788b8266d3bb4ce589d3dfccf9b227c6, type: 3}
       propertyPath: m_AnchorMax.y
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 1002, guid: 788b8266d3bb4ce589d3dfccf9b227c6, type: 3}
-      propertyPath: m_Pivot.y
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 1002, guid: 788b8266d3bb4ce589d3dfccf9b227c6, type: 3}
-      propertyPath: m_AnchoredPosition.y
-      value: -8
+      propertyPath: m_AnchorMin.y
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 1002, guid: 788b8266d3bb4ce589d3dfccf9b227c6, type: 3}
       propertyPath: m_SizeDelta.x
@@ -477,19 +502,19 @@ PrefabInstance:
       value: 48
       objectReference: {fileID: 0}
     - target: {fileID: 1002, guid: 788b8266d3bb4ce589d3dfccf9b227c6, type: 3}
-      propertyPath: m_RootOrder
-      value: 1
+      propertyPath: m_AnchoredPosition.y
+      value: -8
       objectReference: {fileID: 0}
-    - target: {fileID: 1004, guid: 788b8266d3bb4ce589d3dfccf9b227c6, type: 3}
-      propertyPath: m_Sprite
-      value:
-      objectReference: {fileID: 8796308030897771597, guid: 7df4e47565e568e4087cac6ad9452b41, type: 3}
     - target: {fileID: 1004, guid: 788b8266d3bb4ce589d3dfccf9b227c6, type: 3}
       propertyPath: m_Type
       value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 1004, guid: 788b8266d3bb4ce589d3dfccf9b227c6, type: 3}
-      propertyPath: m_Color.r
+      propertyPath: m_Sprite
+      value: 
+      objectReference: {fileID: 8796308030897771597, guid: 7df4e47565e568e4087cac6ad9452b41, type: 3}
+    - target: {fileID: 1004, guid: 788b8266d3bb4ce589d3dfccf9b227c6, type: 3}
+      propertyPath: m_Color.b
       value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 1004, guid: 788b8266d3bb4ce589d3dfccf9b227c6, type: 3}
@@ -497,7 +522,7 @@ PrefabInstance:
       value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 1004, guid: 788b8266d3bb4ce589d3dfccf9b227c6, type: 3}
-      propertyPath: m_Color.b
+      propertyPath: m_Color.r
       value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 1005, guid: 788b8266d3bb4ce589d3dfccf9b227c6, type: 3}
@@ -510,19 +535,19 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1009, guid: 788b8266d3bb4ce589d3dfccf9b227c6, type: 3}
       propertyPath: m_FontData.m_Font
-      value:
+      value: 
       objectReference: {fileID: 12800000, guid: 283225a2bb6488d4eadb8bedaf3687f2, type: 3}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 788b8266d3bb4ce589d3dfccf9b227c6, type: 3}
---- !u!224 &9200817118000010002 stripped
+--- !u!224 &9200817118000009467 stripped
 RectTransform:
   m_CorrespondingSourceObject: {fileID: 1002, guid: 788b8266d3bb4ce589d3dfccf9b227c6, type: 3}
   m_PrefabInstance: {fileID: 9200817118000010001}
   m_PrefabAsset: {fileID: 0}
---- !u!114 &9200817118000010003 stripped
+--- !u!114 &9200817118000009468 stripped
 MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 1005, guid: 788b8266d3bb4ce589d3dfccf9b227c6, type: 3}
   m_PrefabInstance: {fileID: 9200817118000010001}
@@ -531,5 +556,5 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 4e29b1a8efbd4b44bb3f3716e73f07ff, type: 3}
-  m_Name:
-  m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Button
+  m_Name: 
+  m_EditorClassIdentifier: 

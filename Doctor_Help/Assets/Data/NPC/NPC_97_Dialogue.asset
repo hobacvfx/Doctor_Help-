@@ -12,4 +12,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9a19a6ecd4ed2114c9ccb631dd1f32f4, type: 3}
   m_Name: NPC_97_Dialogue
   m_EditorClassIdentifier: Assembly-CSharp::DoctorHelp.NpcDialogueAsset
-  content: "Hello, doctor. My head aches, I feel feverish, and my pulse seems slow.\nMy wrist hurts after a knock, and I heard someone whisper from the cold grate.\nPerhaps all that lost sleep made everything feel worse."
+  content: 'Hello, doctor.
+
+    My head is pounding.
+
+    My wrist has hurt since I stumbled on the steps.
+
+    The ghosts around me will not leave.
+
+    I have no idea where it started.'

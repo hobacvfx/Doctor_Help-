@@ -14,9 +14,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::DoctorHelp.NpcDialogueAsset
   content: 'Good evening, doctor.
 
-    My stomach has felt unsettled since last night.
+    I have felt off all week.
 
-    I
-    wonder if it was the stew from the market.
-
-    Could you take a look?'
+    I think I have been keeping rather poor hours lately.'

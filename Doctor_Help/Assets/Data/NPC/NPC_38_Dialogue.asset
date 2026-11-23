@@ -12,4 +12,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9a19a6ecd4ed2114c9ccb631dd1f32f4, type: 3}
   m_Name: NPC_38_Dialogue
   m_EditorClassIdentifier: Assembly-CSharp::DoctorHelp.NpcDialogueAsset
-  content: "The walk from the station left me gasping like I'd run the whole way.\nMy heart won't slow down, and the fever is getting worse.\nI could feel the heat of my breath through my scarf."
+  content: 'Afternoon, doctor.
+
+    I am having trouble getting my breath.
+
+    I do not know what is wrong; that is why I came.'

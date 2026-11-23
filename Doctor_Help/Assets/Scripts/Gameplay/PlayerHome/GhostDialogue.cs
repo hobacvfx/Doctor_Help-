@@ -21,8 +21,12 @@ namespace DoctorHelp
         };
 
         private Coroutine speech;
+        // Scripted lines (end-of-day cutscene) are pushed back inside the camera view.
+        private bool keepOnScreen;
+        private SpriteRenderer boxRenderer;
         private DialogueBubbleLayout layout;
         internal bool IsSpeaking => speech != null;
+        internal GameObject ChatBox => chatBox;
 
         private void Awake()
         {
@@ -39,12 +43,20 @@ namespace DoctorHelp
         internal void Speak()
         {
             if (isActiveAndEnabled && !IsSpeaking)
-                speech = StartCoroutine(PlaySpeech());
+                speech = StartCoroutine(PlaySpeech(Lines[Random.Range(0, Lines.Length)], holdSeconds));
         }
 
-        private IEnumerator PlaySpeech()
+        // Scripted line (end-of-day cutscene) held for `hold` seconds after it is fully typed.
+        internal void Say(string line, float hold)
         {
-            string line = Lines[Random.Range(0, Lines.Length)];
+            if (!isActiveAndEnabled || string.IsNullOrWhiteSpace(line)) return;
+            keepOnScreen = true;
+            if (speech != null) { StopCoroutine(speech); speech = null; chatBox.SetActive(false); }
+            speech = StartCoroutine(PlaySpeech(line, hold));
+        }
+
+        private IEnumerator PlaySpeech(string line, float hold)
+        {
             // Size the bubble for its line before it opens so it does not jump when text appears.
             layout?.SetLine(line, false);
             dialogueText.text = string.Empty;
@@ -63,7 +75,7 @@ namespace DoctorHelp
                 dialogueText.maxVisibleCharacters = Mathf.Min(characterCount, Mathf.FloorToInt(revealed));
             }
 
-            yield return new WaitForSeconds(holdSeconds);
+            yield return new WaitForSeconds(hold);
             dialogueText.text = string.Empty;
             yield return AnimateBox(opening: false);
             chatBox.SetActive(false);
@@ -94,7 +106,24 @@ namespace DoctorHelp
         {
             if (layout == null || !chatBox.activeSelf) return;
             var camera = Camera.main;
-            if (camera != null) layout.Apply(camera, layout.TailAnchor, DialogueTextSize.Walking);
+            if (camera == null) return;
+            layout.Apply(camera, layout.TailAnchor, DialogueTextSize.Walking);
+            if (keepOnScreen) KeepInView(camera);
+        }
+
+        private void KeepInView(Camera camera)
+        {
+            if (boxRenderer == null) boxRenderer = chatBox.GetComponent<SpriteRenderer>();
+            if (boxRenderer == null) return;
+            const float padding = 16f;
+            var view = camera.pixelRect;
+            var bounds = boxRenderer.bounds;
+            Vector3 min = camera.WorldToScreenPoint(bounds.min), max = camera.WorldToScreenPoint(bounds.max);
+            float dx = min.x < view.xMin + padding ? view.xMin + padding - min.x : max.x > view.xMax - padding ? view.xMax - padding - max.x : 0f;
+            if (dx == 0f) return;
+            var box = chatBox.transform;
+            var point = camera.WorldToScreenPoint(box.position);
+            box.position += camera.ScreenToWorldPoint(point + new Vector3(dx, 0f, 0f)) - camera.ScreenToWorldPoint(point);
         }
 
         private void OnDestroy() => layout?.Dispose();

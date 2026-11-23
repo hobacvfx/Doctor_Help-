@@ -12,4 +12,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9a19a6ecd4ed2114c9ccb631dd1f32f4, type: 3}
   m_Name: NPC_83_Dialogue
   m_EditorClassIdentifier: Assembly-CSharp::DoctorHelp.NpcDialogueAsset
-  content: "Good evening, doctor. I'm cold as the cellar floor.\nMy arm's given me trouble since I knocked it against the pump.\nPerhaps the shock of it made me feel worse."
+  content: 'Good evening, doctor.
+
+    My leg hurts where I fell against a crate.
+
+    I do not know why this keeps happening.'

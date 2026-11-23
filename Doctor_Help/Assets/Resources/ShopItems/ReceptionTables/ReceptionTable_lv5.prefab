@@ -138,8 +138,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::DoctorHelp.ClinicShopItem
   itemId: reception-table-lv5
   displayName: Reception Table Lv5
-  description: +1.5 stars to each patient review.
-  price: 600
+  description: +1.5 stars to each patient review. +15% gold from business.
+  price: 1000
   icon: {fileID: 21300000, guid: d47808937375c6f479fea02cf79117ae, type: 3}
   poster: {fileID: 0}
   posterOffset: {x: 0, y: 0}
@@ -148,4 +148,3 @@ MonoBehaviour:
   furnitureLevel: 5
   equippedVisual: {fileID: 0}
   movingPart: {fileID: 0}
-  electricityPerDay: 25

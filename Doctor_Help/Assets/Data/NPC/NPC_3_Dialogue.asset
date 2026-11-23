@@ -12,4 +12,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9a19a6ecd4ed2114c9ccb631dd1f32f4, type: 3}
   m_Name: NPC_3_Dialogue
   m_EditorClassIdentifier: Assembly-CSharp::DoctorHelp.NpcDialogueAsset
-  content: "I broke a finger turning the handle on my own front door.\nBy supper I was burning up. I thought I'd just sat too close to the fire.\nI'm starting to wonder what I dare pick up."
+  content: 'Hello, doctor.
+
+    I hurt my arm when a cart knocked me over.
+
+    I thought you might be able to make sense of it.'

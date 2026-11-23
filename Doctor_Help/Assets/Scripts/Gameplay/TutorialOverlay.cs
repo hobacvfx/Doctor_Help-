@@ -13,6 +13,8 @@ namespace DoctorHelp
         [SerializeField, Min(.1f)] private float tapPeriod = 1.1f;
         [SerializeField, Min(0)] private float tapTravel = 15;
         [SerializeField] private AnimationCurve tapPose = AnimationCurve.EaseInOut(0, 0, 1, 1);
+        [SerializeField, Min(.5f)] private float dragPeriod = 2.2f;
+        [SerializeField] private AnimationCurve dragMotion = AnimationCurve.EaseInOut(0, 0, 1, 1);
         [SerializeField, Min(1)] private float holdRingRadius = 38;
         [SerializeField, Min(1)] private float holdRingThickness = 9;
         [SerializeField, Min(0)] private float holdRingSideOffset = 140;
@@ -26,6 +28,8 @@ namespace DoctorHelp
         private float holdProgress;
         private bool reviewing;
         private bool dimmed;
+        private bool draggingPreview;
+        private float dragStartedAt;
         internal bool ReviewConfirmed { get; private set; }
 
         protected override void OnEnable()
@@ -39,6 +43,7 @@ namespace DoctorHelp
             if (reviewNext != null) reviewNext.onClick.RemoveListener(ConfirmReview);
             SetReview(false);
             dimmed = false;
+            draggingPreview = false;
             base.OnDisable();
         }
 
@@ -54,7 +59,8 @@ namespace DoctorHelp
         }
 
         public void Present(Rect screenBounds, TutorialStep step, Rect? readingArea = null,
-            Rect? captionAvoidanceArea = null, bool showHand = true, float handScale = 1f)
+            Rect? captionAvoidanceArea = null, bool showHand = true, float handScale = 1f,
+            Vector2? dragTo = null)
         {
             this.readingArea = readingArea;
             gameObject.SetActive(true);
@@ -82,9 +88,22 @@ namespace DoctorHelp
             Vector2 contact = screenBounds.center;
             if (step.Action == TutorialAction.UseTool)
                 contact -= Vector2.Scale(step.HoldAreaOffset, new Vector2(Screen.width, Screen.height));
+            bool showDrag = showHand && dragTo.HasValue;
+            float gestureScale = Mathf.Lerp(1, .9f, press);
+            Vector2 gestureOffset = Vector2.down * (tapTravel * handScale * (1 - press));
+            if (showDrag)
+            {
+                if (!draggingPreview) dragStartedAt = Time.unscaledTime;
+                float dragPhase = Mathf.Repeat((Time.unscaledTime - dragStartedAt) / dragPeriod, 1);
+                float progress = Mathf.Clamp01((dragPhase - .12f) / .70f);
+                contact = Vector2.Lerp(contact, dragTo.Value, dragMotion.Evaluate(progress));
+                gestureScale = progress < 1 ? .9f : 1;
+                gestureOffset = Vector2.zero;
+            }
+            draggingPreview = showDrag;
             RectTransformUtility.ScreenPointToLocalPointInRectangle(rectTransform, contact, null, out var handAnchor);
-            hand.anchoredPosition = handAnchor + step.HandOffset + Vector2.down * (tapTravel * handScale * (1 - press));
-            hand.localScale = Vector3.one * (Mathf.Lerp(1, .9f, press) * handScale);
+            hand.anchoredPosition = handAnchor + step.HandOffset + gestureOffset;
+            hand.localScale = Vector3.one * (gestureScale * handScale);
 
             float captionAreaTop = hole.yMax;
             float captionAreaBottom = hole.yMin;
@@ -113,6 +132,7 @@ namespace DoctorHelp
             SetReview(false);
             SetDimmed(false);
             hand.gameObject.SetActive(false);
+            draggingPreview = false;
             caption.gameObject.SetActive(false);
             readingArea = null;
             if (!hasOpening) return;

@@ -12,4 +12,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9a19a6ecd4ed2114c9ccb631dd1f32f4, type: 3}
   m_Name: NPC_44_Dialogue
   m_EditorClassIdentifier: Assembly-CSharp::DoctorHelp.NpcDialogueAsset
-  content: "A stranger bit me, and by dawn I was burning up and retching.\nI saw something move in the basin. Then the basin started telling me where to go.\nUp the stairs, under the river, back into the basin. It made sense at the time."
+  content: 'Good day, doctor.
+
+    I want to throw up.
+
+    I cannot keep my thoughts in order.
+
+    I think I should have rested before coming here.'

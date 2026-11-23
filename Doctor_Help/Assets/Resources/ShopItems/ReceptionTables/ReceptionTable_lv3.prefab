@@ -48,7 +48,7 @@ MonoBehaviour:
   itemId: reception-table-lv3
   displayName: Reception Table Lv3
   description: '+0.75 stars to each patient review. +15 Gold/minute '
-  price: 240
+  price: 400
   icon: {fileID: 21300000, guid: 7919bd2801d725b4f8b40b482a0fe1c8, type: 3}
   poster: {fileID: 0}
   posterOffset: {x: 0, y: 0}
@@ -57,7 +57,6 @@ MonoBehaviour:
   furnitureLevel: 3
   equippedVisual: {fileID: 0}
   movingPart: {fileID: 0}
-  electricityPerDay: 25
 --- !u!1 &6371526786228758661
 GameObject:
   m_ObjectHideFlags: 0

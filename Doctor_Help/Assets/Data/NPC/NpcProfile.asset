@@ -217,7 +217,7 @@ MonoBehaviour:
     npcName: NPC_21
     sicknessIds:
     - 43e85a3e33844988b968395fcb46a51e
-    - ab5cf45d3497440c8483faf8d964c7af
+    - 051fba9345c84e7488e692592100bb6d
     dialogueAsset: {fileID: 11400000, guid: e7f78e79911847f4bc94ffc7e1f53a63, type: 2}
     difficulty: 1
   - id: 8fe4518acc27b8744b1743c9b7721ea2
@@ -268,7 +268,7 @@ MonoBehaviour:
     npcName: NPC_28
     sicknessIds:
     - 42ee7a9a38694d838b495736ea12cb20
-    - b5e06d1d7b2e459380ace3a0fe06b3d3
+    - 7f12a9d40bea47f5b5284f48762375b1
     dialogueAsset: {fileID: 11400000, guid: 869be10e38c147e884602844a76f5e1c, type: 2}
     difficulty: 1
   - id: d453ddb91789c0c4f9e6e1810be72b24
@@ -393,7 +393,7 @@ MonoBehaviour:
     npcName: NPC_45
     sicknessIds:
     - ab5cf45d3497440c8483faf8d964c7af
-    - 25be672cbb8c4af5ba855e99d8f8133b
+    - 779507f7a91843d8bbe143a5a2400021
     dialogueAsset: {fileID: 11400000, guid: b5ee4bfd7bc9491d80a0650412595eff, type: 2}
     difficulty: 1
   - id: ba27b637f60934e4ebdeb648f57893d9
@@ -517,7 +517,7 @@ MonoBehaviour:
     npcName: NPC_61
     sicknessIds:
     - ab5cf45d3497440c8483faf8d964c7af
-    - 25be672cbb8c4af5ba855e99d8f8133b
+    - 811bcfba402245e7b53ea5c5a6938fc9
     dialogueAsset: {fileID: 11400000, guid: 63ef19fafc96490f84a284b910a97e31, type: 2}
     difficulty: 1
   - id: 608c109cd23ccc240974ea62cd93c733
@@ -541,7 +541,7 @@ MonoBehaviour:
     npcName: NPC_64
     sicknessIds:
     - 811bcfba402245e7b53ea5c5a6938fc9
-    - 42ee7a9a38694d838b495736ea12cb20
+    - e5c336e89c4145a7a647c6813adbbb2e
     dialogueAsset: {fileID: 11400000, guid: 38db1c0a5558499b885d8f64b483f9e2, type: 2}
     difficulty: 1
   - id: f6766c621ab611748a348d4c00997e09
@@ -549,7 +549,7 @@ MonoBehaviour:
     npcName: NPC_65
     sicknessIds:
     - b5e06d1d7b2e459380ace3a0fe06b3d3
-    - 42ee7a9a38694d838b495736ea12cb20
+    - 7f12a9d40bea47f5b5284f48762375b1
     dialogueAsset: {fileID: 11400000, guid: 1d16918ad9884f4493216c88c2e10ef3, type: 2}
     difficulty: 1
   - id: f0d72e4048d4a4048bbf234b91f32bd6
@@ -565,7 +565,7 @@ MonoBehaviour:
     npcName: NPC_67
     sicknessIds:
     - 051fba9345c84e7488e692592100bb6d
-    - 25be672cbb8c4af5ba855e99d8f8133b
+    - 42ee7a9a38694d838b495736ea12cb20
     dialogueAsset: {fileID: 11400000, guid: 94d2b7950cf1407b9038e1d5c168eb5f, type: 2}
     difficulty: 1
   - id: 5a495a86c7249384f919b020ae2c9ccc
@@ -615,7 +615,7 @@ MonoBehaviour:
     sicknessIds:
     - 779507f7a91843d8bbe143a5a2400021
     - 811bcfba402245e7b53ea5c5a6938fc9
-    - 051fba9345c84e7488e692592100bb6d
+    - ab5cf45d3497440c8483faf8d964c7af
     dialogueAsset: {fileID: 11400000, guid: 4a3dd79488084bc1a382079ee6b5c6be, type: 2}
     difficulty: 1
   - id: a24b32a9e8589604aa4a2a0fed779e13
@@ -632,8 +632,8 @@ MonoBehaviour:
     npcName: NPC_75
     sicknessIds:
     - 051fba9345c84e7488e692592100bb6d
-    - b5e06d1d7b2e459380ace3a0fe06b3d3
-    - 25be672cbb8c4af5ba855e99d8f8133b
+    - e5c336e89c4145a7a647c6813adbbb2e
+    - 43e85a3e33844988b968395fcb46a51e
     dialogueAsset: {fileID: 11400000, guid: eb55a722c6224323ae9c60e56a5bbcb1, type: 2}
     difficulty: 1
   - id: ba7cde93effad864aa3d5436745bc701
@@ -660,7 +660,7 @@ MonoBehaviour:
     sicknessIds:
     - 811bcfba402245e7b53ea5c5a6938fc9
     - ab5cf45d3497440c8483faf8d964c7af
-    - 42ee7a9a38694d838b495736ea12cb20
+    - e5c336e89c4145a7a647c6813adbbb2e
     dialogueAsset: {fileID: 11400000, guid: 16daebcbae6045a988d07ec52ec8a508, type: 2}
     difficulty: 1
   - id: 9c5b169736a563e43862b19297c18a88
@@ -713,8 +713,8 @@ MonoBehaviour:
     npcName: NPC_84
     sicknessIds:
     - 779507f7a91843d8bbe143a5a2400021
-    - 051fba9345c84e7488e692592100bb6d
     - 7f12a9d40bea47f5b5284f48762375b1
+    - e5c336e89c4145a7a647c6813adbbb2e
     dialogueAsset: {fileID: 11400000, guid: 60c0007229544f4e984c1ba7ec5f757e, type: 2}
     difficulty: 1
   - id: 2d09773cfc018374ba0af1c55f160ca7
@@ -732,7 +732,7 @@ MonoBehaviour:
     sicknessIds:
     - 779507f7a91843d8bbe143a5a2400021
     - ab5cf45d3497440c8483faf8d964c7af
-    - 051fba9345c84e7488e692592100bb6d
+    - e5c336e89c4145a7a647c6813adbbb2e
     dialogueAsset: {fileID: 11400000, guid: 4c547583668246e5a46bc74e4d52c322, type: 2}
     difficulty: 1
   - id: 0277cf74389187f4d9913be4fe3a4562
@@ -740,8 +740,8 @@ MonoBehaviour:
     npcName: NPC_87
     sicknessIds:
     - 811bcfba402245e7b53ea5c5a6938fc9
-    - 42ee7a9a38694d838b495736ea12cb20
     - 7f12a9d40bea47f5b5284f48762375b1
+    - 43e85a3e33844988b968395fcb46a51e
     dialogueAsset: {fileID: 11400000, guid: 4fc8aa42b6fa49ccb283e1cb1b47660c, type: 2}
     difficulty: 1
   - id: e0df63dee3fdff44e9e9c6be8c2f2a0c
@@ -758,8 +758,8 @@ MonoBehaviour:
     npcName: NPC_89
     sicknessIds:
     - 051fba9345c84e7488e692592100bb6d
-    - 25be672cbb8c4af5ba855e99d8f8133b
     - b09d50f81fe14efab382c302f5b19ef0
+    - e5c336e89c4145a7a647c6813adbbb2e
     dialogueAsset: {fileID: 11400000, guid: 78342cc1b81b4cb9a84171901ecacd59, type: 2}
     difficulty: 1
   - id: 91da00f75880135469bdec4ee248f555
@@ -786,8 +786,8 @@ MonoBehaviour:
     sicknessIds:
     - 811bcfba402245e7b53ea5c5a6938fc9
     - ab5cf45d3497440c8483faf8d964c7af
-    - 051fba9345c84e7488e692592100bb6d
     - 420888271cbf4de8947e7ef841c5e315
+    - e5c336e89c4145a7a647c6813adbbb2e
     dialogueAsset: {fileID: 11400000, guid: 3e72cbcd04d34805af5f5e499718d9d8, type: 2}
     difficulty: 1
   - id: e4afe52b7fd3cfe4da4ba494b05e4af2
@@ -796,8 +796,8 @@ MonoBehaviour:
     sicknessIds:
     - e5c336e89c4145a7a647c6813adbbb2e
     - ab5cf45d3497440c8483faf8d964c7af
-    - 25be672cbb8c4af5ba855e99d8f8133b
     - 420888271cbf4de8947e7ef841c5e315
+    - 779507f7a91843d8bbe143a5a2400021
     dialogueAsset: {fileID: 11400000, guid: edcd1b4cdaa84c25afb0be0d6a4b55d4, type: 2}
     difficulty: 1
   - id: 0273e0f7cd0df2f46960ec74d10196d3
@@ -806,8 +806,8 @@ MonoBehaviour:
     sicknessIds:
     - 811bcfba402245e7b53ea5c5a6938fc9
     - ab5cf45d3497440c8483faf8d964c7af
-    - 43e85a3e33844988b968395fcb46a51e
     - 420888271cbf4de8947e7ef841c5e315
+    - 779507f7a91843d8bbe143a5a2400021
     dialogueAsset: {fileID: 11400000, guid: 4acc82990f9f443d9a4944dd0205ac39, type: 2}
     difficulty: 1
   - id: 5070d1599728ef9439dfed597d68e462
@@ -835,9 +835,9 @@ MonoBehaviour:
     npcName: NPC_97
     sicknessIds:
     - b5e06d1d7b2e459380ace3a0fe06b3d3
-    - 42ee7a9a38694d838b495736ea12cb20
     - 7f12a9d40bea47f5b5284f48762375b1
     - 420888271cbf4de8947e7ef841c5e315
+    - 43e85a3e33844988b968395fcb46a51e
     dialogueAsset: {fileID: 11400000, guid: 58f93aa36ac64cc9a3bf5b5201bbee7a, type: 2}
     difficulty: 1
   - id: af92d87396ee2b541ae8ce53ac712f03
@@ -866,8 +866,8 @@ MonoBehaviour:
     sicknessIds:
     - 779507f7a91843d8bbe143a5a2400021
     - ab5cf45d3497440c8483faf8d964c7af
-    - 42ee7a9a38694d838b495736ea12cb20
     - 420888271cbf4de8947e7ef841c5e315
+    - e5c336e89c4145a7a647c6813adbbb2e
     dialogueAsset: {fileID: 11400000, guid: 940f59f6ebac4b1d8d3504a82bc53832, type: 2}
     difficulty: 1
   - id: b74a30ca538af9941af62f53ffc201d7
@@ -875,9 +875,9 @@ MonoBehaviour:
     npcName: NPC_101
     sicknessIds:
     - 811bcfba402245e7b53ea5c5a6938fc9
-    - 051fba9345c84e7488e692592100bb6d
     - 43e85a3e33844988b968395fcb46a51e
     - 7f12a9d40bea47f5b5284f48762375b1
+    - 25be672cbb8c4af5ba855e99d8f8133b
     dialogueAsset: {fileID: 11400000, guid: 5231da3c813a4d4783c9f85986c47250, type: 2}
     difficulty: 1
   - id: 3929ab750be982b4f97061019b457edc
@@ -885,9 +885,9 @@ MonoBehaviour:
     npcName: NPC_102
     sicknessIds:
     - ab5cf45d3497440c8483faf8d964c7af
-    - b5e06d1d7b2e459380ace3a0fe06b3d3
-    - 7f12a9d40bea47f5b5284f48762375b1
     - 420888271cbf4de8947e7ef841c5e315
+    - e5c336e89c4145a7a647c6813adbbb2e
+    - 779507f7a91843d8bbe143a5a2400021
     dialogueAsset: {fileID: 11400000, guid: bdfb0bb7e0fa4028a39b0aebe13b425f, type: 2}
     difficulty: 1
   - id: 358a0295e90ec18458b03296aaec0cf5
@@ -966,8 +966,8 @@ MonoBehaviour:
     sicknessIds:
     - 779507f7a91843d8bbe143a5a2400021
     - 811bcfba402245e7b53ea5c5a6938fc9
-    - 051fba9345c84e7488e692592100bb6d
     - 25be672cbb8c4af5ba855e99d8f8133b
+    - e5c336e89c4145a7a647c6813adbbb2e
     dialogueAsset: {fileID: 11400000, guid: 77ed4270f1704360925b7573b620be2d, type: 2}
     difficulty: 1
   - id: a5d13f6e465d2dc4087df92c7259f284
@@ -975,8 +975,8 @@ MonoBehaviour:
     npcName: NPC_111
     sicknessIds:
     - e5c336e89c4145a7a647c6813adbbb2e
-    - 779507f7a91843d8bbe143a5a2400021
     - 051fba9345c84e7488e692592100bb6d
     - b09d50f81fe14efab382c302f5b19ef0
+    - 43e85a3e33844988b968395fcb46a51e
     dialogueAsset: {fileID: 11400000, guid: b93b8e5932a540fa96c459c7534d93f4, type: 2}
     difficulty: 1

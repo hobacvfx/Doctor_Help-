@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace DoctorHelp
@@ -26,12 +27,23 @@ namespace DoctorHelp
         internal PatientRockReaction RockReaction { get; set; }
         [SerializeField, HideInInspector] private string consultationId;
         public string ConsultationId => consultationId;
+        [SerializeField, HideInInspector] private List<string> stagedMedicineIds = new List<string>();
+        internal IReadOnlyList<string> StagedMedicineIds => stagedMedicineIds.AsReadOnly();
+        internal bool StageMedicine(string id)
+        {
+            if (string.IsNullOrWhiteSpace(id) || stagedMedicineIds.Contains(id)) return false;
+            stagedMedicineIds.Add(id);
+            return true;
+        }
+        internal bool RemoveStagedMedicine(string id) => stagedMedicineIds.Remove(id);
+        internal void ClearStagedMedicines() => stagedMedicineIds.Clear();
 
         private const double PatienceDuration = 45;
         private double maximumPatienceSeconds = PatienceDuration;
         private double patienceSeconds;
         private bool patienceRunning;
         public bool HasArrived { get; private set; }
+        internal bool HasReceivedMedicine { get; set; }
         public float Patience => (float)(100 * patienceSeconds / maximumPatienceSeconds);
         public int PatienceStars => Mathf.Min(5, 1 + Mathf.FloorToInt(Patience / 10f));
 
@@ -92,6 +104,8 @@ namespace DoctorHelp
             consultationId = Guid.NewGuid().ToString("N");
             // Initialize marks a new consultation, including reuse of a pooled patient.
             HasArrived = patienceRunning = false;
+            HasReceivedMedicine = false;
+            stagedMedicineIds.Clear();
             var playerProfile = PlayerProfileService.Instance;
             float patienceMultiplier = playerProfile != null && playerProfile.IsLoaded ? playerProfile.PatienceMultiplier : 1f;
             maximumPatienceSeconds = PatienceDuration * patienceMultiplier;

@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -24,6 +25,8 @@ namespace DoctorHelp
         private readonly Vector3[] iconScales = new Vector3[3];
         private readonly Stack<Image> idleCoins = new Stack<Image>();
         private readonly List<Image> flyingCoins = new List<Image>();
+        private readonly Stack<RawImage> idlePuffs = new Stack<RawImage>();
+        private readonly List<RawImage> playingPuffs = new List<RawImage>();
         private Canvas flightCanvas;
 
         // Below 50: 10 icons, 50-149: 20 icons, 150 and above: 30 icons.
@@ -48,7 +51,70 @@ namespace DoctorHelp
                 return;
             }
             if (!alreadyHeld) Hold(kind, amount);
-            StartCoroutine(SpawnIcons(kind, amount, screenFrom, icon));
+            StartCoroutine(SpawnIcons(kind, amount, screenFrom, icon, null));
+        }
+
+        // Same icon flight for a bar whose amount text is driven by its owner (the end-of-day report, whose
+        // Headbar component is disabled so it does not show the profile): only the GameObject must be active.
+        // The shown amounts are left alone and landed(share) is called as each icon arrives.
+        // Returns false when nothing will fly, so the caller should apply the amount itself.
+        internal bool FlyIcons(CurrencyKind kind, int amount, Vector2 screenFrom, Action<int> landed)
+        {
+            var icon = Icon(kind);
+            if (amount <= 0 || !gameObject.activeInHierarchy || flightLayer == null || icon == null) return false;
+            StartCoroutine(SpawnIcons(kind, amount, screenFrom, icon, landed));
+            return true;
+        }
+
+        // VFX_Puff drawn as UI in the flight layer, for rewards received on top of a full-screen popup
+        // where a world puff would be hidden. Plays the puff's flipbook once.
+        internal void PlayUiPuff(Vector2 screen)
+        {
+            if (rewardPuff == null || flightLayer == null || !gameObject.activeInHierarchy) return;
+            var renderer = rewardPuff.GetComponent<ParticleSystemRenderer>();
+            var material = renderer != null ? renderer.sharedMaterial : null;
+            if (material == null) return;
+            var texture = material.mainTexture;
+            if (texture == null)
+                foreach (var property in material.GetTexturePropertyNames())
+                    if ((texture = material.GetTexture(property)) != null) break;
+            if (texture == null) return;
+            // The puff material blends additively over a black background; UI blends by alpha, so use a copy
+            // whose alpha comes from brightness (black becomes transparent) instead of drawing a black square.
+            if (material.HasProperty("_DstBlend") && Mathf.Approximately(material.GetFloat("_DstBlend"), 1f))
+                texture = AlphaFromBrightness(texture);
+            StartCoroutine(PlayUiPuff(screen, texture));
+        }
+
+        private static readonly Dictionary<Texture, Texture2D> brightnessAlpha = new Dictionary<Texture, Texture2D>();
+
+        private static Texture AlphaFromBrightness(Texture source)
+        {
+            if (brightnessAlpha.TryGetValue(source, out var cached) && cached != null) return cached;
+            int width = source.width, height = source.height;
+            var target = RenderTexture.GetTemporary(width, height, 0, RenderTextureFormat.ARGB32, RenderTextureReadWrite.sRGB);
+            var previous = RenderTexture.active;
+            Graphics.Blit(source, target);
+            RenderTexture.active = target;
+            var copy = new Texture2D(width, height, TextureFormat.RGBA32, false) { name = source.name + " (UI alpha)" };
+            copy.ReadPixels(new Rect(0, 0, width, height), 0, 0, false);
+            RenderTexture.active = previous;
+            RenderTexture.ReleaseTemporary(target);
+
+            var pixels = copy.GetPixels32();
+            for (int index = 0; index < pixels.Length; index++)
+            {
+                var pixel = pixels[index];
+                byte alpha = (byte)Mathf.Max(pixel.r, Mathf.Max(pixel.g, pixel.b));
+                pixels[index] = alpha == 0 ? new Color32(255, 255, 255, 0) : new Color32(
+                    (byte)(pixel.r * 255 / alpha), (byte)(pixel.g * 255 / alpha), (byte)(pixel.b * 255 / alpha), alpha);
+            }
+            copy.SetPixels32(pixels);
+            copy.wrapMode = TextureWrapMode.Clamp;
+            copy.filterMode = source.filterMode;
+            copy.Apply(false, true);
+            brightnessAlpha[source] = copy;
+            return copy;
         }
 
         // VFX_Puff at a screen point (UI rewards), drawn in front of the given camera's world.
@@ -115,7 +181,59 @@ namespace DoctorHelp
             Refresh();
         }
 
-        private IEnumerator SpawnIcons(CurrencyKind kind, int amount, Vector2 screenFrom, Image icon)
+        private IEnumerator PlayUiPuff(Vector2 screen, Texture texture)
+        {
+            var root = flightCanvas != null ? flightCanvas.rootCanvas : GetComponentInParent<Canvas>();
+            var eye = root == null || root.renderMode == RenderMode.ScreenSpaceOverlay ? null : root.worldCamera;
+            RectTransformUtility.ScreenPointToLocalPointInRectangle(flightLayer, screen, eye, out var local);
+
+            RawImage puff;
+            if (idlePuffs.Count > 0) puff = idlePuffs.Pop();
+            else
+            {
+                var go = new GameObject("Reward Puff", typeof(RectTransform), typeof(CanvasRenderer), typeof(RawImage));
+                go.layer = flightLayer.gameObject.layer;
+                puff = go.GetComponent<RawImage>();
+                puff.raycastTarget = false;
+                puff.rectTransform.SetParent(flightLayer, false);
+                puff.rectTransform.anchorMin = puff.rectTransform.anchorMax = puff.rectTransform.pivot = new Vector2(.5f, .5f);
+            }
+            playingPuffs.Add(puff);
+            puff.texture = texture;
+            var settings = rewardPuff.main;
+            puff.color = settings.startColor.color;
+            var rect = puff.rectTransform;
+            rect.sizeDelta = Vector2.one * 230f * ReferenceUnit();
+            rect.localPosition = local;
+            rect.localRotation = Quaternion.Euler(0f, 0f, UnityEngine.Random.Range(0f, 360f));
+            rect.SetAsLastSibling();
+            puff.gameObject.SetActive(true);
+
+            var sheet = rewardPuff.textureSheetAnimation;
+            int columns = sheet.enabled ? Mathf.Max(1, sheet.numTilesX) : 1;
+            int rows = sheet.enabled ? Mathf.Max(1, sheet.numTilesY) : 1;
+            int frames = columns * rows;
+            float lifetime = Mathf.Max(.1f, settings.startLifetime.constant);
+            for (float elapsed = 0f; elapsed < lifetime; elapsed += Time.unscaledDeltaTime)
+            {
+                float t = elapsed / lifetime;
+                int frame = Mathf.Min(frames - 1, (int)(t * frames));
+                int column = frame % columns, row = frame / columns;
+                puff.uvRect = new Rect((float)column / columns, 1f - (row + 1f) / rows, 1f / columns, 1f / rows);
+                rect.localScale = Vector3.one * Mathf.Lerp(.85f, 1.15f, t);
+                yield return null;
+            }
+            ReturnPuff(puff);
+        }
+
+        private void ReturnPuff(RawImage puff)
+        {
+            playingPuffs.Remove(puff);
+            puff.gameObject.SetActive(false);
+            idlePuffs.Push(puff);
+        }
+
+        private IEnumerator SpawnIcons(CurrencyKind kind, int amount, Vector2 screenFrom, Image icon, Action<int> landed)
         {
             int count = RewardIconCount(amount);
             float window = Mathf.Lerp(1f, 2f, (count - 10) / 20f); // Spread over 1-2 seconds.
@@ -128,26 +246,26 @@ namespace DoctorHelp
             {
                 int share = (int)((long)amount * (index + 1) / count) - paid;
                 paid += share;
-                StartCoroutine(FlyIcon(kind, share, origin, icon));
-                float wait = window / count * Random.Range(.55f, 1.45f);
+                StartCoroutine(FlyIcon(kind, share, origin, icon, landed));
+                float wait = window / count * UnityEngine.Random.Range(.55f, 1.45f);
                 for (float waited = 0f; waited < wait; waited += Time.unscaledDeltaTime) yield return null;
             }
         }
 
-        private IEnumerator FlyIcon(CurrencyKind kind, int share, Vector2 origin, Image icon)
+        private IEnumerator FlyIcon(CurrencyKind kind, int share, Vector2 origin, Image icon, Action<int> landed)
         {
             var coin = TakeCoin(icon);
             var rect = coin.rectTransform;
             float unit = ReferenceUnit();
 
             // Burst out in a random upward fan, then curve into the slot from below at a random speed.
-            Vector2 start = origin + Random.insideUnitCircle * 40f * unit; // Local to the layer's pivot.
-            float angle = Random.Range(15f, 165f) * Mathf.Deg2Rad;
-            Vector2 burst = new Vector2(Mathf.Cos(angle), Mathf.Sin(angle)) * Random.Range(260f, 560f) * unit;
-            Vector2 sway = new Vector2(Random.Range(-1f, 1f) * Random.Range(120f, 380f), -Random.Range(80f, 320f)) * unit;
-            float duration = Random.Range(.7f, 1.1f);
-            float spin = Random.Range(-25f, 25f);
-            float phase = Random.value * Mathf.PI * 2f;
+            Vector2 start = origin + UnityEngine.Random.insideUnitCircle * 40f * unit; // Local to the layer's pivot.
+            float angle = UnityEngine.Random.Range(15f, 165f) * Mathf.Deg2Rad;
+            Vector2 burst = new Vector2(Mathf.Cos(angle), Mathf.Sin(angle)) * UnityEngine.Random.Range(260f, 560f) * unit;
+            Vector2 sway = new Vector2(UnityEngine.Random.Range(-1f, 1f) * UnityEngine.Random.Range(120f, 380f), -UnityEngine.Random.Range(80f, 320f)) * unit;
+            float duration = UnityEngine.Random.Range(.7f, 1.1f);
+            float spin = UnityEngine.Random.Range(-25f, 25f);
+            float phase = UnityEngine.Random.value * Mathf.PI * 2f;
 
             for (float elapsed = 0f; elapsed < duration; elapsed += Time.unscaledDeltaTime)
             {
@@ -165,7 +283,8 @@ namespace DoctorHelp
 
             ReturnCoin(coin);
             punch[(int)kind] = 1f;
-            Release(kind, share);
+            if (landed != null) landed(share);
+            else Release(kind, share);
         }
 
         private void Update()
@@ -227,12 +346,18 @@ namespace DoctorHelp
             idleCoins.Push(coin);
         }
 
+        // For owners of a disabled bar (OnDisable does not run for it): drop icons and puffs still in the air.
+        internal void StopRewardFlights() => StopFlights();
+
         private void StopFlights()
         {
             StopAllCoroutines();
             for (int index = flyingCoins.Count - 1; index >= 0; index--)
                 if (flyingCoins[index] != null) ReturnCoin(flyingCoins[index]);
             flyingCoins.Clear();
+            for (int index = playingPuffs.Count - 1; index >= 0; index--)
+                if (playingPuffs[index] != null) ReturnPuff(playingPuffs[index]);
+            playingPuffs.Clear();
             for (int index = 0; index < held.Length; index++)
             {
                 held[index] = 0;

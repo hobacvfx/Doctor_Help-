@@ -14,9 +14,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::DoctorHelp.NpcDialogueAsset
   content: 'Hello, doctor.
 
-    I haven''t felt right since breakfast.
+    I lose track halfway through a sentence.
 
-    The floorboards
-    keep sending me letters.
-
-    Perhaps it was the water I drew from the cellar.'
+    I thought you might be able to make sense of it.'

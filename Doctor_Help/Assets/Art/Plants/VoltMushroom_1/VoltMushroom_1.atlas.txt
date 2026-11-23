@@ -1,0 +1,16 @@
+VoltMushroom_1.png
+size:1851,405
+filter:Linear,Linear
+cap
+bounds:2,18,613,385
+offsets:5,5,620,395
+glow
+bounds:617,75,679,328
+offsets:6,6,690,343
+pot
+bounds:1298,31,372,348
+offsets:4,4,380,355
+rotate:90
+stem
+bounds:1648,2,201,401
+offsets:4,5,209,410

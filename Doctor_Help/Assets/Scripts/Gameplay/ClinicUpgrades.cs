@@ -5,7 +5,7 @@ namespace DoctorHelp
     internal static class ClinicUpgrades
     {
         private static readonly float[] ReceptionTableStars = { 0f, .25f, .5f, .75f, 1f, 1.5f };
-        private static readonly float[] ReceptionTableGold = { 0f, .05f, 0f, 0f, 0f, 0f };
+        private static readonly float[] ReceptionTableGold = { 0f, .05f, 0f, 0f, 0f, .15f };
         private static readonly float[] ReceptionTablePatience = { 0f, 0f, .1f, 0f, .2f, 0f };
         private static readonly int[] ReceptionTableGoldPerMinute = { 0, 0, 0, 15, 0, 0 };
 

@@ -17,6 +17,8 @@ namespace DoctorHelp
         [SerializeField] private string organSymptomId;
         [SerializeField] private OrganSlot[] organs;
         [SerializeField, HideInInspector] private GameObject spawnedOrgan;
+        internal string ClueSymptomId => organSymptomId;
+        internal GameObject ClueInstance => spawnedOrgan;
 
         public void Initialize(NpcDefinition npc, AllSickness medicalData)
         {

@@ -12,4 +12,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9a19a6ecd4ed2114c9ccb631dd1f32f4, type: 3}
   m_Name: NPC_32_Dialogue
   m_EditorClassIdentifier: Assembly-CSharp::DoctorHelp.NpcDialogueAsset
-  content: "I polish silver for a living. It used to take me an hour to do a tray.\nNow I have to stop and press a hand under my ribs every few minutes.\nI thought it was my posture until it started hurting in bed."
+  content: 'Evening, doctor.
+
+    I feel worn out and out of sorts.
+
+    I do not know what is wrong; that is why I came.'

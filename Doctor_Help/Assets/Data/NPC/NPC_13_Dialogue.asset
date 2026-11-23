@@ -12,4 +12,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9a19a6ecd4ed2114c9ccb631dd1f32f4, type: 3}
   m_Name: NPC_13_Dialogue
   m_EditorClassIdentifier: Assembly-CSharp::DoctorHelp.NpcDialogueAsset
-  content: "I mind the ovens at a boarding house. Yesterday I ate whatever the lodgers left.\nI've had cramps in waves ever since.\nI saw something pale and thin this morning that had no business moving."
+  content: 'Good evening, doctor.
+
+    I feel worn out and out of sorts.
+
+    I have no idea where it started.'

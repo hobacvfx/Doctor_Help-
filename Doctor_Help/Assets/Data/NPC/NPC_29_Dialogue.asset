@@ -12,4 +12,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9a19a6ecd4ed2114c9ccb631dd1f32f4, type: 3}
   m_Name: NPC_29_Dialogue
   m_EditorClassIdentifier: Assembly-CSharp::DoctorHelp.NpcDialogueAsset
-  content: "Something scratched me in a passage behind the slaughterhouse.\nBy midnight I was burning up and so queasy I couldn't keep down a spoonful of broth.\nThen there was something wriggling in the basin. I left it there."
+  content: 'Good evening, doctor.
+
+    I feel nauseous.
+
+    Perhaps I have been running myself ragged on errands.'

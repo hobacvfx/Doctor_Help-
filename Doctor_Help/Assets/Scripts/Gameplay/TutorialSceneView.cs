@@ -36,8 +36,16 @@ namespace DoctorHelp
             var row = step.Action == TutorialAction.SelectMedicine ? gameplay.PillPopup?.MedicineList.TutorialRow(medicineId) : null;
             Rect? captionAvoidanceArea = row != null ? ScreenBounds((RectTransform)row.transform) : null;
             if (step.Action == TutorialAction.UseTool) holdStep = step;
+            if (step.Action == TutorialAction.SelectMedicine && gameplay.PillPopup.IsDragging)
+                bounds = new Rect(0, 0, Screen.width, Screen.height);
+            Vector2? dragTo = null;
+            if (step.Action == TutorialAction.SelectMedicine && patients.CurrentPatient != null)
+            {
+                dragTo = gameplay.PillPopup.GivenMedicines.ScreenCenter;
+            }
             overlay.Present(bounds, step, readingArea, captionAvoidanceArea,
-                showHand: step.Action != TutorialAction.ReviewSymptoms);
+                showHand: step.Action != TutorialAction.ReviewSymptoms && !gameplay.PillPopup.IsDragging,
+                dragTo: dragTo);
         }
         internal void Hide()
         {
@@ -70,7 +78,9 @@ namespace DoctorHelp
                 case TutorialAction.ReviewSymptoms: return overlay.ReviewConfirmed;
                 case TutorialAction.CloseDoctorBook: return book != null && !book.IsOpen;
                 case TutorialAction.OpenTreatment: return gameplay.PillPopup.gameObject.activeInHierarchy;
-                case TutorialAction.SelectMedicine: return gameplay.PillPopup.SelectedMedicineIds.Contains(medicineId);
+                case TutorialAction.SelectMedicine: return gameplay.PillPopup.SelectedMedicineIds.Contains(medicineId) ||
+                    (patients.CurrentPatient != null && patients.CurrentPatient.HasReceivedMedicine && loop.SelectedPills?.Contains(medicineId) == true);
+                case TutorialAction.RemoveMedicine: return !gameplay.PillPopup.SelectedMedicineIds.Contains(medicineId);
                 case TutorialAction.GiveMedicine:
                     return !gameplay.PillPopup.gameObject.activeInHierarchy && loop.SelectedPills?.Contains(medicineId) == true;
                 default: return false;
@@ -145,7 +155,9 @@ namespace DoctorHelp
                 case TutorialAction.SelectMedicine:
                     return Ui(gameplay.PillPopup?.MedicineList.TutorialButton(plan.MedicineId, reveal), out bounds);
                 case TutorialAction.GiveMedicine:
-                    return Ui(gameplay.PillPopup?.GiveButton, out bounds);
+                    return false; // Legacy ID retained; completion now happens on the last drop.
+                case TutorialAction.RemoveMedicine:
+                    return Ui(gameplay.PillPopup?.GivenMedicines.TutorialRemoveButton(plan.MedicineId), out bounds);
                 default: return false;
             }
         }

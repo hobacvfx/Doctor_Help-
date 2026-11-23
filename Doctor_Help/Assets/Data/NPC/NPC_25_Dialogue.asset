@@ -12,4 +12,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9a19a6ecd4ed2114c9ccb631dd1f32f4, type: 3}
   m_Name: NPC_25_Dialogue
   m_EditorClassIdentifier: Assembly-CSharp::DoctorHelp.NpcDialogueAsset
-  content: "A crate slipped off the dock and landed squarely across my forearm.\nI heard the crack before I felt it.\nI've kept the arm tucked in since. It hurts when the sleeve pulls."
+  content: 'Hello there, doctor.
+
+    My wrist has hurt since I stumbled on the steps.
+
+    Maybe
+    I took on too much work this week.'

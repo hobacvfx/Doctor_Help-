@@ -1,0 +1,170 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ea73f1d3ca14a28468425055efeca271, type: 3}
+  m_Name: ExaminationClueCatalog
+  m_EditorClassIdentifier: Assembly-CSharp::DoctorHelp.ExaminationClueCatalog
+  symptoms: {fileID: 11400000, guid: fd6823cbade36444ab4130a73f177fd6, type: 2}
+  entries:
+  - symptomId: 3faa1f876c2a48f783d453e90ad80866
+    measurement: 0
+    dialoguePhrases:
+    - bone fracture
+    - broken bone
+    - broken bones
+    referencePhrases:
+    - Broken bones
+    - Bone fractures
+  - symptomId: bc866d1df5cc48cba1fbe4dcaa873633
+    measurement: 0
+    dialoguePhrases:
+    - incoherent
+    - confused and incoherent
+    - I keep losing the thread of what I am saying
+    - my words keep getting mixed up
+    - I cannot keep my thoughts in order
+    - I lose track halfway through a sentence
+    - my speech keeps getting muddled
+    - I cannot make my thoughts come out straight
+    referencePhrases:
+    - confused and incoherent
+  - symptomId: d3a6ab2e13704c59b818be21248e9a2e
+    measurement: 0
+    dialoguePhrases:
+    - parasite infestation
+    - parasites inside my body
+    - parasite
+    - parasites
+    referencePhrases:
+    - Parasites
+    - parasites inside the body
+  - symptomId: 868f3555805749b391b6641bd163f651
+    measurement: 0
+    dialoguePhrases:
+    - abnormal internal organs
+    referencePhrases:
+    - Abnormal internal organs
+  - symptomId: e40ba4b660b94711a7935deae8b2602c
+    measurement: 0
+    dialoguePhrases:
+    - abnormal heart
+    referencePhrases:
+    - abnormal heart
+  - symptomId: ba01540c62484c209e3ec60d8200cd10
+    measurement: 1
+    dialoguePhrases: []
+    referencePhrases:
+    - high temperature
+  - symptomId: d0b701a64ef14b1b891b7163abb92c71
+    measurement: 0
+    dialoguePhrases:
+    - abnormal brain
+    referencePhrases:
+    - abnormal brain
+  - symptomId: 99740cad57794442b282b9c1caddbbe0
+    measurement: 2
+    dialoguePhrases: []
+    referencePhrases:
+    - rapid heartbeat
+  - symptomId: 642f83d862cb41cc8d242ec08a901cd2
+    measurement: 0
+    dialoguePhrases:
+    - shortness of breath
+    - short of breath
+    - trouble breathing
+    - trouble getting my breath
+    - breath won't come easily
+    - stop to catch my breath
+    - "kh\xF3 th\u1EDF"
+    - I am short of breath
+    - I am having trouble breathing
+    - I have to stop to catch my breath
+    - I feel out of breath
+    - I am having trouble getting my breath
+    - my breath will not come easily
+    referencePhrases:
+    - Shortness of breath
+  - symptomId: 0856d09d9e1a480ea6b6e272e92cff3b
+    measurement: 0
+    dialoguePhrases:
+    - distinctive brain abnormality
+    referencePhrases:
+    - distinctive brain abnormality
+  - symptomId: ec557b40a6ed406fbb270e751a04cb18
+    measurement: 2
+    dialoguePhrases: []
+    referencePhrases:
+    - slow heartbeat
+  - symptomId: eedde69cc36140329b7308ccdeb34f92
+    measurement: 0
+    dialoguePhrases:
+    - headache
+    - head hurts
+    - head is pounding
+    - head's pounding
+    - "\u0111au \u0111\u1EA7u"
+    - my head aches
+    - my head is pounding
+    - I have a headache
+    - my head is throbbing
+    - my head hurts
+    - I have a dreadful headache
+    referencePhrases:
+    - Headache
+  - symptomId: dc3b1e5abee94c1d9b4c5a184fd22ada
+    measurement: 0
+    dialoguePhrases:
+    - nausea
+    - nauseous
+    - queasy
+    - wanting to vomit
+    - feel sick
+    - sick to my stomach
+    - "bu\u1ED3n n\xF4n"
+    - I feel nauseous
+    - I feel queasy
+    - I keep wanting to vomit
+    - I want to throw up
+    - I feel sick to my stomach
+    - I keep wanting to throw up
+    referencePhrases:
+    - Nausea
+  - symptomId: 22eaad3867e2482cb6baaf07d3a04bd3
+    measurement: 2
+    dialoguePhrases: []
+    referencePhrases:
+    - no heartbeat
+  - symptomId: 81086fbd9e514e13b5674857847a7ead
+    measurement: 1
+    dialoguePhrases: []
+    referencePhrases:
+    - low temperature
+  - symptomId: 8439037532414cfe808eec0c66b75c5e
+    measurement: 0
+    dialoguePhrases:
+    - ghosts haunt
+    - ghosts around me
+    - there are ghosts around me
+    - I keep seeing ghosts around me
+    - the ghosts around me will not leave
+    - I can feel ghosts around me
+    - I think there are ghosts around me
+    - there are ghosts around me even here
+    referencePhrases:
+    - ghosts
+  - symptomId: 22e04f4290ee46c9b4bacad833c5b7d3
+    measurement: 0
+    dialoguePhrases:
+    - abnormal brain
+    referencePhrases:
+    - abnormal brain
+    - delusional brain
+    - brain abnormality (delusion)

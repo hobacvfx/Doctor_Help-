@@ -7,7 +7,8 @@ namespace DoctorHelp
     public enum TutorialAction
     {
         SelectTool = 4, UseTool = 5, OpenTreatment = 6, SelectMedicine = 7, GiveMedicine = 8,
-        OpenDoctorBook = 9, CloseDoctorBook = 10, ReviewSymptoms = 11, ExplainStain = 12, SelectClean = 13
+        OpenDoctorBook = 9, CloseDoctorBook = 10, ReviewSymptoms = 11, ExplainStain = 12, SelectClean = 13,
+        RemoveMedicine = 14
     }
 
     [Serializable]
@@ -17,7 +18,7 @@ namespace DoctorHelp
         public ExaminationToolKind Tool;
         [TextArea(2, 4)] public string Instruction;
         [Min(0)] public float Padding = 6;
-        [Tooltip("Only charge the hold progress while the X-ray lens covers the worm.")]
+        [Tooltip("Only charge the hold progress while the X-ray lens covers the parasite.")]
         public bool RequireWormInLens;
         [Tooltip("Interaction area width and height as fractions of the screen during a hold.")]
         public Vector2 HoldArea = new Vector2(.26f, .20f);

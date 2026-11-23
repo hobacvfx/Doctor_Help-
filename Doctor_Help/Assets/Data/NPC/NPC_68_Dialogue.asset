@@ -12,4 +12,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9a19a6ecd4ed2114c9ccb631dd1f32f4, type: 3}
   m_Name: NPC_68_Dialogue
   m_EditorClassIdentifier: Assembly-CSharp::DoctorHelp.NpcDialogueAsset
-  content: "Afternoon, doctor. I'm hot and short of breath.\nMy heart is racing. The street numbers were doing the same thing.\nPerhaps I wore myself out chasing number twelve."
+  content: 'Afternoon, doctor.
+
+    I am having trouble getting my breath.
+
+    I cannot keep my thoughts in order.
+
+    I do not know what is wrong; that is why I came.'

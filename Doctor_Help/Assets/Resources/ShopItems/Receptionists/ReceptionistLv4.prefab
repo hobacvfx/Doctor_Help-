@@ -47,7 +47,7 @@ MonoBehaviour:
   itemId: receptionist-lv4
   displayName: Receptionist Lv4
   description: '+80% gold from business. + 1.5 star review '
-  price: 700
+  price: 1000
   icon: {fileID: 21300000, guid: f24c05e247ed4ea45a28894944acf540, type: 3}
   poster: {fileID: 0}
   posterOffset: {x: 0, y: 0}
@@ -56,4 +56,3 @@ MonoBehaviour:
   furnitureLevel: 4
   equippedVisual: {fileID: 176444578778948757, guid: d8fea880fb78db342a59a985b63a7f95, type: 3}
   movingPart: {fileID: 0}
-  electricityPerDay: 25

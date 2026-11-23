@@ -12,4 +12,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9a19a6ecd4ed2114c9ccb631dd1f32f4, type: 3}
   m_Name: NPC_51_Dialogue
   m_EditorClassIdentifier: Assembly-CSharp::DoctorHelp.NpcDialogueAsset
-  content: "Someone keeps moving my shop while I'm inside it.\nI told the constable it had gone to Wednesday. He asked for the street.\nIf I knew the street, doctor, I wouldn't have come to you."
+  content: 'Hello, doctor.
+
+    I lose track halfway through a sentence.
+
+    I think I should have taken yesterday off.'

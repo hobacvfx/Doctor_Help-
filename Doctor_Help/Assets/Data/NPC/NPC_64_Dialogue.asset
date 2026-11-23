@@ -12,4 +12,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9a19a6ecd4ed2114c9ccb631dd1f32f4, type: 3}
   m_Name: NPC_64_Dialogue
   m_EditorClassIdentifier: Assembly-CSharp::DoctorHelp.NpcDialogueAsset
-  content: "Morning, doctor. My head aches, and my pulse feels slow.\nI noticed it while I was tying my boots for work.\nMaybe I read too long by candlelight last night."
+  content: 'Morning, doctor.
+
+    My wrist hurts after I slipped by the door.
+
+    Maybe I read too long by candlelight last night.'

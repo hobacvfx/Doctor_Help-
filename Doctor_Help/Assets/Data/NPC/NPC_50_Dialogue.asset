@@ -12,4 +12,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9a19a6ecd4ed2114c9ccb631dd1f32f4, type: 3}
   m_Name: NPC_50_Dialogue
   m_EditorClassIdentifier: Assembly-CSharp::DoctorHelp.NpcDialogueAsset
-  content: "The pain under my ribs has been keeping me from breakfast.\nMy head aches, I keep losing my words, and my pulse is running slow.\nI brought a note because I couldn't trust myself to remember all three."
+  content: 'Morning, doctor.
+
+    I have a headache.
+
+    Perhaps the trouble began after that late visit to the docks.'

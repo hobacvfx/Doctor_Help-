@@ -21,10 +21,10 @@ namespace DoctorHelp.Editor
                     names[i + 1] = source.Symptoms[i].DisplayName;
                     if (source.Symptoms[i].Id == mapping.stringValue) current = i + 1;
                 }
-                int selected = EditorGUILayout.Popup("Worm symptom", current, names);
+                int selected = EditorGUILayout.Popup("Parasite symptom", current, names);
                 if (selected != current) mapping.stringValue = selected == 0 ? "" : source.Symptoms[selected - 1].Id;
             }
-            EditorGUILayout.HelpBox("One random prefab at one random position, once per consultation. Reinitializing replaces only worms spawned by this component. Prefab layers, materials and scale are preserved.", MessageType.Info);
+            EditorGUILayout.HelpBox("One random prefab at one random position, once per consultation. Reinitializing replaces only parasites spawned by this component. Prefab layers, materials and scale are preserved.", MessageType.Info);
             serializedObject.ApplyModifiedProperties();
         }
     }

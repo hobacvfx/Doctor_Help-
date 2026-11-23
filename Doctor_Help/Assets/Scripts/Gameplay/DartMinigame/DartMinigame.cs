@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Threading;
 using UnityEngine;
 using UnityEngine.UI;
 using Random = UnityEngine.Random;
@@ -91,6 +92,16 @@ namespace DoctorHelp
         [Header("UI")]
         [SerializeField] private RectTransform safeArea;
         [SerializeField] private Text dartCount;
+        [SerializeField] private Button addDartsButton;
+        [SerializeField] private Button missAddDartsButton;
+        [SerializeField] private RewardedAdConfirmation confirmation;
+        [SerializeField] private CanvasGroup presentation;
+        [SerializeField] private Text adMessage;
+        private readonly CancellationTokenSource lifetime = new();
+        private bool adBusy;
+        internal IFortuneWheelAd AdOverride { get; set; }
+        private bool CanRequestDarts => started && !adBusy && flyingDart == null &&
+            pendingReward < 0 && !missPending && !rewardPopup.activeSelf && AnyBalloonLeft;
         [SerializeField] private Button exitButton;
         [SerializeField] private GameObject rewardPopup;
         [SerializeField] private Image rewardCard;
@@ -121,7 +132,7 @@ namespace DoctorHelp
         private readonly List<Canvas> hiddenCanvases = new List<Canvas>();
 
         private bool PopupOpen => rewardPopup.activeSelf || missPopup.activeSelf;
-        private bool Busy => flyingDart != null || pendingReward >= 0 || missPending || PopupOpen;
+        private bool Busy => adBusy || flyingDart != null || pendingReward >= 0 || missPending || PopupOpen;
         private int DartsLeft => profile != null ? profile.DartsLeft : 0;
         private bool CanAim => !Busy && DartsLeft > 0 && AnyBalloonLeft && Time.time >= readyAt;
         private float BoardDepth => -gameCamera.transform.localPosition.z;
@@ -154,6 +165,8 @@ namespace DoctorHelp
             rewardPopup.SetActive(false);
             missPopup.SetActive(false);
             exitButton.onClick.AddListener(Close);
+            addDartsButton.onClick.AddListener(RequestDarts);
+            missAddDartsButton.onClick.AddListener(RequestDarts);
             rewardConfirm.onClick.AddListener(CloseReward);
             missConfirm.onClick.AddListener(Close);
         }
@@ -466,13 +479,51 @@ namespace DoctorHelp
 
         private void RefreshThrowButton()
         {
+            addDartsButton.interactable = CanRequestDarts;
+            missAddDartsButton.interactable = CanRequestDarts;
+            missConfirm.interactable = !adBusy;
+            exitButton.interactable = !adBusy;
             bool ready = aiming || CanAim;
             if (throwButton != null && throwButton.interactable != ready) throwButton.interactable = ready;
+        }
+
+        private async void RequestDarts()
+        {
+            if (!CanRequestDarts) return;
+            CancelAim();
+            adBusy = true;
+            adMessage.text = "";
+            RefreshUi();
+            try
+            {
+                if (!await confirmation.AskAsync(lifetime.Token)) return;
+                IFortuneWheelAd ad = AdOverride ?? FindFirstObjectByType<FortuneWheelRewardedAd>();
+                if (ad == null || !ad.IsReady)
+                { adMessage.text = "Advertisement is loading. Please try again."; return; }
+                presentation.alpha = 0;
+                presentation.blocksRaycasts = false;
+                if (await ad.ShowAsync(RewardedPlacement.DartRefill, lifetime.Token))
+                { missPopup.SetActive(false); adMessage.text = "+2 darts"; }
+                else adMessage.text = "No reward earned. Please complete the ad.";
+            }
+            catch (OperationCanceledException) { }
+            catch (Exception error) { Debug.LogException(error); }
+            finally
+            {
+                if (this != null)
+                {
+                    presentation.alpha = 1;
+                    presentation.blocksRaycasts = true;
+                    adBusy = false;
+                    RefreshUi();
+                }
+            }
         }
 
         // A dart already in the air still lands and pays out when the player leaves.
         internal void Close()
         {
+            if (adBusy) return;
             CancelAim();
             if (flyingDart != null)
             {
@@ -487,6 +538,10 @@ namespace DoctorHelp
 
         private void OnDestroy()
         {
+            lifetime.Cancel();
+            lifetime.Dispose();
+            addDartsButton.onClick.RemoveListener(RequestDarts);
+            missAddDartsButton.onClick.RemoveListener(RequestDarts);
             if (Current == this) Current = null;
             if (profile != null) profile.Changed -= RefreshUi;
             if (aimInput != null) aimInput.Throwing = null;

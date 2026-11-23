@@ -43,7 +43,7 @@ namespace DoctorHelp.Editor
                     {
                         stream.CopyTo(buffer); buffer.Position = 0;
                         using (var jar = new ZipArchive(buffer, ZipArchiveMode.Read))
-                            foreach (string name in new[] { "UnityMobileAds", "Interstitial" })
+                            foreach (string name in new[] { "UnityMobileAds", "Interstitial", "UnityRewardedAd", "UnityRewardedAdCallback" })
                                 if (jar.GetEntry("com/google/unity/ads/" + name + ".class") == null)
                                     throw new InvalidDataException("Missing Java bridge class: " + name);
                     }

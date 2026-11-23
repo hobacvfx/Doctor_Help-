@@ -12,4 +12,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9a19a6ecd4ed2114c9ccb631dd1f32f4, type: 3}
   m_Name: NPC_31_Dialogue
   m_EditorClassIdentifier: Assembly-CSharp::DoctorHelp.NpcDialogueAsset
-  content: "I came to deliver a note and forgot the address by the second crossing.\nThere's a slow, heavy ache behind both eyes.\nThe chemist checked my pulse and sent me straight here."
+  content: 'Good morning, doctor.
+
+    My head is pounding.
+
+    Maybe the long shift at the mill has caught up with me.'

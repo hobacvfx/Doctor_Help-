@@ -12,4 +12,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9a19a6ecd4ed2114c9ccb631dd1f32f4, type: 3}
   m_Name: NPC_101_Dialogue
   m_EditorClassIdentifier: Assembly-CSharp::DoctorHelp.NpcDialogueAsset
-  content: "Morning, doctor. I'm much too warm and my wrist hurts.\nIt started after a light knock against the table, barely enough to rattle a cup.\nI can't say why I feel this bad. The knock was nothing at the time."
+  content: 'Morning, doctor.
+
+    I have a dreadful headache and I am having trouble breathing.
+
+    My leg hurts where I fell against a crate.
+
+    Perhaps I have been running myself ragged on errands.'

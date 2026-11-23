@@ -47,7 +47,7 @@ MonoBehaviour:
   itemId: receptionist-lv1
   displayName: Receptionist Lv1
   description: '+20% gold from business. +10% patient patience duration in the Office. '
-  price: 120
+  price: 160
   icon: {fileID: 21300000, guid: 30bfa6e6523600e448928fb5fd2645cb, type: 3}
   poster: {fileID: 0}
   posterOffset: {x: 0, y: 0}
@@ -56,4 +56,3 @@ MonoBehaviour:
   furnitureLevel: 1
   equippedVisual: {fileID: 176444578778948757, guid: 38ff80198127fa54cbd90128f6dad12b, type: 3}
   movingPart: {fileID: 0}
-  electricityPerDay: 25

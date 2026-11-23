@@ -12,4 +12,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9a19a6ecd4ed2114c9ccb631dd1f32f4, type: 3}
   m_Name: NPC_72_Dialogue
   m_EditorClassIdentifier: Assembly-CSharp::DoctorHelp.NpcDialogueAsset
-  content: "Good evening, doctor. My head aches and I'm freezing.\nI had to stop twice on the way over to catch my breath.\nPerhaps the night air is colder than I thought."
+  content: 'Good evening, doctor.
+
+    My head aches and I have to stop to catch my breath.
+
+    I cannot tell what brought it on.'

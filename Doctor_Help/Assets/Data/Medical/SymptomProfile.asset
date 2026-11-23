@@ -18,7 +18,7 @@ MonoBehaviour:
   - id: bc866d1df5cc48cba1fbe4dcaa873633
     displayName: Incoherent Speech
   - id: d3a6ab2e13704c59b818be21248e9a2e
-    displayName: Worm Infestation
+    displayName: Parasite Infestation
   - id: 868f3555805749b391b6641bd163f651
     displayName: Internal Organ Abnormality
   - id: e40ba4b660b94711a7935deae8b2602c
@@ -46,4 +46,4 @@ MonoBehaviour:
   - id: 8439037532414cfe808eec0c66b75c5e
     displayName: Haunted
   - id: 22e04f4290ee46c9b4bacad833c5b7d3
-    displayName: Abnormal Brain
+    displayName: Brain Abnormality (Delusion)

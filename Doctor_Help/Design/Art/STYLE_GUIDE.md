@@ -7,7 +7,7 @@
 - **Cách render:** bộ thuốc `Design/MedicineIllustrations/Medicine_Collection.png`; asset thuốc trong `Assets/2D_Assets/Medicines/`. Dùng nét chì đen, texture vẽ tay và cel shading như các hình này.
 - **NPC mới:** `Design/Characters/VictorianRedraw/Collection.png` và các sprite rời trong `Assets/2D_Assets/Special_Look/VictorianRedraw/`. Dùng để tham khảo mức độ nét và chất liệu.
 - **Tỷ lệ, góc nhìn, vị trí cơ thể:** prefab `Assets/2D_Assets/NPC/NPC_0.prefab` là chuẩn kỹ thuật bắt buộc; nó có ưu tiên cao hơn hình concept hoặc NPC AI khác.
-- **UI:** `Assets/Art/UI/DoctorBook/` — giấy cũ, gỗ, đồng, hình giải phẫu và chữ UI tách riêng.
+- **UI popup kẹp tài liệu (duyệt 2026-11-21):** `Assets/Art/UI/ClinicClipboard/CleanClipboardAtlas.png` — giấy kem sạch, nguyên vẹn, khung gỗ gọn và kẹp đồng; nét rõ theo chất lượng popup thưởng Dart nhưng không có họa tiết hội chợ. Ảnh triệu chứng cũ giữ tại `Assets/Art/UI/DoctorBook/Symptoms/`. Khung, hình và chữ UI tách riêng; không dùng lại giấy rách/nát cho hai popup này.
 - Bộ NPC AI trong `Design/Characters/PublicDomain/`, `PencilRevision/`, `Dracula/` là lịch sử, không phải chuẩn chất lượng. Không lấy chúng để sửa lại khi người dùng yêu cầu vẽ mới.
 
 ## Nét vẽ và màu

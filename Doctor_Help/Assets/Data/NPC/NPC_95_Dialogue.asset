@@ -12,4 +12,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9a19a6ecd4ed2114c9ccb631dd1f32f4, type: 3}
   m_Name: NPC_95_Dialogue
   m_EditorClassIdentifier: Assembly-CSharp::DoctorHelp.NpcDialogueAsset
-  content: "Hello, doctor. I'm hot, short of breath, and terribly nauseous.\nMy heart keeps racing even when I sit as still as I can.\nI don't know what's wrong. I felt well enough to go out this morning."
+  content: 'Hello, doctor.
+
+    I have a dreadful headache, I feel nauseous, and I am having trouble breathing.
+
+    I think I have been keeping rather poor hours lately.'

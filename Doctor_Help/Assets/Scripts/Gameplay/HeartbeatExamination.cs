@@ -15,6 +15,7 @@ namespace DoctorHelp
         [SerializeField] private ParticleSystem visibilityPuff;
         [SerializeField] private AudioSource heartbeatAudio;
         [SerializeField] private AudioClip heartbeatClip;
+        [SerializeField] private DoctorBookClues clues;
         [SerializeField] private HeartbeatRhythm rhythm = new HeartbeatRhythm();
         [SerializeField, Min(0.001f)] private float noHeartbeatPreviewTime = 0.1f;
         [SerializeField, Min(0.01f)] private float maxDistance = 4;
@@ -27,6 +28,8 @@ namespace DoctorHelp
         private double nextBeatTime;
         private float previousGain;
         private string lastError;
+        private readonly ContinuousClueHold clueHold = new ContinuousClueHold();
+        private bool clueReported, applicationPaused, applicationUnfocused;
         private float CurrentBpm { get; set; }
         private float CurrentGain { get; set; }
 
@@ -88,8 +91,20 @@ namespace DoctorHelp
             float distance = float.PositiveInfinity;
             if (plane.Raycast(ray, out float depth))
                 distance = Vector2.Distance(ray.GetPoint(depth), patient.Heart.position);
-            CurrentGain = CurrentBpm > 0 ? HeartbeatRhythm.DistanceGain(distance, maxDistance) : 0;
+            float proximity = HeartbeatRhythm.DistanceGain(distance, maxDistance);
+            CurrentGain = CurrentBpm > 0 ? proximity : 0;
             ApplyGain(CurrentGain);
+            bool canListen = !applicationPaused && !applicationUnfocused && Time.timeScale > 0;
+            // A beating heart must actually be audible; a silent heart (No Heartbeat) is confirmed
+            // by holding the stethoscope within hearing range of the Heart anchor for the same time.
+            bool audibleSignal = canListen && (CurrentBpm > 0
+                ? CurrentGain > 0 && heartbeatAudio.volume > 0
+                : proximity > 0);
+            if (!clueReported && clueHold.Advance(audibleSignal, Time.deltaTime, clues != null ? clues.HeartbeatSeconds : 2))
+            {
+                clueReported = true;
+                if (clues != null) clues.Measurement(patient, ClueMeasurement.Heartbeat, patient.Heart.position);
+            }
             double now = Time.timeAsDouble;
             if (!listening)
             {
@@ -158,6 +173,7 @@ namespace DoctorHelp
         {
             if (playPuff && listening) PlayPuff();
             listening = false;
+            clueHold.Reset(); clueReported = false;
             CurrentBpm = CurrentGain = previousGain = 0;
             if (feedbackVfx != null) feedbackVfx.Stop(false, ParticleSystemStopBehavior.StopEmittingAndClear);
             if (soundVfx != null) soundVfx.Stop(false, ParticleSystemStopBehavior.StopEmittingAndClear);
@@ -169,6 +185,8 @@ namespace DoctorHelp
             lastError = message;
             Debug.LogError(message, this);
         }
+        private void OnApplicationPause(bool value) { applicationPaused = value; if (value) clueHold.Reset(); }
+        private void OnApplicationFocus(bool value) { applicationUnfocused = !value; if (!value) clueHold.Reset(); }
         private void OnDisable()
         {
             StopListening();

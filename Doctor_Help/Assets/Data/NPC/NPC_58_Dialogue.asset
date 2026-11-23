@@ -12,4 +12,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9a19a6ecd4ed2114c9ccb631dd1f32f4, type: 3}
   m_Name: NPC_58_Dialogue
   m_EditorClassIdentifier: Assembly-CSharp::DoctorHelp.NpcDialogueAsset
-  content: "Good morning. I feel washed out and much too warm.\nI was up late mending gloves by the stove.\nMaybe I simply stayed too near the fire."
+  content: 'Morning, doctor.
+
+    My head hurts.
+
+    I cannot think of anything that would explain it.'

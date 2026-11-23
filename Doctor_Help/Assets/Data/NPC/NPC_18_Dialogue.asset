@@ -12,4 +12,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9a19a6ecd4ed2114c9ccb631dd1f32f4, type: 3}
   m_Name: NPC_18_Dialogue
   m_EditorClassIdentifier: Assembly-CSharp::DoctorHelp.NpcDialogueAsset
-  content: "The woman who lets my room says I've let the fire go out.\nIt hasn't. I've had it going all night, and my fingers are still cold.\nI pressed on my wrist until it bruised and felt nothing beating."
+  content: 'Morning, doctor.
+
+    I feel weak and tired for no reason.
+
+    I cannot tell what brought it on.'

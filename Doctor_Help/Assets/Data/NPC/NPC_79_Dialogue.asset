@@ -12,4 +12,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9a19a6ecd4ed2114c9ccb631dd1f32f4, type: 3}
   m_Name: NPC_79_Dialogue
   m_EditorClassIdentifier: Assembly-CSharp::DoctorHelp.NpcDialogueAsset
-  content: "Good afternoon, doctor. I fell on the cellar steps and hurt my shoulder.\nThere were footsteps behind me, but nobody came down the stairs.\nPerhaps I turned round too quickly when I heard them."
+  content: 'Good afternoon, doctor.
+
+    My wrist has hurt since I stumbled on the steps.
+
+    The ghosts around me will not leave.
+
+    Perhaps I turned round too quickly when I heard them.'

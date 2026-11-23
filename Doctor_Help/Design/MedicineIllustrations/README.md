@@ -6,7 +6,7 @@ Generated using the built-in image_gen tool. The final prompt set is in `Prompts
 
 The completed original medicine images were retained after the user's instruction not to redo completed items. Additional alternative packaging studies were not substituted for these images. Transparent canvas padding was added mechanically without repainting or resampling the generated drawing pixels, to keep loose pencil strokes away from the UI bounds.
 
-The medicine set is Bone Growth Medicine, Sedative, Deworming Medicine, Heart Medicine, Antibiotics, Brain Medicine, Vaccine, Science Book, Calcium and Organs_Detox_Pill. Glass color, vessel proportions, stopper/cap type, contents and paper-label treatment distinguish the medicines. Science Book remains an ordinary leather-bound book because it is already a remedy in the game.
+The medicine set is Bone Growth Medicine, Sedative, Antiparasitic Medicine, Heart Medicine, Antibiotics, Brain Medicine, Vaccine, Science Book, Calcium and Organs_Detox_Pill. Glass color, vessel proportions, stopper/cap type, contents and paper-label treatment distinguish the medicines. Science Book remains an ordinary leather-bound book because it is already a remedy in the game.
 
 Each existing PillProfile sprite slot was assigned through Unity's SerializedObject API using the stable medicine ID. Names, IDs, prices, descriptions and entry order were preserved. No new medicine ID, medicine type, treatment rule or injection mechanic was added for the standalone syringe.
 

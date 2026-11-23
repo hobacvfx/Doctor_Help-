@@ -12,4 +12,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9a19a6ecd4ed2114c9ccb631dd1f32f4, type: 3}
   m_Name: NPC_54_Dialogue
   m_EditorClassIdentifier: Assembly-CSharp::DoctorHelp.NpcDialogueAsset
-  content: "Good day, doctor. I'm burning up.\nMy wrist hurt after I bumped the jamb. The door insists it was my fault.\nPerhaps the door and I should stop arguing."
+  content: 'Good day, doctor.
+
+    My arm hurts after an awkward fall.
+
+    I keep losing the thread of what I am saying.
+
+    Perhaps the door and I should stop arguing.'

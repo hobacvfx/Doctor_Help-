@@ -12,4 +12,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9a19a6ecd4ed2114c9ccb631dd1f32f4, type: 3}
   m_Name: NPC_23_Dialogue
   m_EditorClassIdentifier: Assembly-CSharp::DoctorHelp.NpcDialogueAsset
-  content: "I take the first milk round. The bottles have felt warmer than my hands all week.\nThis morning I held a bottle against my chest and couldn't feel a beat through it.\nWould you try? I don't trust my own fingers."
+  content: 'Good morning, doctor.
+
+    I feel weak and tired for no reason.
+
+    I do not know why this keeps happening.'

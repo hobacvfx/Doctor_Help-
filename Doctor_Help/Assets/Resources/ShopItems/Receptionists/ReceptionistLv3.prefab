@@ -47,7 +47,7 @@ MonoBehaviour:
   itemId: receptionist-lv3
   displayName: Receptionist Lv3
   description: +60% gold from business. + 20 gold per/minute
-  price: 400
+  price: 600
   icon: {fileID: 21300000, guid: 744b059cce8d3de4aaaa7289e8b288f0, type: 3}
   poster: {fileID: 0}
   posterOffset: {x: 0, y: 0}
@@ -56,4 +56,3 @@ MonoBehaviour:
   furnitureLevel: 3
   equippedVisual: {fileID: 176444578778948757, guid: 7d4fe3c6af8d55a4ba42b0f8cc225418, type: 3}
   movingPart: {fileID: 0}
-  electricityPerDay: 25

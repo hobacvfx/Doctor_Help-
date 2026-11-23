@@ -12,4 +12,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9a19a6ecd4ed2114c9ccb631dd1f32f4, type: 3}
   m_Name: NPC_96_Dialogue
   m_EditorClassIdentifier: Assembly-CSharp::DoctorHelp.NpcDialogueAsset
-  content: "Good evening, doctor. I feel hot and short of breath, and my pulse is racing.\nMy wrist hurts, and someone in the empty hall keeps calling me the wrong year.\nI've no idea what started it. I'm fairly sure my name isn't Thursday."
+  content: 'Good evening, doctor.
+
+    I have to stop to catch my breath.
+
+    My arm hurts after an awkward fall.
+
+    I keep losing the thread of what I am saying and I keep seeing ghosts around me.
+
+    Perhaps I should not have worked through supper again.'

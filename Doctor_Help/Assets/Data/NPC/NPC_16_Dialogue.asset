@@ -12,4 +12,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9a19a6ecd4ed2114c9ccb631dd1f32f4, type: 3}
   m_Name: NPC_16_Dialogue
   m_EditorClassIdentifier: Assembly-CSharp::DoctorHelp.NpcDialogueAsset
-  content: "At the print shop I set a whole line of type backwards without noticing.\nThe pounding in my head has made it hard to think since dawn.\nOdd thing is, the pulse in my wrist is the only thing taking its time."
+  content: 'Evening, doctor.
+
+    My head hurts.
+
+    Maybe I ought to have stayed home instead of going to market.'

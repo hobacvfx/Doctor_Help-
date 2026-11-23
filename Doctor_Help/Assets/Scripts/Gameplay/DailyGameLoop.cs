@@ -66,19 +66,31 @@ namespace DoctorHelp
                 PlayerPrefs.DeleteKey(OpeningCompletedKey);
                 PlayerPrefs.Save();
             }
-            if (!preview && PlayerPrefs.GetInt(OpeningCompletedKey) != 0) return;
+            var profile = PlayerProfileService.Instance;
+            bool playComic = preview || PlayerPrefs.GetInt(OpeningCompletedKey) == 0;
+            bool needsName = string.IsNullOrWhiteSpace(profile.ClinicName);
+            if (!playComic && !needsName) return;
 
             var home = await scenes.LoadAsync(GameScene.Player_Home, lifetime.Token);
-            var comic = ((SceneGameplayUI)home).GetComponentInChildren<OpeningComicView>(true);
-            if (comic == null || !comic.IsConfigured)
+            if (playComic)
             {
-                Debug.LogError("Player Home is missing its configured opening comic prefab.");
-                return;
+                var comic = ((SceneGameplayUI)home).GetComponentInChildren<OpeningComicView>(true);
+                if (comic == null || !comic.IsConfigured)
+                    throw new InvalidOperationException("Player Home is missing its configured opening comic prefab.");
+                await comic.PlayAsync(lifetime.Token);
+                if (!preview)
+                {
+                    PlayerPrefs.SetInt(OpeningCompletedKey, 1);
+                    PlayerPrefs.Save();
+                }
             }
-            await comic.PlayAsync(lifetime.Token);
-            if (preview) return;
-            PlayerPrefs.SetInt(OpeningCompletedKey, 1);
-            PlayerPrefs.Save();
+            if (needsName)
+            {
+                var naming = ((SceneGameplayUI)home).GetComponentInChildren<ClinicNamingView>(true);
+                if (naming == null || !naming.IsConfigured)
+                    throw new InvalidOperationException("Player Home is missing its configured clinic naming prefab.");
+                await naming.PresentAsync(profile, lifetime.Token);
+            }
         }
 
         private Task StartFlowAsync(PlayerProfileService profile)
@@ -216,6 +228,14 @@ namespace DoctorHelp
         {
             if (retryView != null) retryView.RetryRequested -= RequestRetry;
             retryView = null;
+        }
+        // Leaving Play Mode (or quitting) disables the scene fade mid-transition; that cancellation is expected,
+        // so cancel the loop first and RunAsync treats it as cancellation instead of logging a flow error.
+        private void OnEnable() => Application.quitting += CancelOnQuit;
+        private void OnDisable() => Application.quitting -= CancelOnQuit;
+        private void CancelOnQuit()
+        {
+            if (!lifetime.IsCancellationRequested) lifetime.Cancel();
         }
         private void OnDestroy()
         {

@@ -12,4 +12,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9a19a6ecd4ed2114c9ccb631dd1f32f4, type: 3}
   m_Name: NPC_82_Dialogue
   m_EditorClassIdentifier: Assembly-CSharp::DoctorHelp.NpcDialogueAsset
-  content: "Evening, doctor. I feel feverish and nauseous.\nThe chair by my bed rocked after I took my feet off it.\nMaybe I'd have felt better if I'd managed some sleep."
+  content: 'Evening, doctor.
+
+    I keep wanting to throw up.
+
+    There are ghosts around me even here.
+
+    I cannot think of anything that would explain it.'

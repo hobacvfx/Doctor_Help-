@@ -14,9 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::DoctorHelp.NpcDialogueAsset
   content: 'Good morning, doctor.
 
-    Something feels wrong with my arm.
+    My arm hurts after an awkward fall.
 
     I
-    took a tumble on the front steps.
-
-    I think I landed on it.'
+    think I landed on it.'

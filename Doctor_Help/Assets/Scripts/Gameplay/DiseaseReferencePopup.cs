@@ -9,6 +9,7 @@ namespace DoctorHelp
     {
         [SerializeField] private AllSickness medicalData;
         [SerializeField] private SymptomReferenceArt referenceArt;
+        [SerializeField] private DoctorBookClues clues;
         [SerializeField] private DiseaseReferenceRow rowPrefab;
         [SerializeField] private ScrollRect scroll;
         [SerializeField] private VerticalLayoutGroup listLayout;
@@ -71,9 +72,15 @@ namespace DoctorHelp
             else gameObject.SetActive(true);
         }
         public void Close() => gameObject.SetActive(false);
-        private void OnEnable() => Refresh();
+        private void OnEnable()
+        {
+            if (clues != null) { clues.Changed += RefreshClues; clues.Acknowledge(); }
+            Refresh();
+        }
+        private void RefreshClues() { foreach (var row in rows) if (row != null) row.RefreshDiscovery(); }
         private void OnDisable()
         {
+            if (clues != null) clues.Changed -= RefreshClues;
             if (scroll != null) { lastScrollPosition = scroll.verticalNormalizedPosition; scroll.StopMovement(); }
         }
         public void Refresh()
@@ -89,7 +96,7 @@ namespace DoctorHelp
                         throw new InvalidOperationException("Casebook disease catalogue contains an empty or duplicate disease ID.");
                     if (i >= rows.Count) rows.Add(Instantiate(rowPrefab, scroll.content, false));
                     rows[i].gameObject.SetActive(true);
-                    rows[i].Bind(disease, i + 1, medicalData.SymptomProfile, referenceArt);
+                    rows[i].Bind(disease, i + 1, medicalData.SymptomProfile, referenceArt, medicalData.PillProfile, clues);
                 }
                 for (int i = medicalData.Sicknesses.Count; i < rows.Count; i++) rows[i].gameObject.SetActive(false);
                 scroll.gameObject.SetActive(true); errorText.gameObject.SetActive(false);

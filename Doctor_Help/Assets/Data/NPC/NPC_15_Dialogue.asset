@@ -12,4 +12,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9a19a6ecd4ed2114c9ccb631dd1f32f4, type: 3}
   m_Name: NPC_15_Dialogue
   m_EditorClassIdentifier: Assembly-CSharp::DoctorHelp.NpcDialogueAsset
-  content: "I only crossed the street, and I had to stop to catch my breath.\nMy chest is racing and I feel hot even in the open air.\nCould I sit for a moment before you ask me anything else?"
+  content: 'Good morning, doctor.
+
+    My breath will not come easily.
+
+    I think I should have taken yesterday off.'

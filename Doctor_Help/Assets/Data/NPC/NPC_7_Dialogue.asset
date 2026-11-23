@@ -12,4 +12,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9a19a6ecd4ed2114c9ccb631dd1f32f4, type: 3}
   m_Name: NPC_7_Dialogue
   m_EditorClassIdentifier: Assembly-CSharp::DoctorHelp.NpcDialogueAsset
-  content: "I used to carry coal up three flights without thinking.\nLately there's a tight feeling in my chest, as if I'm still carrying the sack.\nI sat down twice on the way to your door."
+  content: 'Good morning, doctor.
+
+    Something is not right, but I cannot put my finger on it.
+
+    I have no idea where it started.'

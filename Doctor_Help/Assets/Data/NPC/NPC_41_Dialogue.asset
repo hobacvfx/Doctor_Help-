@@ -12,4 +12,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9a19a6ecd4ed2114c9ccb631dd1f32f4, type: 3}
   m_Name: NPC_41_Dialogue
   m_EditorClassIdentifier: Assembly-CSharp::DoctorHelp.NpcDialogueAsset
-  content: "I've been burning up since the night I pulled a stranger out of the ditch.\nI get nauseous whenever I try to swallow, and there are pale worms in the basin.\nI don't know whether I brought them home from the ditch or they came later."
+  content: 'Hello there, doctor.
+
+    I feel nauseous.
+
+    Perhaps I have been running myself ragged on errands.'

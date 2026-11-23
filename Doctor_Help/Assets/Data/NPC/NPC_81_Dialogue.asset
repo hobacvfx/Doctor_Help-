@@ -12,4 +12,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9a19a6ecd4ed2114c9ccb631dd1f32f4, type: 3}
   m_Name: NPC_81_Dialogue
   m_EditorClassIdentifier: Assembly-CSharp::DoctorHelp.NpcDialogueAsset
-  content: "Morning, doctor. I'm burning up, and my wrist is hard to move.\nMy heart's racing, I need air, and my left boot keeps giving orders.\nI don't know what to make of it. The right one won't explain."
+  content: 'Morning, doctor.
+
+    My breath will not come easily.
+
+    I hurt my arm when a cart knocked me over.
+
+    I lose track halfway through a sentence.
+
+    Perhaps I have spent too many evenings poring over my accounts.'

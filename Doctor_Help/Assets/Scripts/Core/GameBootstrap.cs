@@ -27,11 +27,13 @@ namespace DoctorHelp
             var root = new GameObject("Game Services");
             DontDestroyOnLoad(root);
             root.AddComponent<PlayerProfileService>();
+            root.AddComponent<BasementDefenseService>(); // Needs the loaded profile; shows nothing itself.
             root.AddComponent<GameAudio>();
             root.AddComponent<GameBootstrap>();
             if (!preview && !tutorialPreview)
             {
                 root.AddComponent<DayEndInterstitialService>();
+                root.AddComponent<FortuneWheelRewardedAd>();
                 root.AddComponent<DoctorHelpFirebaseService>();
             }
             root.AddComponent<DailyGameLoop>().SkipOnboarding = preview;

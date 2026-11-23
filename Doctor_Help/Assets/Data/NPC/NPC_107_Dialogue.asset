@@ -12,4 +12,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9a19a6ecd4ed2114c9ccb631dd1f32f4, type: 3}
   m_Name: NPC_107_Dialogue
   m_EditorClassIdentifier: Assembly-CSharp::DoctorHelp.NpcDialogueAsset
-  content: "Morning, doctor. I'm much too warm, and my ankle hurts.\nI fell on the lane. I think the cobbles moved when I wasn't looking.\nPerhaps I should have watched where I put my foot."
+  content: 'Morning, doctor.
+
+    My leg hurts where I fell against a crate.
+
+    I cannot make my thoughts come out straight.
+
+    I do not know why this keeps happening.'

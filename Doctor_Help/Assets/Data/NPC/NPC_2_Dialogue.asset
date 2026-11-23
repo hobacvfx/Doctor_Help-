@@ -12,4 +12,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9a19a6ecd4ed2114c9ccb631dd1f32f4, type: 3}
   m_Name: NPC_2_Dialogue
   m_EditorClassIdentifier: Assembly-CSharp::DoctorHelp.NpcDialogueAsset
-  content: "I bought an eel pie outside the market. It was still warm.\nNow my stomach won't settle, no matter what I eat.\nThe vendor promised it would stay with me all day. He was right."
+  content: 'Morning, doctor.
+
+    I have been feeling poorly since yesterday.
+
+    I do not know what is wrong; that is why I came.'

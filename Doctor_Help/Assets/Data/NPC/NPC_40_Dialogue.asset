@@ -12,4 +12,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9a19a6ecd4ed2114c9ccb631dd1f32f4, type: 3}
   m_Name: NPC_40_Dialogue
   m_EditorClassIdentifier: Assembly-CSharp::DoctorHelp.NpcDialogueAsset
-  content: "I mixed up three familiar faces at the market this morning.\nThere's a pain in my head that won't let me finish a thought.\nThe woman at the stall took my wrist and asked if my heart was always that slow."
+  content: 'Evening, doctor.
+
+    My head hurts.
+
+    Maybe I ought to have stayed home instead of going to market.'

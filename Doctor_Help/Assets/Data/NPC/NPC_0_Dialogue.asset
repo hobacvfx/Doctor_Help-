@@ -14,10 +14,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::DoctorHelp.NpcDialogueAsset
   content: 'Morning, doctor!
 
-    I feel worn out before the day has even started.
+    My head aches.
 
-    Perhaps
-    all that late-night studying has caught up with me.
-
-    I was hoping to get
-    cleverer, not a doctor''s bill.'
+    Perhaps I have been working too many hours at the shop.'

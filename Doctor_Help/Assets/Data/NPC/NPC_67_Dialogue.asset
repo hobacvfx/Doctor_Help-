@@ -12,4 +12,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9a19a6ecd4ed2114c9ccb631dd1f32f4, type: 3}
   m_Name: NPC_67_Dialogue
   m_EditorClassIdentifier: Assembly-CSharp::DoctorHelp.NpcDialogueAsset
-  content: "Good morning, doctor. I can't quite catch my breath.\nI feel warm, and my heart's racing even in this chair.\nPerhaps I shouldn't have hurried to catch the omnibus."
+  content: 'Good morning, doctor.
+
+    My head is pounding.
+
+    I have no idea where it started.'

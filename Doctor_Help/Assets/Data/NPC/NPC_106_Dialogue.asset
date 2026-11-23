@@ -12,4 +12,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9a19a6ecd4ed2114c9ccb631dd1f32f4, type: 3}
   m_Name: NPC_106_Dialogue
   m_EditorClassIdentifier: Assembly-CSharp::DoctorHelp.NpcDialogueAsset
-  content: "Good evening, doctor. I'm cold and haven't felt right since breakfast.\nI think the fog is trying to get in through my pockets.\nI haven't the faintest idea what's wrong. The fog isn't telling."
+  content: 'Good evening, doctor.
+
+    My head hurts.
+
+    My speech keeps getting muddled.
+
+    Maybe it started after yesterday''s journey across town.'

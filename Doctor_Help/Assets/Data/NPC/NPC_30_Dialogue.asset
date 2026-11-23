@@ -12,4 +12,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9a19a6ecd4ed2114c9ccb631dd1f32f4, type: 3}
   m_Name: NPC_30_Dialogue
   m_EditorClassIdentifier: Assembly-CSharp::DoctorHelp.NpcDialogueAsset
-  content: "I've been keeping my hands in my pockets to hide how cold they are.\nI held my fingers to my throat and waited for the pulse.\nI waited until a carriage passed. Still nothing."
+  content: 'Afternoon, doctor.
+
+    Something is not right, but I cannot put my finger on it.
+
+    Perhaps I have been working too many hours at the shop.'

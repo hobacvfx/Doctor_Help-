@@ -12,4 +12,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9a19a6ecd4ed2114c9ccb631dd1f32f4, type: 3}
   m_Name: NPC_100_Dialogue
   m_EditorClassIdentifier: Assembly-CSharp::DoctorHelp.NpcDialogueAsset
-  content: "Good evening, doctor. My head is throbbing and my pulse feels slow.\nThe voice in my room said I'd left yesterday under the bed.\nI don't know what to believe. I feel poorly wherever I go."
+  content: 'Good evening, doctor.
+
+    My wrist hurts after I slipped by the door.
+
+    My speech keeps getting muddled and there are ghosts around me even here.
+
+    Maybe I ought to have stayed home instead of going to market.'

@@ -8,14 +8,56 @@ namespace DoctorHelp
     {
         public static PlayerProfileService Instance { get; private set; }
         public event Action Changed;
+        // Raised after the profile is reset to a new game, so systems with their own save files reset too.
+        internal event Action ProfileReset;
         public bool IsLoaded => session != null;
         public string SavePath => store.SavePath;
+        // True when a profile change is saved within a second (outside the working day).
+        internal bool CanCommitImmediately => IsLoaded && !workingDayOpen;
+        internal int BasementRepairsPaid => Data.basementRepairsPaid;
+        // Owned basement plants. Read only: change them through the TryBuy/TryUpgrade methods below.
+        internal IReadOnlyList<BasementPlantRecord> BasementPlants => Data.basementPlants;
         public int Money => Data.money;
         public int Water => Data.water;
         public int Electricity => Data.electricity;
         public float Dirt => Data.dirt;
         public float Rating => Data.rating;
         public int CurrentDay => Data.currentDay;
+        public string ClinicName => Data.clinicName ?? "";
+
+        internal bool TrySetClinicName(string input, out string error)
+        {
+            if (!ClinicNameRules.TryValidate(input, out var name, out error)) return false;
+            if (!IsLoaded || workingDayOpen)
+            {
+                error = "Cannot name your clinic right now. Please try again.";
+                return false;
+            }
+            var candidate = Data.Copy();
+            candidate.clinicName = name;
+            try
+            {
+                store.Flush();
+                store.ConsumeWriteFailure();
+                store.AutosaveNow(candidate);
+                if (store.ConsumeWriteFailure())
+                {
+                    QueueSave(RetryDelay);
+                    error = "Could not save your clinic name. Please try again.";
+                    return false;
+                }
+            }
+            catch (Exception ex)
+            {
+                Debug.LogError("Could not save clinic name: " + ex);
+                error = "Could not save your clinic name. Please try again.";
+                return false;
+            }
+            Data.clinicName = name;
+            ClearPendingSave();
+            NotifyChanged();
+            return true;
+        }
         public bool ThrowRock => IsLoaded && Data.throwRock;
         public bool Clean => IsLoaded && Data.clean;
         internal bool ShopsOpen => IsLoaded && CurrentDay >= 2;
@@ -90,7 +132,8 @@ namespace DoctorHelp
             catch (Exception ex) { Debug.LogError("Cannot resume working profile after code reload: " + ex); }
         }
 
-        private static string ProfileDirectory()
+        // Also used by saves kept beside the profile (basement), so previews stay isolated together.
+        internal static string ProfileDirectory()
         {
 #if UNITY_EDITOR
             if (TutorialPreviewSession.IsActive)
@@ -212,7 +255,7 @@ namespace DoctorHelp
             if (!IsLoaded || patient == null || patient.Definition == null || pills == null ||
                 string.IsNullOrWhiteSpace(patient.ConsultationId) || ids == null)
             { error = "Patient or medicine catalogue unavailable."; return false; }
-            if (patient.Haunting != null && !patient.HauntingCleared)
+            if (patient.Haunting != null && !patient.HauntingCleared && !patient.Definition.RequiresPoliceReport)
             { error = "Remove all ghosts before giving medicine."; return false; }
             if (journal.Contains(patient.ConsultationId))
             {
@@ -221,6 +264,8 @@ namespace DoctorHelp
             }
             if (!session.TryGive(pills, ids, () => journal.Record(CurrentDay, patient, pills, ids), out error,
                 patient.CanConfirmWithoutMedicine)) return false;
+            patient.HasReceivedMedicine = true;
+            patient.ClearStagedMedicines();
             patient.StopPatience();
             Commit();
             return true;
@@ -270,6 +315,49 @@ namespace DoctorHelp
             Commit();
         }
 
+        internal int FortuneAdSpins => IsLoaded ? Data.fortuneAdSpins : 0;
+
+        internal bool TryEarnFortuneAdSpin()
+        {
+            if (!IsLoaded || Data.fortuneAdSpins == int.MaxValue) return false;
+            Data.fortuneAdSpins++;
+            Commit();
+            return true;
+        }
+
+        // Cost/credit consumption and payout are one mutation and one save. The animation only reveals
+        // an already-settled result, so stopping the app midway cannot lose or claim that result twice.
+        internal bool TrySpinFortune(FortuneWheelCatalog catalog, int index, bool adCredit, out string error)
+        {
+            error = null;
+            if (!CanCommitImmediately || catalog == null || !catalog.IsConfigured || index < 0 ||
+                index >= FortuneWheelCatalog.SectorCount)
+            { error = "The fortune wheel is unavailable right now."; return false; }
+            if (adCredit ? Data.fortuneAdSpins <= 0 : Data.money < catalog.SpinPrice)
+            { error = adCredit ? "Watch a rewarded ad to spin." : "Not enough gold."; return false; }
+            var reward = catalog.Rewards[index];
+            int cost = adCredit ? 0 : catalog.SpinPrice;
+            long money = (long)Data.money - cost + (reward.kind == CurrencyKind.Gold ? reward.amount : 0);
+            long water = (long)Data.water + (reward.kind == CurrencyKind.Water ? reward.amount : 0);
+            long electricity = (long)Data.electricity + (reward.kind == CurrencyKind.Electricity ? reward.amount : 0);
+            if (money > int.MaxValue || water > int.MaxValue || electricity > int.MaxValue)
+            { error = "Your balance cannot hold this reward."; return false; }
+            if (adCredit) Data.fortuneAdSpins--;
+            Data.money = (int)money;
+            Data.water = (int)water;
+            Data.electricity = (int)electricity;
+            if (reward.kind == CurrencyKind.Gold) Data.walterQuest.RecordEarnings(reward.amount);
+            Commit();
+            return true;
+        }
+
+        internal bool TryEarnDartAdReward()
+        {
+            if (!IsLoaded || (Data.dartDay == Data.currentDay && Data.dartBonus > int.MaxValue - PlayerProfileData.DartsPerDay - 2)) return false;
+            Data.AddRewardedDarts();
+            Commit();
+            return true;
+        }
         internal bool TryUseDart()
         {
             if (!IsLoaded || Data.DartsLeft <= 0) return false;
@@ -294,6 +382,60 @@ namespace DoctorHelp
             }
             Commit();
             return true;
+        }
+
+        // Pays for one basement generator repair. Requires the full cost (no debt) and an immediately saved profile.
+        internal bool TryPayBasementRepair(int cost)
+        {
+            if (!CanCommitImmediately || cost < 0 || Data.money < cost) return false;
+            Data.money -= cost;
+            Data.basementRepairsPaid = checked(Data.basementRepairsPaid + 1);
+            Commit();
+            return true;
+        }
+
+        internal BasementPlantRecord FindBasementPlant(int instanceId) =>
+            IsLoaded ? Data.basementPlants.Find(plant => plant.instanceId == instanceId) : null;
+
+        // Buys one Lv.1 basement plant with clean water: water and the new plant are written in one save, now.
+        internal bool TryBuyBasementPlant(string profileId, int waterCost, out int instanceId)
+        {
+            instanceId = 0;
+            if (!CanCommitImmediately || string.IsNullOrWhiteSpace(profileId) || waterCost < 0 ||
+                Data.water < waterCost) return false;
+            instanceId = Data.nextBasementPlantId;
+            Data.nextBasementPlantId = checked(instanceId + 1);
+            Data.water -= waterCost;
+            Data.basementPlants.Add(new BasementPlantRecord { instanceId = instanceId, profileId = profileId, level = 1 });
+            CommitNow();
+            return true;
+        }
+
+        // Raises a plant from exactly fromLevel by one, paying clean water, in one immediate save.
+        internal bool TryUpgradeBasementPlant(int instanceId, int fromLevel, int waterCost, int maxLevel)
+        {
+            var plant = FindBasementPlant(instanceId);
+            if (!CanCommitImmediately || plant == null || plant.level != fromLevel || fromLevel >= maxLevel ||
+                waterCost < 0 || Data.water < waterCost) return false;
+            Data.water -= waterCost;
+            plant.level = fromLevel + 1;
+            CommitNow();
+            return true;
+        }
+
+        // Save migration: a plant placed on a shelf before plants were sold becomes an owned Lv.1 plant, free.
+        // Idempotent per shelf, so a migration interrupted before the basement saved never grants twice.
+        internal int GrantLegacyBasementPlant(string slotId, string profileId)
+        {
+            if (!CanCommitImmediately || string.IsNullOrWhiteSpace(slotId) || string.IsNullOrWhiteSpace(profileId)) return 0;
+            var existing = Data.basementPlants.Find(plant => plant.legacySlot == slotId);
+            if (existing != null) return existing.instanceId;
+            int id = Data.nextBasementPlantId;
+            Data.nextBasementPlantId = checked(id + 1);
+            Data.basementPlants.Add(new BasementPlantRecord
+                { instanceId = id, profileId = profileId, level = 1, legacySlot = slotId });
+            CommitNow();
+            return id;
         }
 
         internal bool AcceptWalterQuest()
@@ -399,8 +541,11 @@ namespace DoctorHelp
             if (!IsLoaded) return false;
             try
             {
+                // Generator output is decided once per day by the basement and reused if this save is retried.
+                var basement = BasementDefenseService.Instance;
+                int produced = basement != null ? basement.ClaimDayProduction(CurrentDay) : 0;
                 session.CompleteDay(incorrectPatients, goldDelta, dailyRating, hadConsultations,
-                    DifficultySettings.SuccessStreak, goldEarned, patientsExamined, DailyElectricityUse);
+                    DifficultySettings.SuccessStreak, goldEarned, patientsExamined, DailyElectricityUse, produced);
             }
             catch (Exception ex) { Debug.LogError($"Player profile save failed: {ex}"); return false; }
             // Future patient-result calculations must read history before this checkpoint.
@@ -425,6 +570,8 @@ namespace DoctorHelp
             workingDayOpen = false;
             ClearPendingSave();
             workingDay = session.WorkingProfile.Copy();
+            try { ProfileReset?.Invoke(); }
+            catch (Exception error) { Debug.LogException(error); }
             NotifyChanged();
             return true;
         }
@@ -436,6 +583,20 @@ namespace DoctorHelp
         {
             UpdateObjectives(Data);
             QueueSave(SaveDelay);
+            NotifyChanged();
+        }
+
+        // Basement transactions: written synchronously so the basement file (saved right after) never runs ahead.
+        private void CommitNow()
+        {
+            UpdateObjectives(Data);
+            ClearPendingSave();
+            try { store.AutosaveNow(Data); }
+            catch (Exception ex)
+            {
+                Debug.LogError($"Player profile save failed: {ex}");
+                QueueSave(RetryDelay);
+            }
             NotifyChanged();
         }
 

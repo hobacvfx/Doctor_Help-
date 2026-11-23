@@ -12,4 +12,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9a19a6ecd4ed2114c9ccb631dd1f32f4, type: 3}
   m_Name: NPC_75_Dialogue
   m_EditorClassIdentifier: Assembly-CSharp::DoctorHelp.NpcDialogueAsset
-  content: "Good morning, doctor. I'm hot and short of breath.\nMy heart was racing while I was still buttoning my waistcoat.\nI've no idea what brought it on. I hadn't left the house."
+  content: 'Good morning, doctor.
+
+    My head is throbbing.
+
+    I hurt my arm when a cart knocked me over.
+
+    I think I should have taken yesterday off.'

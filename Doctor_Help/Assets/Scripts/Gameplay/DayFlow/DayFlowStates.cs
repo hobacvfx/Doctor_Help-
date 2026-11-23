@@ -25,7 +25,8 @@ namespace DoctorHelp
         Task FadeToBlackAsync(CancellationToken token);
         void ShowExamination(int day);
         void ShowTreatment(int day);
-        Task PresentResultsAsync(DayTreatmentResult result, CancellationToken token);
+        // afterCutscene: the in-game end-of-day cutscene already played, so only the newspaper and the new-day line remain.
+        Task PresentResultsAsync(DayTreatmentResult result, bool afterCutscene, CancellationToken token);
         void HideAll();
         void ShowFlowError(string message);
     }
@@ -36,6 +37,8 @@ namespace DoctorHelp
         INeighborhoodView CurrentNeighborhood { get; }
         Task<IDayFlowView> LoadAsync(GameScene scene, CancellationToken cancellation);
         Task<INeighborhoodView> LoadNeighborhoodAsync(string destination, CancellationToken cancellation);
+        // Loads Endday_Cutscene and plays it to black. False when it could not play (the day still goes on).
+        Task<bool> PlayDayEndCutsceneAsync(DayTreatmentResult result, CancellationToken cancellation);
     }
 
     public interface INeighborhoodView
@@ -383,6 +386,8 @@ namespace DoctorHelp
         private readonly IDayEndAdvertisement advertisement;
         private IDayFlowView view;
         private int? closingDay;
+        // A retry after the cutscene (e.g. Home failed to load) does not replay it.
+        private bool cutsceneShown;
         public DayResultsState(IDaySceneService scenes, IDayProfile profile, DayCompletionService completion,
             IDayEndAdvertisement advertisement = null)
         { this.scenes = scenes; this.profile = profile; this.completion = completion; this.advertisement = advertisement; }
@@ -391,12 +396,16 @@ namespace DoctorHelp
             if (!closingDay.HasValue) closingDay = profile.CurrentDay;
             if (scenes.CurrentView != null) await scenes.CurrentView.FadeToBlackAsync(token);
             var result = completion.Complete(closingDay.Value);
+            // Days with consultations show the in-game cutscene; a day without patients goes straight to Home.
+            if (result.HasCompletedConsultations && !cutsceneShown)
+                cutsceneShown = await scenes.PlayDayEndCutsceneAsync(result, token);
             await scenes.LoadNeighborhoodAsync(nameof(GameScene.Player_Home), token);
             view = scenes.CurrentView;
-            await view.PresentResultsAsync(result, token);
+            await view.PresentResultsAsync(result, cutsceneShown, token);
             UnityEngine.Debug.Log($"[Test Ads] Day {result.Day}: presentation completed; ad service present={advertisement != null}.");
             if (advertisement != null) await advertisement.ShowAfterResultsAsync(result.Day, token);
             closingDay = null;
+            cutsceneShown = false;
         }
         public void Exit()
         { if (view == null) return; view.HideAll(); view = null; }

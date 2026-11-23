@@ -12,4 +12,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9a19a6ecd4ed2114c9ccb631dd1f32f4, type: 3}
   m_Name: NPC_12_Dialogue
   m_EditorClassIdentifier: Assembly-CSharp::DoctorHelp.NpcDialogueAsset
-  content: "I copied the same address three times before I noticed I'd missed an entire street.\nThe words are clear when I look at them. They don't stay where I put them in my head.\nI've kept the envelopes if you'd like to see."
+  content: 'Good day, doctor.
+
+    My head aches.
+
+    I cannot tell what brought it on.'

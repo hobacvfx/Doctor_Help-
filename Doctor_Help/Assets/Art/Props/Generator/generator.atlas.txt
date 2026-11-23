@@ -1,0 +1,15 @@
+generator.png
+size:2013,1239
+filter:Linear,Linear
+body
+bounds:1083,130,1107,928
+offsets:1,2,1109,930
+rotate:90
+needle
+bounds:2,2,178,995
+offsets:1,1,180,998
+rotate:90
+wheel
+bounds:2,182,1055,1079
+offsets:1,1,1057,1081
+rotate:90

@@ -12,4 +12,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9a19a6ecd4ed2114c9ccb631dd1f32f4, type: 3}
   m_Name: NPC_47_Dialogue
   m_EditorClassIdentifier: Assembly-CSharp::DoctorHelp.NpcDialogueAsset
-  content: "I've had a tightness in my chest for weeks. Today it feels different.\nMy hands won't warm up, and my sister couldn't find a pulse at all.\nShe sent me here before I'd even finished dressing."
+  content: 'Good morning, doctor.
+
+    I have felt off all week.
+
+    I do not know why this keeps happening.'

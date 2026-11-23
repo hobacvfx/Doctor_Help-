@@ -33,7 +33,11 @@ namespace DoctorHelp
         private bool Suspended => applicationPaused || applicationUnfocused;
         private float ForegroundDelta => Suspended || skipFrame ? 0 : Time.unscaledDeltaTime;
 
-        public async Task PlayAsync(DayTreatmentResult result, CancellationToken token)
+        public Task PlayAsync(DayTreatmentResult result, CancellationToken token) => PlayAsync(result, false, token);
+
+        // afterCutscene: Endday_Cutscene already showed "Later that night..." and the night; only the newspaper
+        // and the new-day line remain.
+        public async Task PlayAsync(DayTreatmentResult result, bool afterCutscene, CancellationToken token)
         {
             if (!IsConfigured) throw new InvalidOperationException("Home result cutscene references are incomplete.");
             if (presentationLifetime != null) throw new InvalidOperationException("A result cutscene is already playing.");
@@ -52,6 +56,12 @@ namespace DoctorHelp
             player.errorReceived += Failed;
             try
             {
+                if (afterCutscene)
+                {
+                    await newspaper.ShowAsync(result, lifetime.Token);
+                    await ShowTextAsync(newDayText, NewDaySeconds, false, lifetime.Token);
+                    return;
+                }
                 if (!result.HasCompletedConsultations)
                 {
                     await ShowTextAsync(dayEndedText, narrationSeconds, false, lifetime.Token);

@@ -12,4 +12,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9a19a6ecd4ed2114c9ccb631dd1f32f4, type: 3}
   m_Name: NPC_6_Dialogue
   m_EditorClassIdentifier: Assembly-CSharp::DoctorHelp.NpcDialogueAsset
-  content: "They trust me to check the accounts at the brewery.\nToday I forgot what I'd just added, and my head throbbed all the way here.\nMy apprentice says my pulse is as slow as the Sunday shift."
+  content: 'Afternoon, doctor.
+
+    My head aches.
+
+    Perhaps I have been working too many hours at the shop.'

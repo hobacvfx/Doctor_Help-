@@ -14,9 +14,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::DoctorHelp.NpcDialogueAsset
   content: 'Good morning, doctor.
 
-    I''ve had a headache since dawn.
+    I have a headache.
 
-    I suspect
-    I stayed too long under the reading lamp.
-
-    It followed me all the way here.'
+    I think I should have rested before coming here.'

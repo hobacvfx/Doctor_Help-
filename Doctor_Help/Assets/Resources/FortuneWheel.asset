@@ -1,0 +1,54 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 22d9d917f40f84c4181953c8af9b5d22, type: 3}
+  m_Name: FortuneWheel
+  m_EditorClassIdentifier: Assembly-CSharp::DoctorHelp.FortuneWheelCatalog
+  spinPrice: 70
+  spinSeconds: 5
+  fullTurns: 5
+  rewards:
+  - kind: 0
+    amount: 25
+    icon: {fileID: 5618026609613044863, guid: 663071c08d93e8145aed5c75d39a6e0a, type: 3}
+  - kind: 1
+    amount: 25
+    icon: {fileID: -7077578495685720143, guid: 663071c08d93e8145aed5c75d39a6e0a, type: 3}
+  - kind: 0
+    amount: 50
+    icon: {fileID: 5618026609613044863, guid: 663071c08d93e8145aed5c75d39a6e0a, type: 3}
+  - kind: 2
+    amount: 25
+    icon: {fileID: 2301512831249569618, guid: 663071c08d93e8145aed5c75d39a6e0a, type: 3}
+  - kind: 0
+    amount: 25
+    icon: {fileID: 5618026609613044863, guid: 663071c08d93e8145aed5c75d39a6e0a, type: 3}
+  - kind: 1
+    amount: 50
+    icon: {fileID: -7077578495685720143, guid: 663071c08d93e8145aed5c75d39a6e0a, type: 3}
+  - kind: 0
+    amount: 150
+    icon: {fileID: 5618026609613044863, guid: 663071c08d93e8145aed5c75d39a6e0a, type: 3}
+  - kind: 2
+    amount: 25
+    icon: {fileID: 2301512831249569618, guid: 663071c08d93e8145aed5c75d39a6e0a, type: 3}
+  - kind: 0
+    amount: 50
+    icon: {fileID: 5618026609613044863, guid: 663071c08d93e8145aed5c75d39a6e0a, type: 3}
+  - kind: 1
+    amount: 25
+    icon: {fileID: -7077578495685720143, guid: 663071c08d93e8145aed5c75d39a6e0a, type: 3}
+  - kind: 0
+    amount: 25
+    icon: {fileID: 5618026609613044863, guid: 663071c08d93e8145aed5c75d39a6e0a, type: 3}
+  - kind: 2
+    amount: 50
+    icon: {fileID: 2301512831249569618, guid: 663071c08d93e8145aed5c75d39a6e0a, type: 3}

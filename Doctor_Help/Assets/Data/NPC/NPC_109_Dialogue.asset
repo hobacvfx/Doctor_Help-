@@ -12,4 +12,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9a19a6ecd4ed2114c9ccb631dd1f32f4, type: 3}
   m_Name: NPC_109_Dialogue
   m_EditorClassIdentifier: Assembly-CSharp::DoctorHelp.NpcDialogueAsset
-  content: "Good evening, doctor. I'm cold, and I'm having trouble getting my breath.\nSomething walked behind me the whole way here, even when I stopped.\nPerhaps I walked too fast trying to leave it behind."
+  content: 'Good evening, doctor.
+
+    I feel out of breath.
+
+    The ghosts around me will not leave.
+
+    Perhaps I walked too fast trying to leave it behind.'

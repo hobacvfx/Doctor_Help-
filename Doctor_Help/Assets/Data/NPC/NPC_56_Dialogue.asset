@@ -12,4 +12,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9a19a6ecd4ed2114c9ccb631dd1f32f4, type: 3}
   m_Name: NPC_56_Dialogue
   m_EditorClassIdentifier: Assembly-CSharp::DoctorHelp.NpcDialogueAsset
-  content: "Morning, doctor. I took a tumble unloading a cart.\nMy arm hurts when I move it, and now I feel hot and nauseous.\nI can't tell whether any of it is connected."
+  content: 'Morning, doctor.
+
+    I want to throw up.
+
+    My ankle hurts where I landed badly.
+
+    I think I should have rested before coming here.'

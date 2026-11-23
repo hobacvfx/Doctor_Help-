@@ -12,4 +12,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9a19a6ecd4ed2114c9ccb631dd1f32f4, type: 3}
   m_Name: NPC_108_Dialogue
   m_EditorClassIdentifier: Assembly-CSharp::DoctorHelp.NpcDialogueAsset
-  content: "Evening, doctor. I'm freezing, and my hand hurts from a knock.\nI caught it on the rail coming down the stairs.\nPerhaps I should have carried a lamp in my other hand."
+  content: 'Evening, doctor.
+
+    My head aches.
+
+    My arm hurts after an awkward fall.
+
+    I cannot tell what brought it on.'

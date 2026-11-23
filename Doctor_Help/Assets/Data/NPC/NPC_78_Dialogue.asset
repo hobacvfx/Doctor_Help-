@@ -12,4 +12,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9a19a6ecd4ed2114c9ccb631dd1f32f4, type: 3}
   m_Name: NPC_78_Dialogue
   m_EditorClassIdentifier: Assembly-CSharp::DoctorHelp.NpcDialogueAsset
-  content: "Morning, doctor. My head hurts, and my pulse feels slow.\nI woke before dawn and haven't felt right since.\nPerhaps I should have stopped puzzling over that letter before midnight."
+  content: 'Morning, doctor.
+
+    My arm hurts after an awkward fall.
+
+    I cannot tell what brought it on.'

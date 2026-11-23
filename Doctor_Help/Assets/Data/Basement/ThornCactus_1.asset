@@ -1,0 +1,38 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2e8c152489ae68d4e9614e5d295e8072, type: 3}
+  m_Name: ThornCactus_1
+  m_EditorClassIdentifier: Assembly-CSharp::DoctorHelp.BasementPlantProfile
+  plantId: ThornCactus_1
+  displayName: Thorn Cactus
+  portrait: {fileID: 21300000, guid: d2ced9a8b9b9e9548b3213b657772209, type: 3}
+  prefab: {fileID: 7405090799810153322, guid: 66fec2856687d974b900dcb79786cf88, type: 3}
+  attack: 2
+  range: 1
+  rangeMetres: 5
+  buyCost: 150
+  baseDamage: 2
+  damageIncreasePerLevel: 0.5
+  baseCooldownSeconds: 3
+  cooldownReductionPerLevel: 0.3
+  baseTargets: 3
+  targetsIncreasePerLevel: 0
+  attackClipSeconds: 0.8
+  fireSeconds: 0.32
+  projectileSpeed: 12
+  magazineSize: 16
+  reloadSeconds: 1.4
+  slowFraction: 0
+  slowSeconds: 0
+  initialUpgradeCost: 120
+  upgradeCostIncreasePerLevel: 60
+  maxLevel: 5

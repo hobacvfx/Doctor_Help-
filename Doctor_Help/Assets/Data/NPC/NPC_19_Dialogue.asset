@@ -12,4 +12,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9a19a6ecd4ed2114c9ccb631dd1f32f4, type: 3}
   m_Name: NPC_19_Dialogue
   m_EditorClassIdentifier: Assembly-CSharp::DoctorHelp.NpcDialogueAsset
-  content: "I sew gloves for the winter trade. My fingers are colder than the ones on the tailor's dummy.\nI put my hand against my chest for a long while.\nThere's usually a beat, isn't there?"
+  content: 'Hello, doctor.
+
+    I feel weak and tired for no reason.
+
+    Maybe the long shift at the mill has caught up with me.'

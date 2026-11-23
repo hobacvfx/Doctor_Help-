@@ -14,9 +14,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::DoctorHelp.NpcDialogueAsset
   content: 'Evening, doctor.
 
-    I''m rather out of sorts.
+    My words keep getting mixed up.
 
-    The mirror at the
-    theatre kept my reflection when I left.
-
-    I couldn''t say what started it.'
+    Maybe I took on too much work this week.'

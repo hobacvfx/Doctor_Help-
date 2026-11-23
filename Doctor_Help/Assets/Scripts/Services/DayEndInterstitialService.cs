@@ -20,6 +20,17 @@ namespace DoctorHelp
         public const string AndroidSampleAppId = "ca-app-pub-3940256099942544~3347511713";
         public const string AndroidSampleInterstitialId = "ca-app-pub-3940256099942544/1033173712";
         private int lastAttemptedDay;
+        internal bool IsInitialized
+        {
+            get
+            {
+#if UNITY_ANDROID || UNITY_EDITOR
+                return initialized;
+#else
+                return false;
+#endif
+            }
+        }
 #if UNITY_ANDROID || UNITY_EDITOR
         private readonly ConcurrentQueue<Action> callbacks = new ConcurrentQueue<Action>();
         private InterstitialAd readyAd, showingAd;

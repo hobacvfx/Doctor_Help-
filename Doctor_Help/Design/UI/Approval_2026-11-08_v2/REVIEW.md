@@ -15,7 +15,7 @@ Read MedicineRow.cs, MedicineListView.cs, StoreInventoryUI.cs, SelectPillPopup.c
 
 ## Data in demo
 
-Three visible rows demonstrate a scroll viewport, not a reduction to three medicines. Use full dynamic source list at integration. Exact names/descriptions copied from current PillProfile: Bone Growth Medicine — Used to treat Trauma.; Sedative — Used to treat Delusional Disorder.; Deworming Medicine — Used for Worm Infestation and Internal Organ Disease. Unit price 1 matches current asset. Balance 500 and owned counts 4/2/3 are illustrative UI examples, not edits to player data.
+Three visible rows demonstrate a scroll viewport, not a reduction to three medicines. Use full dynamic source list at integration. Exact names/descriptions copied from current PillProfile: Bone Growth Medicine — Used to treat Trauma.; Sedative — Used to treat Delusional Disorder.; Antiparasitic Medicine — Used for Parasite Infestation and Internal Organ Disease. Unit price 1 matches current asset. Balance 500 and owned counts 4/2/3 are illustrative UI examples, not edits to player data.
 
 ## Visual QA and handoff
 

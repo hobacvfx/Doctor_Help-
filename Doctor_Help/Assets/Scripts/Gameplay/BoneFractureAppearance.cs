@@ -14,6 +14,10 @@ namespace DoctorHelp
         [SerializeField, HideInInspector] private bool hasFracture;
         [SerializeField, HideInInspector] private Vector2 crackOffset;
         private MaterialPropertyBlock properties;
+        internal bool HasFracture => initialized && hasFracture;
+        internal string ClueSymptomId => boneFractureSymptomId;
+        internal SpriteRenderer ClueRenderer => boneRenderer as SpriteRenderer;
+        internal Vector2 ClueOffset => crackOffset;
         private static readonly int BoneCrackId = Shader.PropertyToID("_BoneCrack");
         private static readonly int CrackOffsetId = Shader.PropertyToID("_Crack_Offset");
 

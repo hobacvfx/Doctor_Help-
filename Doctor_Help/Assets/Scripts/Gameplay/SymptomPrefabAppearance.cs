@@ -20,6 +20,8 @@ namespace DoctorHelp
         [SerializeField, HideInInspector] private List<GameObject> spawned = new List<GameObject>();
         private const float SharedAnchorDisplaySeconds = 1f;
         private Coroutine sharedAnchorCycle;
+        private readonly List<XrayClueTarget> clueTargets = new List<XrayClueTarget>();
+        internal void AppendClueTargets(List<XrayClueTarget> output) => output.AddRange(clueTargets);
 
         public void Initialize(NpcDefinition npc, AllSickness medicalData)
         {
@@ -51,6 +53,7 @@ namespace DoctorHelp
                     if (!symptoms.Contains(binding.symptomId)) continue;
                     var instance = Instantiate(binding.prefab, binding.position, false);
                     spawned.Add(instance);
+                    clueTargets.Add(new XrayClueTarget(binding.symptomId, instance));
                     instance.transform.localPosition = Vector3.zero;
                     if (!byAnchor.TryGetValue(binding.position, out var group))
                         byAnchor.Add(binding.position, group = new List<GameObject>());
@@ -98,6 +101,7 @@ namespace DoctorHelp
                 else DestroyImmediate(instance);
             }
             spawned.Clear();
+            clueTargets.Clear();
         }
     }
 }

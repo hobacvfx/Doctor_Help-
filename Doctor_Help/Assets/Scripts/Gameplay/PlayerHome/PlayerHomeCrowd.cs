@@ -20,6 +20,10 @@ namespace DoctorHelp
         [SerializeField] private bool useProfileGhostCount = true;
         [SerializeField, Range(0, 10)] private int fixedGhostCount;
         [SerializeField] private NpcCatalog catalog;
+        [Tooltip("Walking-scene copies (<NPC>_world: no X-ray/symptom parts). Empty: Resources/NpcWorldCatalog. " +
+            "An NPC without a world copy walks as its Office prefab.")]
+        [SerializeField] private NpcCatalog worldCatalog;
+        private const string WorldSuffix = "_world";
         [SerializeField] private RuntimeAnimatorController locomotion;
         [SerializeField] private Shader examinationShader;
         [SerializeField] private Material walkingSpriteMaterial;
@@ -52,10 +56,20 @@ namespace DoctorHelp
 
         private void Start()
         {
+            // Outside Office every NPC walks as its "_world" copy, matched by name.
+            var world = worldCatalog != null ? worldCatalog : Resources.Load<NpcCatalog>("NpcWorldCatalog");
+            var worldByName = new Dictionary<string, GameObject>(StringComparer.Ordinal);
+            if (world != null && world.prefabs != null)
+                foreach (var prefab in world.prefabs)
+                    if (prefab != null) worldByName[prefab.name] = prefab;
             if (catalog != null && catalog.prefabs != null)
-                foreach (var prefab in catalog.prefabs)
-                    if (prefab != null && prefab.GetComponentInChildren<Animator>(true) != null && !unusedNpcPrefabs.Contains(prefab))
+                foreach (var officePrefab in catalog.prefabs)
+                {
+                    if (officePrefab == null) continue;
+                    var prefab = worldByName.TryGetValue(officePrefab.name + WorldSuffix, out var copy) ? copy : officePrefab;
+                    if (prefab.GetComponentInChildren<Animator>(true) != null && !unusedNpcPrefabs.Contains(prefab))
                         unusedNpcPrefabs.Add(prefab);
+                }
 
             bool layoutConfigured = IsStreet ? streetLeftWall != null && streetRightWall != null :
                 elevator != null && elevator.isActiveAndEnabled;

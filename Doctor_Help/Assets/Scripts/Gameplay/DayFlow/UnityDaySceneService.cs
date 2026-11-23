@@ -34,6 +34,27 @@ namespace DoctorHelp
             return view;
         }
 
+        internal const string DayEndCutsceneScene = "Endday_Cutscene";
+
+        public async Task<bool> PlayDayEndCutsceneAsync(DayTreatmentResult result, CancellationToken cancellation)
+        {
+            try
+            {
+                var scene = await LoadSceneAsync(DayEndCutsceneScene, cancellation);
+                var cutscene = FindSceneComponent<EnddayCutscene>(scene);
+                if (cutscene == null) throw new InvalidOperationException("Endday_Cutscene has no EnddayCutscene component.");
+                await cutscene.PlayAsync(result, cancellation);
+                return true;
+            }
+            catch (OperationCanceledException) { throw; }
+            catch (Exception exception)
+            {
+                // The cutscene is presentation only: the day result is already saved, so carry on to Home.
+                Debug.LogException(exception);
+                return false;
+            }
+        }
+
         private void ConfigureFirstDayGuide(NeighborhoodView view, SceneGameplayUI home)
         {
             if (tutorialPlan == null) tutorialPlan = Resources.Load<TutorialPlan>("FirstRunTutorial");

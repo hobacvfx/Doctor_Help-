@@ -12,4 +12,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9a19a6ecd4ed2114c9ccb631dd1f32f4, type: 3}
   m_Name: NPC_17_Dialogue
   m_EditorClassIdentifier: Assembly-CSharp::DoctorHelp.NpcDialogueAsset
-  content: "I wheezed so badly coming up the stairs that the porter came after me.\nMy heart was still hammering when I sat down, and my face felt on fire.\nIt was no more than one flight."
+  content: 'Hello there, doctor.
+
+    I am having trouble breathing.
+
+    There are ghosts around me.
+
+    I do not know why this keeps happening.'

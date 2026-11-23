@@ -47,6 +47,22 @@ namespace DoctorHelp
             bool scrollbarWasInteractable = scrollbar != null && scrollbar.interactable;
             bool wasVertical = scroll.vertical;
             var flights = new List<(Text label, Text source, Vector3 origin)>();
+            // Gains fly into the report's Headbar as gold icons (with a puff at the amount); losses still fly as red text.
+            var bar = reportHeadbar.GetComponentInChildren<Headbar>(true);
+            int shown = result.GoldBefore, flying = 0;
+            bool settled = false;
+            void Show(int value)
+            {
+                shown = value;
+                balance.text = shown.ToString();
+            }
+            void Landed(int share)
+            {
+                if (settled || balance == null) return;
+                flying -= share;
+                balance.color = gainBalanceColor;
+                Show(shown + share);
+            }
             scroll.StopMovement();
             if (scrollbar != null) scrollbar.interactable = false;
             scroll.vertical = false;
@@ -63,19 +79,30 @@ namespace DoctorHelp
                 while (first < rows.Count)
                 {
                     RevealAmount(scroll, rows[first].GoldAmount);
-                    int next = first;
+                    int next = first, textDelta = 0;
                     while (next < rows.Count)
                     {
                         var amount = rows[next].GoldAmount;
                         var origin = TextCenter(amount);
                         var viewportPoint = scroll.viewport.InverseTransformPoint(origin);
                         if (next != first && !scroll.viewport.rect.Contains(viewportPoint)) break;
+                        int delta = rows[next].GoldDelta;
+                        if (delta > 0 && bar != null)
+                        {
+                            Vector2 screen = RectTransformUtility.WorldToScreenPoint(null, origin);
+                            bar.PlayUiPuff(screen);
+                            if (bar.FlyIcons(CurrencyKind.Gold, delta, screen, Landed)) flying += delta;
+                            else Show(shown + delta);
+                            next++;
+                            continue;
+                        }
                         var fly = Instantiate(flyingGoldPrefab, flightLayer, false);
                         fly.text = amount.text;
                         fly.color = rows[next].GoldDelta > 0 ? gainBalanceColor : lossBalanceColor;
                         fly.rectTransform.position = origin;
                         amount.canvasRenderer.SetAlpha(0);
                         flights.Add((fly, amount, origin));
+                        textDelta += delta;
                         next++;
                     }
 
@@ -85,20 +112,31 @@ namespace DoctorHelp
                         foreach (var flight in flights)
                             flight.label.rectTransform.position = Vector3.Lerp(flight.origin, target, fraction);
                     }, token);
+                    if (textDelta != 0)
+                    {
+                        balance.color = textDelta > 0 ? gainBalanceColor : lossBalanceColor;
+                        Show(shown + textDelta);
+                    }
                     ClearFlights(flights);
                     first = next;
                 }
                 scroll.verticalNormalizedPosition = 1;
 
-                if (result.NetGold != 0)
+                // Let the last gold icons land (they spawn over 1-2 s), then settle any remainder such as passive gold.
+                for (float waited = 0f; flying > 0 && waited < 5f; waited += Time.unscaledDeltaTime)
+                    await Awaitable.NextFrameAsync(token);
+                if (result.NetGold != 0) balance.color = result.NetGold > 0 ? gainBalanceColor : lossBalanceColor;
+                if (shown != result.GoldAfter)
                 {
-                    balance.color = result.NetGold > 0 ? gainBalanceColor : lossBalanceColor;
+                    int from = shown;
                     await AnimateAsync(balanceSeconds,
-                        fraction => balance.text = Interpolate(result.GoldBefore, result.GoldAfter, fraction).ToString(), token);
+                        fraction => balance.text = Interpolate(from, result.GoldAfter, fraction).ToString(), token);
                 }
             }
             finally
             {
+                settled = true;
+                if (bar != null) bar.StopRewardFlights();
                 ClearFlights(flights);
                 if (scroll != null) scroll.vertical = wasVertical;
                 if (scrollbar != null) scrollbar.interactable = scrollbarWasInteractable;

@@ -12,10 +12,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9a19a6ecd4ed2114c9ccb631dd1f32f4, type: 3}
   m_Name: NPC_Dracu_Dialogue
   m_EditorClassIdentifier: Assembly-CSharp::DoctorHelp.NpcDialogueAsset
-  content: 'Peasant! i feeling unwell...
+  content: 'Hello, doctor.
 
-    I''m not sure what it is, but i can''t
-    be cure by blood...
+    I feel rather unwell today.
 
-    if you can''t cure me, i will show you my blood thirst
-    tonight!'
+    Maybe the long shift at the mill has caught up with me.'

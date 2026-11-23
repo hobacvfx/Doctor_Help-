@@ -12,4 +12,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9a19a6ecd4ed2114c9ccb631dd1f32f4, type: 3}
   m_Name: NPC_85_Dialogue
   m_EditorClassIdentifier: Assembly-CSharp::DoctorHelp.NpcDialogueAsset
-  content: "Evening, doctor. My head aches, and I can't warm up.\nI hurt my leg slipping off the tram step.\nI don't know if that explains any of the rest."
+  content: 'Evening, doctor.
+
+    My head is pounding.
+
+    My wrist has hurt since I stumbled on the steps.
+
+    Maybe I took on too much work this week.'

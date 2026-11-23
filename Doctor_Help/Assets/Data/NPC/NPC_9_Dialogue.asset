@@ -12,4 +12,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9a19a6ecd4ed2114c9ccb631dd1f32f4, type: 3}
   m_Name: NPC_9_Dialogue
   m_EditorClassIdentifier: Assembly-CSharp::DoctorHelp.NpcDialogueAsset
-  content: "Has anyone asked you about the pigeons on Fleet Street?\nThey've been repeating things I haven't said yet.\nI can't explain the order of it. First the roof, then Thursday, then my name."
+  content: 'Hello there, doctor.
+
+    I lose track halfway through a sentence.
+
+    Perhaps I have spent too many evenings poring over my accounts.'

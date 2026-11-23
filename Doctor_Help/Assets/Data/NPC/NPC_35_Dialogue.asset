@@ -12,4 +12,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9a19a6ecd4ed2114c9ccb631dd1f32f4, type: 3}
   m_Name: NPC_35_Dialogue
   m_EditorClassIdentifier: Assembly-CSharp::DoctorHelp.NpcDialogueAsset
-  content: "It aches deep on one side, especially after I've had something to eat.\nI tried moving my belt down, then up. Neither helped.\nMy wife says I've spent the week carrying my dinner plate back half full."
+  content: 'Hello, doctor.
+
+    I feel weak and tired for no reason.
+
+    I think I have been keeping rather poor hours lately.'

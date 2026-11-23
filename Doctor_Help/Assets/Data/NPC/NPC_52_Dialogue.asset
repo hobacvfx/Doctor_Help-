@@ -12,4 +12,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9a19a6ecd4ed2114c9ccb631dd1f32f4, type: 3}
   m_Name: NPC_52_Dialogue
   m_EditorClassIdentifier: Assembly-CSharp::DoctorHelp.NpcDialogueAsset
-  content: "Good morning, doctor. I feel out of sorts today.\nThe clock says Tuesday, but I'm certain the hands mean rain.\nPerhaps I spent too long resetting it last night."
+  content: 'Good morning, doctor.
+
+    My head hurts.
+
+    My speech keeps getting muddled.
+
+    I cannot think of anything that would explain it.'

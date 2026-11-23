@@ -30,6 +30,7 @@ namespace DoctorHelp
         [SerializeField] private NpcLipAnimation lips;
         [SerializeField, Min(.1f)] private float charactersPerSecond = 30;
         [SerializeField, Min(0)] private float ambientHoldSeconds = 5;
+        [SerializeField] private string medicineThanks = "Thank you!";
         [SerializeField] private bool fitInViewport = true;
         [SerializeField, Min(0)] private float screenPadding = 16;
 
@@ -52,6 +53,12 @@ namespace DoctorHelp
         private float holdRemaining;
 
         internal bool IsShowing => phase != Phase.Hidden;
+        internal bool TryGetClueText(out TMP_Text text)
+        {
+            text = dialogueText;
+            return ambientLine == null && text != null && text.gameObject.activeInHierarchy &&
+                (phase == Phase.Typing || phase == Phase.WaitingForNext);
+        }
         // Patient lines and complaints happen in the Office; ambient lines and outbursts in walking scenes.
         private bool IsExamination => ambientLine == null || patientComplaint;
 
@@ -134,6 +141,19 @@ namespace DoctorHelp
             patientComplaint = true;
             BeginAmbient(line, false);
         }
+        internal void ThankForMedicine() => SpeakPatientComplaint(medicineThanks);
+
+        // Scripted line (end-of-day cutscene): types the line, holds it for `holdSeconds`, then closes.
+        internal void SpeakFor(string line, float holdSeconds)
+        {
+            HideBox();
+            customHold = Mathf.Max(0f, holdSeconds);
+            BeginAmbient(line, false);
+            if (!IsShowing) customHold = null;
+        }
+        internal bool IsHolding => phase == Phase.Holding;
+        internal TMP_Text Text => dialogueText;
+        private float? customHold;
         private bool patientComplaint;
 
         private void BeginAmbient(string line, bool outburst)
@@ -234,7 +254,8 @@ namespace DoctorHelp
             float rightLimit = examination ? SpeakerLeftEdge(camera) : float.PositiveInfinity;
             if (!layout.Apply(camera, anchor,
                     examination ? DialogueTextSize.Examination : DialogueTextSize.Walking, rightLimit, screenPadding)) return;
-            if ((ambientLine != null && !streetOutburst && !patientComplaint) || !fitInViewport) return;
+            // Scripted cutscene lines (customHold) are kept on screen like outbursts and complaints.
+            if ((ambientLine != null && !streetOutburst && !patientComplaint && customHold == null) || !fitInViewport) return;
 
             // Keep the dialogue within the safe area; width is already limited by wrapping.
             var box = chatBox.transform;
@@ -312,7 +333,7 @@ namespace DoctorHelp
                 phase = Phase.WaitingForNext;
             else
             {
-                holdRemaining = streetOutburst || patientComplaint ? 1f : ambientHoldSeconds;
+                holdRemaining = customHold ?? (streetOutburst || patientComplaint ? 1f : ambientHoldSeconds);
                 phase = Phase.Holding;
             }
         }
@@ -350,6 +371,7 @@ namespace DoctorHelp
         private void HideBox()
         {
             phase = Phase.Hidden;
+            customHold = null;
             ambientLine = null;
             streetOutburst = false;
             patientComplaint = false;

@@ -12,4 +12,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9a19a6ecd4ed2114c9ccb631dd1f32f4, type: 3}
   m_Name: NPC_22_Dialogue
   m_EditorClassIdentifier: Assembly-CSharp::DoctorHelp.NpcDialogueAsset
-  content: "The little boy I look after took my hand to cross the road, and something in my wrist cracked.\nA while later the fever started, though I'd barely left the house.\nI don't want him to think he did anything wrong."
+  content: 'Afternoon, doctor.
+
+    My wrist hurts after I slipped by the door.
+
+    I cannot think of anything that would explain it.'

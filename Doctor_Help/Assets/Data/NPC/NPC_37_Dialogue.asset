@@ -12,4 +12,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9a19a6ecd4ed2114c9ccb631dd1f32f4, type: 3}
   m_Name: NPC_37_Dialogue
   m_EditorClassIdentifier: Assembly-CSharp::DoctorHelp.NpcDialogueAsset
-  content: "I can't keep the days straight, and my fingertips have gone cold as brass.\nI asked my brother to check my pulse because I kept losing count.\nHe says there was nothing to count."
+  content: 'Good evening, doctor.
+
+    My head is pounding.
+
+    I have no idea where it started.'

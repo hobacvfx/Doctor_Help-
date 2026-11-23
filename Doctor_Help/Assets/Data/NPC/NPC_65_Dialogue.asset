@@ -12,4 +12,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9a19a6ecd4ed2114c9ccb631dd1f32f4, type: 3}
   m_Name: NPC_65_Dialogue
   m_EditorClassIdentifier: Assembly-CSharp::DoctorHelp.NpcDialogueAsset
-  content: "Hello, doctor. I'm hot all over, and my head is pounding.\nMy pulse seems slower than usual, even walking here.\nI don't know where it started. I felt fine before bed."
+  content: 'Hello, doctor.
+
+    My leg hurts where I fell against a crate.
+
+    Perhaps I have been running myself ragged on errands.'

@@ -12,4 +12,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9a19a6ecd4ed2114c9ccb631dd1f32f4, type: 3}
   m_Name: NPC_10_Dialogue
   m_EditorClassIdentifier: Assembly-CSharp::DoctorHelp.NpcDialogueAsset
-  content: "I thought the pain under my ribs would pass if I left off strong tea.\nIt's still there before breakfast, and it gets sharper after I eat.\nI can point to the spot, but it feels much deeper than that."
+  content: 'Morning, doctor.
+
+    I have felt off all week.
+
+    Maybe it started after yesterday''s journey across town.'

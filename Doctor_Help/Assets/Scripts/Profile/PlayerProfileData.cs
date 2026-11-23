@@ -24,6 +24,21 @@ namespace DoctorHelp
         public string itemId;
     }
 
+    // A basement plant the player owns. Water spent and the plant are saved together in this profile, so a
+    // purchase or upgrade can never be half applied. Where it stands (shelf or storage) is saved by the basement.
+    [Serializable]
+    public sealed class BasementPlantRecord
+    {
+        public int instanceId;
+        public string profileId;
+        public int level = 1;
+        // Shelf of a plant placed before plants were bought (granted once, free, by the save migration).
+        public string legacySlot = "";
+
+        internal BasementPlantRecord Copy() => new BasementPlantRecord
+            { instanceId = instanceId, profileId = profileId, level = level, legacySlot = legacySlot };
+    }
+
     [Serializable]
     public sealed class ClinicDayRating
     {
@@ -49,6 +64,7 @@ namespace DoctorHelp
         private const int LegacyRockThrowDeathThreshold = 11;
 
         public int schemaVersion = CurrentSchemaVersion;
+        public string clinicName = "";
         public int money = 500;
         public float rating = DefaultRating;
         public int currentDay = 1;
@@ -69,12 +85,21 @@ namespace DoctorHelp
         // Dart minigame state belongs to dartDay; any other day starts with a full set of darts and balloons.
         public int dartDay;
         public int dartsUsed;
+        public int dartBonus;
         public int dartBalloonsPopped; // Bit per balloon reward index.
+        // Earned rewarded-ad spins survive app/scene interruptions until consumed.
+        public int fortuneAdSpins;
         // Clean water and electricity behave like gold. Saves made before they existed start with the defaults.
         public int water = DefaultWater;
         public int electricity = DefaultElectricity;
         // Hidden player dirtiness, 0..MaxDirt in half points.
         public float dirt;
+        // Basement generator repairs paid for with gold. Basement progress (separate file) records how many it
+        // has applied; the two are reconciled on load so a repair is never free or paid without effect.
+        public int basementRepairsPaid;
+        // Owned basement plants and the next free instance ID (IDs are never reused).
+        public List<BasementPlantRecord> basementPlants = new();
+        public int nextBasementPlantId = 1;
         internal const int DefaultWater = 100;
         internal const int DefaultElectricity = 100;
         public const float MaxDirt = 10f;
@@ -82,10 +107,11 @@ namespace DoctorHelp
         internal bool IsStreetRockThrowingActive => rockThrowDeaths >= RockThrowDeathThreshold;
         internal const int DartsPerDay = 3;
         internal const int DartBalloonCount = 4;
-        internal int DartsLeft => dartDay == currentDay ? DartsPerDay - dartsUsed : DartsPerDay;
+        internal int DartsLeft => dartDay == currentDay ? DartsPerDay + dartBonus - dartsUsed : DartsPerDay;
         internal bool IsDartBalloonPopped(int reward) =>
             dartDay == currentDay && (dartBalloonsPopped & (1 << reward)) != 0;
 
+        internal void AddRewardedDarts() { StartDartDay(); dartBonus += 2; }
         internal void UseDart()
         {
             StartDartDay();
@@ -103,6 +129,7 @@ namespace DoctorHelp
             if (dartDay == currentDay) return;
             dartDay = currentDay;
             dartsUsed = 0;
+            dartBonus = 0;
             dartBalloonsPopped = 0;
         }
         public List<ClinicDayRating> dayRatings = new List<ClinicDayRating>();
@@ -120,15 +147,20 @@ namespace DoctorHelp
             var copy = new PlayerProfileData
             {
                 schemaVersion = schemaVersion, money = money, rating = rating, currentDay = currentDay,
+                clinicName = clinicName,
                 mainObjective = mainObjective,
                 walterQuest = walterQuest,
                 diffProgress = diffProgress, diffStreakDays = diffStreakDays, diffStreakMistakeDay = diffStreakMistakeDay,
                 patientsKilled = patientsKilled, patientsSaved = patientsSaved, ghostNumber = ghostNumber,
                 rockThrowDeaths = rockThrowDeaths, rockThrowCleanDays = rockThrowCleanDays,
                 throwRock = throwRock, clean = clean, playSeconds = playSeconds,
-                dartDay = dartDay, dartsUsed = dartsUsed, dartBalloonsPopped = dartBalloonsPopped,
-                water = water, electricity = electricity, dirt = dirt
+                dartDay = dartDay, dartsUsed = dartsUsed, dartBonus = dartBonus, dartBalloonsPopped = dartBalloonsPopped,
+                fortuneAdSpins = fortuneAdSpins,
+                water = water, electricity = electricity, dirt = dirt, basementRepairsPaid = basementRepairsPaid,
+                nextBasementPlantId = nextBasementPlantId
             };
+            foreach (var plant in basementPlants)
+                copy.basementPlants.Add(plant.Copy());
             foreach (var stock in medicines)
                 copy.medicines.Add(new MedicineStock { medicineId = stock.medicineId, quantity = stock.quantity });
             foreach (var stock in shopItems)
@@ -159,9 +191,14 @@ namespace DoctorHelp
                 dayRatings == null || rivalRatings == null || clinicDirtDays == null ||
                 shopItems == null || equippedFurniture == null || !IsRatingValid(rating) ||
                 !(playSeconds >= 0d) || double.IsInfinity(playSeconds) ||
-                dartDay < 0 || dartDay > currentDay || dartsUsed < 0 || dartsUsed > DartsPerDay ||
+                fortuneAdSpins < 0 || dartDay < 0 || dartDay > currentDay || dartsUsed < 0 || dartBonus < 0 || dartBonus > int.MaxValue - DartsPerDay || dartsUsed > (long)DartsPerDay + dartBonus ||
                 dartBalloonsPopped < 0 || dartBalloonsPopped >= 1 << DartBalloonCount ||
-                water < 0 || electricity < 0 || !(dirt >= 0f && dirt <= MaxDirt)) return false;
+                water < 0 || electricity < 0 || !(dirt >= 0f && dirt <= MaxDirt) || basementRepairsPaid < 0 ||
+                basementPlants == null || nextBasementPlantId < 1) return false;
+            var plantIds = new HashSet<int>();
+            foreach (var plant in basementPlants)
+                if (plant == null || plant.instanceId < 1 || plant.instanceId >= nextBasementPlantId ||
+                    !plantIds.Add(plant.instanceId) || string.IsNullOrWhiteSpace(plant.profileId) || plant.level < 1) return false;
             int previousDay = 0;
             foreach (var entry in dayRatings)
             {

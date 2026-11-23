@@ -48,7 +48,7 @@ MonoBehaviour:
   displayName: Receptionist Lv5
   description: +120% gold from business. +60 gold/minute. + 20% patient patience
     duration in the Office.
-  price: 1200
+  price: 1600
   icon: {fileID: 21300000, guid: cb3f01e646a48b548abd1c6f55306ff3, type: 3}
   poster: {fileID: 0}
   posterOffset: {x: 0, y: 0}
@@ -57,4 +57,3 @@ MonoBehaviour:
   furnitureLevel: 5
   equippedVisual: {fileID: 176444578778948757, guid: 1cebc5509f68b66448d7d0d60475beab, type: 3}
   movingPart: {fileID: 0}
-  electricityPerDay: 25

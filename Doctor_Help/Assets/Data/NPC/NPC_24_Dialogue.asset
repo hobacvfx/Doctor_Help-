@@ -12,4 +12,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9a19a6ecd4ed2114c9ccb631dd1f32f4, type: 3}
   m_Name: NPC_24_Dialogue
   m_EditorClassIdentifier: Assembly-CSharp::DoctorHelp.NpcDialogueAsset
-  content: "My chest feels tight whenever I rush to catch the omnibus.\nEven standing still at the stop, the feeling takes a while to pass.\nI've started leaving a full quarter of an hour early."
+  content: 'Evening, doctor.
+
+    Something is not right, but I cannot put my finger on it.
+
+    Perhaps I should not have worked through supper again.'

@@ -12,4 +12,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9a19a6ecd4ed2114c9ccb631dd1f32f4, type: 3}
   m_Name: NPC_94_Dialogue
   m_EditorClassIdentifier: Assembly-CSharp::DoctorHelp.NpcDialogueAsset
-  content: "Evening, doctor. I've felt poorly since I woke.\nThere was a face in the dark window, even after I moved away.\nPerhaps I spent too long awake waiting for it to go."
+  content: 'Evening, doctor.
+
+    My speech keeps getting muddled and there are ghosts around me even here.
+
+    Perhaps I spent too long awake waiting for it to go.'

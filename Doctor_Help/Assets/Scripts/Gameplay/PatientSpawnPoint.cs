@@ -18,6 +18,7 @@ namespace DoctorHelp
         private int difficultyProgress;
         private bool hasSpawnedPatient;
         private bool departureStarted, paused, unfocused, skipPatienceFrame;
+        private bool medicineThanksStarted;
         private static readonly int IdleState = Animator.StringToHash("Base Layer.NPC_Idle");
         private static readonly int DepartureState = Animator.StringToHash("Base Layer.A_Walk_Out");
         public NpcProfile NpcProfile => npcProfile;
@@ -78,6 +79,16 @@ namespace DoctorHelp
                 CurrentPatient.StopPatience();
                 if (CurrentPatient.RockReaction != null)
                     await CurrentPatient.RockReaction.PlayAsync(token);
+                else if (CurrentPatient.HasReceivedMedicine && patient.TryGetComponent<NpcDialogue>(out var dialogue))
+                {
+                    if (!medicineThanksStarted)
+                    {
+                        dialogue.ThankForMedicine();
+                        medicineThanksStarted = true;
+                    }
+                    while (dialogue != null && dialogue.IsShowing)
+                        await Awaitable.NextFrameAsync(token);
+                }
                 patient.GetComponent<NpcDialogue>()?.CloseBox();
                 animator.ResetTrigger("Leave");
                 animator.SetTrigger("Leave");
@@ -127,6 +138,7 @@ namespace DoctorHelp
             if (template == null || template.Heart == null)
                 throw new InvalidOperationException("NPC prefab is missing its examination profile or Heart anchor: " + prefab.name);
             departureStarted = false;
+            medicineThanksStarted = false;
             var spawned = Instantiate(prefab, transform, false);
             try
             {

@@ -1,0 +1,24 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: dbce5ef2f52e06244bf8b2aa9506e1da, type: 3}
+  m_Name: BasementDefenseSettings
+  m_EditorClassIdentifier: Assembly-CSharp::DoctorHelp.BasementDefenseSettings
+  spawnIntervalSeconds: 25
+  travelSeconds: 30
+  eatSeconds: 1.68
+  biteSeconds: 0.58
+  plantCooldownSeconds: 30
+  wireBreakSeconds: 1.28
+  breakWireSeconds: 2.6
+  electricityPerDay: 50
+  repairCost: 50
+  autosaveDelaySeconds: 1

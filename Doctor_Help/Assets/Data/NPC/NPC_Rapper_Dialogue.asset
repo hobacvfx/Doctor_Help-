@@ -14,9 +14,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::DoctorHelp.NpcDialogueAsset
   content: 'Afternoon, doctor.
 
-    I feel off my rhythm today.
+    My head hurts.
 
-    I was counting
-    beats, but the seventh one put on my coat.
+    My speech keeps getting muddled.
 
-    I don''t know what started it.'
+    I cannot think of anything that would explain it.'

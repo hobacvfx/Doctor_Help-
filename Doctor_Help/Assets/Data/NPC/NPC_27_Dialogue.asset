@@ -12,4 +12,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9a19a6ecd4ed2114c9ccb631dd1f32f4, type: 3}
   m_Name: NPC_27_Dialogue
   m_EditorClassIdentifier: Assembly-CSharp::DoctorHelp.NpcDialogueAsset
-  content: "I'm the lamplighter. I've worked through worse nights than this.\nYet I can't get warm, and I couldn't find a pulse after climbing the ladder.\nThat frightened me more than the height did."
+  content: 'Hello, doctor.
+
+    I feel rather unwell today.
+
+    I thought you might be able to make sense of it.'
