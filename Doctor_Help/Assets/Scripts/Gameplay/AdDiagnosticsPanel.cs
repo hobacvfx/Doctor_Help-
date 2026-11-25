@@ -30,8 +30,8 @@ namespace DoctorHelp
             }
             if (panel.activeSelf && displayedRevision != AdDiagnosticLog.Revision) Refresh();
         }
-        private void Open() { panel.SetActive(true); feedback.text = "Copy includes the entire session log."; Refresh(); }
-        private void Close() => panel.SetActive(false);
+        private void Open() { PopupAnimation.Show(panel); feedback.text = "Copy includes the entire session log."; Refresh(); }
+        private void Close() => PopupAnimation.Hide(panel);
         private void Refresh()
         {
             displayedRevision = AdDiagnosticLog.Revision;

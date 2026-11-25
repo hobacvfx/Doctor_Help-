@@ -51,7 +51,16 @@ namespace DoctorHelp
             if (medicineGrid != null && !Mathf.Approximately(lastSide, CellSide())) Resize();
             FollowPatient();
         }
-        private float CellSide() => medicineGrid.cellSize.x * Mathf.Abs(medicineGrid.transform.lossyScale.x / content.lossyScale.x);
+        private float CellSide()
+        {
+            // PopupAnimation starts the shared parent at scale zero. Dividing its
+            // children's world scales then produces NaN and poisons the tray layout.
+            float scale = Mathf.Abs(content.lossyScale.x);
+            if (scale < .0001f) return lastSide > 0 ? lastSide : medicineGrid.cellSize.x;
+            float side = medicineGrid.cellSize.x * Mathf.Abs(medicineGrid.transform.lossyScale.x) / scale;
+            return float.IsNaN(side) || float.IsInfinity(side) || side <= 0
+                ? (lastSide > 0 ? lastSide : medicineGrid.cellSize.x) : side;
+        }
         private void Resize()
         {
             if (medicineGrid == null) return;
@@ -70,6 +79,9 @@ namespace DoctorHelp
             var patient = patients != null ? patients.CurrentPatient : null;
             if (patient == null || patient.Heart == null || patientCamera == null) return;
             var rect = (RectTransform)transform;
+            var parentScale = rect.parent.lossyScale;
+            // A collapsed popup also has no invertible screen-to-local transform.
+            if (Mathf.Abs(parentScale.x) < .0001f || Mathf.Abs(parentScale.y) < .0001f) return;
             var world = patient.Heart.position + (Vector3)chestOffset;
             if (patient.TreasureBody != null) world.x = patient.TreasureBody.bounds.center.x + chestOffset.x;
             Vector2 screen = patientCamera.WorldToScreenPoint(world);

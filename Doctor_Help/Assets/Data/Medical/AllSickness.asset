@@ -199,8 +199,8 @@ MonoBehaviour:
     ghostSpeedDiff3: 1.1
     ghostSpeedDiff4: 1.45
   - id: 420888271cbf4de8947e7ef841c5e315
-    displayName: Haunted
-    referenceDescription: There are ghosts haunts and flies around patient
+    displayName: Dirty
+    referenceDescription: Large flies circle around the patient.
     treatment: 2
     symptomIds:
     - 8439037532414cfe808eec0c66b75c5e

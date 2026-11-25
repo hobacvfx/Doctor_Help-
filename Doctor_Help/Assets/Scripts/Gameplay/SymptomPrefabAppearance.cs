@@ -14,6 +14,8 @@ namespace DoctorHelp
         {
             public string symptomId;
             public GameObject prefab;
+            [Tooltip("Optional shared set. Overrides the single prefab with equal-probability variants, chosen once per consultation.")]
+            public SymptomAnimationVariants variants;
             public Transform position;
         }
         [SerializeField] private Binding[] bindings;
@@ -21,6 +23,8 @@ namespace DoctorHelp
         private const float SharedAnchorDisplaySeconds = 1f;
         private Coroutine sharedAnchorCycle;
         private readonly List<XrayClueTarget> clueTargets = new List<XrayClueTarget>();
+        private readonly Dictionary<string, GameObject> consultationChoices = new Dictionary<string, GameObject>();
+        private string choicesConsultationId;
         internal void AppendClueTargets(List<XrayClueTarget> output) => output.AddRange(clueTargets);
 
         public void Initialize(NpcDefinition npc, AllSickness medicalData)
@@ -31,8 +35,10 @@ namespace DoctorHelp
             foreach (var binding in bindings)
                 if (binding == null || string.IsNullOrEmpty(binding.symptomId) ||
                     medicalData.SymptomProfile.Find(binding.symptomId) == null || !mapped.Add(binding.symptomId) ||
-                    binding.prefab == null || binding.position == null || !binding.position.IsChildOf(transform))
+                    (binding.variants == null && binding.prefab == null) || binding.position == null || !binding.position.IsChildOf(transform))
                     throw new InvalidOperationException("Each symptom mapping needs a unique valid symptom, prefab and child anchor.");
+            foreach (var binding in bindings)
+                if (binding.variants != null) binding.variants.Validate();
             var symptoms = new HashSet<string>();
             if (npc.HasSickness)
             {
@@ -45,13 +51,24 @@ namespace DoctorHelp
                 }
             }
             ClearSpawned();
+            var consultationId = GetComponent<PatientExaminationProfile>().ConsultationId;
+            if (string.IsNullOrEmpty(consultationId) || choicesConsultationId != consultationId)
+            {
+                consultationChoices.Clear();
+                choicesConsultationId = consultationId;
+            }
             try
             {
                 var byAnchor = new Dictionary<Transform, List<GameObject>>();
                 foreach (var binding in bindings)
                 {
                     if (!symptoms.Contains(binding.symptomId)) continue;
-                    var instance = Instantiate(binding.prefab, binding.position, false);
+                    if (!consultationChoices.TryGetValue(binding.symptomId, out var selected))
+                    {
+                        selected = binding.variants != null ? binding.variants.Pick() : binding.prefab;
+                        consultationChoices.Add(binding.symptomId, selected);
+                    }
+                    var instance = Instantiate(selected, binding.position, false);
                     spawned.Add(instance);
                     clueTargets.Add(new XrayClueTarget(binding.symptomId, instance));
                     instance.transform.localPosition = Vector3.zero;

@@ -31,7 +31,8 @@ namespace DoctorHelp
             item = definition;
             action = onAction;
             itemName.text = item.DisplayName;
-            description.text = item.Description;
+            description.text = item.IsGenerator
+                ? $"+{item.GeneratedElectricityPerDay} energy/day\n{item.Description}" : item.Description;
             icon.sprite = item.Icon;
             icon.enabled = item.Icon != null;
             poster.sprite = item.Poster;

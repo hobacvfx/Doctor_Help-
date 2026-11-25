@@ -27,7 +27,7 @@ namespace DoctorHelp
             errorText.text = "";
             okayButton.onClick.AddListener(Confirm);
             nameInput.onValueChanged.AddListener(ClearError);
-            gameObject.SetActive(true);
+            PopupAnimation.Show(gameObject);
             ScreenSafeArea.ApplyTo(safeArea);
             try
             {
@@ -41,7 +41,7 @@ namespace DoctorHelp
                     okayButton.onClick.RemoveListener(Confirm);
                     nameInput.onValueChanged.RemoveListener(ClearError);
                     nameInput.DeactivateInputField();
-                    gameObject.SetActive(false);
+                    await PopupAnimation.HideAsync(gameObject);
                 }
             }
         }

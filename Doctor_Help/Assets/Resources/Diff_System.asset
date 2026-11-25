@@ -12,20 +12,20 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 268e868a06074901887f4f508281bcf6, type: 3}
   m_Name: Diff_System
   m_EditorClassIdentifier: Assembly-CSharp::DoctorHelp.DifficultyProfile
-  successStreak: 3
+  successStreak: 2
   progress1:
     diff2: 0
     diff3: 0
     diff4: 0
   progress2:
-    diff2: 30
+    diff2: 50
     diff3: 0
     diff4: 0
   progress3:
-    diff2: 40
-    diff3: 25
+    diff2: 50
+    diff3: 30
     diff4: 0
   progress4:
-    diff2: 20
-    diff3: 30
-    diff4: 20
+    diff2: 35
+    diff3: 35
+    diff4: 30

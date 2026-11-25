@@ -15,7 +15,7 @@ namespace DoctorHelp.Editor
             EditorGUILayout.PropertyField(serializedObject.FindProperty("testNpcSmellyBleed"),
                 new GUIContent("Test NPC smelly/bleed"));
             EditorGUILayout.PropertyField(serializedObject.FindProperty("hauntedTest"),
-                new GUIContent("Haunted test", "Adds Haunted on arrival when the patient has room for another disease."));
+                new GUIContent("Dirty test", "Adds Dirty on arrival when the patient has room for another disease."));
             serializedObject.ApplyModifiedProperties();
             int money = EditorGUILayout.IntField("Player Money", profile.Money);
             if (money != profile.Money) profile.SetMoney(money);

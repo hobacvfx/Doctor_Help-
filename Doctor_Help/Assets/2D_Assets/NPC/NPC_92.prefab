@@ -287,7 +287,7 @@ SpriteRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 9dfc825aed78fcd4ba02077103263b40, type: 2}
+  - {fileID: 2100000, guid: 08c0bb80f12f23d44a723304c1d935d3, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -310,7 +310,7 @@ SpriteRenderer:
   m_SortingLayer: 0
   m_SortingOrder: -10
   m_MaskInteraction: 0
-  m_Sprite: {fileID: 21300000, guid: e700e586e4817dd408913a414a9aa26c, type: 3}
+  m_Sprite: {fileID: 21300000, guid: 57bd865ac848da14daa29bb15dc48ba4, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
@@ -1760,6 +1760,7 @@ GameObject:
   - component: {fileID: 8546781498786291280}
   - component: {fileID: 4035777494667938796}
   - component: {fileID: 3357943126158622694}
+  - component: {fileID: 4104903218094034273}
   m_Layer: 0
   m_Name: NPC_92
   m_TagString: Untagged
@@ -1841,7 +1842,10 @@ MonoBehaviour:
   npcId: 
   hasConsultationTemperature: 0
   consultationTemperature: 0
+  hasConsultationHeartbeat: 0
+  consultationHeartbeat: 0
   consultationId: 
+  stagedMedicineIds: []
 --- !u!114 &2791416406553146099
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1922,15 +1926,19 @@ MonoBehaviour:
   bindings:
   - symptomId: e40ba4b660b94711a7935deae8b2602c
     prefab: {fileID: 6032930250343531119, guid: d62cb85a456e0ff4bbcef76dc7eb6cd3, type: 3}
+    variants: {fileID: 11400000, guid: b91b2fb432f246138a2152ca6cd6eb49, type: 2}
     position: {fileID: 7637610960121706633}
   - symptomId: d0b701a64ef14b1b891b7163abb92c71
     prefab: {fileID: 6032930250343531119, guid: 80af53a18fde61e488ff0c040af43099, type: 3}
+    variants: {fileID: 11400000, guid: 265721547dc047319f68d5aa1b2f1f51, type: 2}
     position: {fileID: 2933873619427774836}
   - symptomId: 0856d09d9e1a480ea6b6e272e92cff3b
     prefab: {fileID: 6032930250343531119, guid: ad8f472ba7a5e03428740b8cc7ecb05b, type: 3}
+    variants: {fileID: 11400000, guid: 985556b08eb14713a13b97d6737cb6d3, type: 2}
     position: {fileID: 2933873619427774836}
   - symptomId: 22e04f4290ee46c9b4bacad833c5b7d3
     prefab: {fileID: 6032930250343531119, guid: fd8bad8b45e98c2479655bfa01edc460, type: 3}
+    variants: {fileID: 11400000, guid: 0454ae90af984e80bf111451d6a8fa27, type: 2}
     position: {fileID: 2933873619427774836}
   spawned: []
 --- !u!114 &4035777494667938796
@@ -1952,8 +1960,8 @@ MonoBehaviour:
   lips: {fileID: 3357943126158622694}
   charactersPerSecond: 30
   ambientHoldSeconds: 5
+  medicineThanks: Thank you!
   fitInViewport: 1
-  maximumViewportWidth: 0.38
   screenPadding: 16
 --- !u!114 &3357943126158622694
 MonoBehaviour:
@@ -1982,6 +1990,21 @@ MonoBehaviour:
   - {fileID: 21300000, guid: bb56210ba296f8141b3d8b4593788fe7, type: 3}
   - {fileID: 21300000, guid: 770e8ad1844748f4bb0f59ac30b3b940, type: 3}
   framesPerSecond: 10
+--- !u!114 &4104903218094034273
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8701766909000273175}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d745c88430a565f4c8649d53d99122b8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::DoctorHelp.DirtyPatientAppearance
+  smellyPrefab: {fileID: 3342197913089542085, guid: 1f5c105b8119e014db46d8b17a503287, type: 3}
+  effectParent: {fileID: 1288797091239358197}
+  localOffset: {x: 0, y: 0, z: 0}
 --- !u!1 &8793208775290799907
 GameObject:
   m_ObjectHideFlags: 0

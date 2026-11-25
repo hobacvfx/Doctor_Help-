@@ -13,6 +13,8 @@ namespace DoctorHelp
         [SerializeField] private RectTransform content;
         [SerializeField, Min(0)] private float contentPaddingHeight = 210;
         [SerializeField, Min(0)] private float minimumHeight = 420;
+        [Tooltip("Optional fixed width/height ratio. Zero keeps the existing independent size limits.")]
+        [SerializeField, Min(0)] private float aspectRatio;
         private void OnEnable() => Fit();
         private void LateUpdate() => Fit();
         private void Fit()
@@ -26,6 +28,11 @@ namespace DoctorHelp
                 : maximumSize.y;
             var size = new Vector2(Mathf.Min(maximumSize.x, Mathf.Max(0, parent.rect.width - 2 * padding)),
                 Mathf.Min(desiredHeight, Mathf.Min(maximumSize.y, Mathf.Max(0, parent.rect.height - 2 * padding))));
+            if (aspectRatio > 0)
+            {
+                size.x = Mathf.Min(size.x, size.y * aspectRatio);
+                size.y = size.x / aspectRatio;
+            }
             if (rect.sizeDelta != size) rect.sizeDelta = size;
         }
     }

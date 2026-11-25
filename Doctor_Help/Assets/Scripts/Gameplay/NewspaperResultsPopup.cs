@@ -63,6 +63,9 @@ namespace DoctorHelp
                 bool animate = showSettlement && showPatients;
                 article.text = result == null ? morningArticle : !showPatients ? emptyDayArticle :
                     result.IsSuccess ? successArticleContent : articleContent;
+                // Patient reports use this space for the expanded results list. Keep the
+                // morning/empty-day message for reports that have no patient list.
+                article.gameObject.SetActive(!showPatients);
                 ShowFeedback(showPatients && result.HasDirtyClinicFeedback, showPatients && result.HasColdClinicFeedback,
                     showPatients && result.ClientLimitReached);
                 list.gameObject.SetActive(showPatients);
@@ -75,7 +78,7 @@ namespace DoctorHelp
                         row.Bind(patient, portraits, list.viewport, animate);
                     }
                 }
-                gameObject.SetActive(true);
+                PopupAnimation.Show(gameObject);
                 settlement.Configure(result, showSettlement);
                 continueButton.interactable = !animate;
                 continueButton.onClick.AddListener(Continue);
@@ -96,9 +99,9 @@ namespace DoctorHelp
             finally
             {
                 if (continueButton != null) continueButton.onClick.RemoveListener(Continue);
-                dismissal = null;
                 presentation = null;
-                if (this != null) { gameObject.SetActive(false); ClearRows(); }
+                if (this != null) { await PopupAnimation.HideAsync(gameObject); ClearRows(); }
+                dismissal = null;
             }
         }
         private void Continue()

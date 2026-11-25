@@ -10,6 +10,21 @@
 - **UI popup kẹp tài liệu (duyệt 2026-11-21):** `Assets/Art/UI/ClinicClipboard/CleanClipboardAtlas.png` — giấy kem sạch, nguyên vẹn, khung gỗ gọn và kẹp đồng; nét rõ theo chất lượng popup thưởng Dart nhưng không có họa tiết hội chợ. Ảnh triệu chứng cũ giữ tại `Assets/Art/UI/DoctorBook/Symptoms/`. Khung, hình và chữ UI tách riêng; không dùng lại giấy rách/nát cho hai popup này.
 - Bộ NPC AI trong `Design/Characters/PublicDomain/`, `PencilRevision/`, `Dracula/` là lịch sử, không phải chuẩn chất lượng. Không lấy chúng để sửa lại khi người dùng yêu cầu vẽ mới.
 
+## Shop và nâng cấp — 2026-11-24
+
+- Các popup shop/nâng cấp và kho dùng bộ `CleanClipboardAtlas.png`: `ClipboardPanel` làm khung gỗ + nền giấy kem sạch, `BrassClip` làm kẹp đồng riêng, `PaperSlot` làm thẻ hàng, khung ảnh, nhãn tiêu đề và nhãn thông tin bên trong. Các Image khung dùng Sliced; ảnh vật phẩm/portrait và chữ là lớp riêng.
+- Tiêu đề và thông tin trên nền giấy dùng mực nâu đậm; nút hành động tiếp tục dùng khung nút thống nhất bên dưới. Bố cục và các tham chiếu mua/equip/upgrade giữ trong prefab/scene.
+- Áp dụng cho ClinicShops (biển hiệu, lễ tân, nhân viên lễ tân, thang máy, vật phẩm, kho), ShopPopup/InventoryPopup/MedicineRow, BasementProtectionPopup/BasementPlantShopPopup/BasementPlantCard.
+- Mô tả và chữ nội dung trong các shop dùng font thật `OldStandardTT-Bold`, giữ mực nâu đậm; không dùng lại bản Regular mảnh. GeneratorUpgradeShop là Canvas độc lập nên có CanvasScaler 540×960, match width như HUD. Thẻ riêng GeneratorShopRow có preferred height 300 / minimum 280; tên 26, mô tả 22 và nút 24 reference units, không auto-shrink chữ. Kiểm tra ở chiều ngang 360 và 720 để tránh thẻ/chữ quá nhỏ trên mobile.
+
+## Khung nút popup thống nhất — 2026-11-23
+
+- Mọi nút hành động trong popup dùng chung sprite `Assets/2D_Assets/DartMinigame/Button_Confirm.png` (khung đồng, nền vải xanh). Sprite được crop bằng rect import sát vùng alpha và có border 9-slice trái/phải 60 px, dưới/trên 56 px; Image dùng Sliced. Chữ/icon nằm riêng trên khung.
+- Prefab mẫu để tái sử dụng: `Assets/Resources/UI/PopupActionButton.prefab`. `PopupButtonFrame` tự điều chỉnh Pixels Per Unit Multiplier theo chiều cao RectTransform để giữ hai đầu tròn và tán đinh đồng đúng tỷ lệ khi co kéo.
+- Các hành động No/Reset/Decline dùng cùng sprite với material `Assets/Art/UI/SharedButtons/PopupButtonRed.mat`: chỉ đổi màu vải sang đỏ, giữ màu đồng của viền. Trạng thái khóa làm mờ bằng Color Tint, cùng khung.
+- Nút đóng có dấu × riêng; nút thêm/đổi có ký hiệu +/↔ riêng. Các ô thuốc, vùng nhận thuốc và vùng bấm ngoài popup tiếp tục là slot/vùng tương tác riêng theo thiết kế của chúng.
+- Công cụ áp dụng lại cho prefab có sẵn: Tools → Doctor Help → UI → Apply Shared Popup Button Frame (`PopupButtonStyleEditor.cs`). Layout, nội dung và listener thuộc prefab/scene đang dùng.
+
 ## Nét vẽ và màu
 
 - 2D cartoon hơi spooky, gợi Tim Burton; London thời Victoria trong thế giới giả tưởng. Hình rõ, hơi lệch tự nhiên, không kinh dị tả thực.
@@ -33,6 +48,10 @@
 - Lưu các part thành nested prefab, khóa các slot ngoại hình đã author. Không đổi GUID, danh tính, bệnh hoặc hội thoại của bản ghi NPC cũ để thay art.
 
 ## Thuốc, triệu chứng và UI
+
+- Popup báo cảnh sát theo concept `Design/UI/PoliceReport/PoliceReport_Concept_v1.png`: cảnh sát Victoria cầm dùi cui, quay phải; thẻ Zombie bên trái, Vampire bên phải có hai răng nanh rõ. Hình là minh họa UI riêng, không thay các part NPC. Giữ khung gỗ/giấy kem, nút xanh dùng sprite chung; tên, tick, viền chọn và khung tách khỏi portrait. Ảnh production tại `Assets/Art/UI/PoliceReport`, alpha thật, ASTC 6x6 cho mobile.
+
+- Báo cuối ngày: giấy ivory sạch, viền in đôi mảnh, minh họa London dạng khắc sepia tách khỏi giấy; chữ thật dùng OldStandardTT-Bold để có độ dày gần concept `Design/UI/NewspaperClean/Newspaper_Results_Concept_v1.png`. Danh sách bệnh nhân giữ portrait và thông tin gameplay hiện có; khung gỗ/brass nền vàng dành riêng cho TOTAL EARN. Không bake chữ, số tiền, nút hoặc portrait vào nền báo. Báo có bệnh nhân bỏ đoạn dẫn truyện theo yêu cầu người dùng.
 
 - Thuốc là lọ/chai/hộp/sách/ống tiêm thông thường phù hợp thời Victoria; tránh bình phép, sinh vật fantasy hoặc phụ kiện kỳ ảo không được yêu cầu. Đa dạng dáng lọ, nắp, nhãn, màu chất thuốc và cách đóng gói.
 - Minh họa triệu chứng chỉ dành cho triệu chứng có biểu hiện hình ảnh trong gameplay. Buồn nôn, đau đầu, khó thở và phép đo đi vào mô tả chữ, không tự thêm icon. Minh họa có cùng ý nghĩa nhưng không chép y hệt sprite triệu chứng trong game.

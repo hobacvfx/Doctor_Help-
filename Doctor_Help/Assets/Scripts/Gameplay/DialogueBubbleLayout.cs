@@ -137,7 +137,7 @@ namespace DoctorHelp
         // The last Sample pose becomes a pop multiplier around the tail.
         // rightLimit keeps the whole bubble left of this screen x, so it never covers the speaker's face.
         internal bool Apply(Camera camera, Vector3 anchor, DialogueTextSize size,
-            float rightLimit = float.PositiveInfinity, float screenPadding = 0f)
+            float rightLimit = float.PositiveInfinity, float screenPadding = 0f, float maximumWidthPixels = float.PositiveInfinity)
         {
             if (!hasOpenedPose) return false;
             var style = DialogueTextStyle.Current;
@@ -158,6 +158,7 @@ namespace DoctorHelp
                 widthPixels = Mathf.Min(widthPixels, rightLimit - (safe.xMin + screenPadding));
             // Below a few words per line, wrapping stops helping; let the safe-area clamp handle the rest.
             widthPixels = Mathf.Max(widthPixels, linePixels * (style.MinimumTextWidthInLines + 2f));
+            widthPixels = Mathf.Min(widthPixels, maximumWidthPixels);
 
             if (dirty || Changed(targetScale, scale) || Changed(widthPixels, maximumWidth))
             {

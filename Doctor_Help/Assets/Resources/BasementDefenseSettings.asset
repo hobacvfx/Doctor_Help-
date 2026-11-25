@@ -19,6 +19,5 @@ MonoBehaviour:
   plantCooldownSeconds: 30
   wireBreakSeconds: 1.28
   breakWireSeconds: 2.6
-  electricityPerDay: 50
   repairCost: 50
   autosaveDelaySeconds: 1

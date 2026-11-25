@@ -24,11 +24,11 @@ namespace DoctorHelp
             }
             var loop = FindFirstObjectByType<DailyGameLoop>();
             if (inventoryPopup != null && ClinicShopPopup.CanInteract(loop))
-                inventoryPopup.SetActive(true);
+                PopupAnimation.Show(inventoryPopup);
         }
         public void Close()
         {
-            if (inventoryPopup != null) inventoryPopup.SetActive(false);
+            if (inventoryPopup != null) PopupAnimation.Hide(inventoryPopup);
             if (shopInventory != null) shopInventory.Close();
         }
         private void OnDestroy()

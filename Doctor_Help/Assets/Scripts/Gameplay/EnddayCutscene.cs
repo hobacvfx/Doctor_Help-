@@ -3,7 +3,6 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
-using TMPro;
 using UnityEngine;
 using UnityEngine.Rendering;
 using Random = UnityEngine.Random;
@@ -55,6 +54,8 @@ namespace DoctorHelp
         [SerializeField] private int characterSortingOrder = 5;
         [Tooltip("Speech bubbles draw above every character sprite and the foreground.")]
         [SerializeField] private int bubbleSortingOrder = 40;
+        [Tooltip("Raise player and patient speech bubbles above their heads, in world units.")]
+        [SerializeField, Min(0f)] private float dialogueLift = 3f;
 
         [Header("Death")]
         [SerializeField] private GameObject eyeHurt;
@@ -62,6 +63,9 @@ namespace DoctorHelp
         [SerializeField] private GameObject eyeDie;
         [SerializeField] private GameObject mouthDie;
         [SerializeField, Min(0f)] private float hurtFaceSeconds = .5f;
+        [SerializeField] private Color dyingSkinColor = new Color(.64f, .66f, .84f, 1f);
+        [SerializeField, Min(0f)] private float dyingSkinSeconds = 1f;
+        [SerializeField] private ParticleSystem angryEffect;
         [Tooltip("Keep the medicine hand visible while dying (it shows only while drinking otherwise).")]
         [SerializeField] private bool keepHandWhileDying;
         [SerializeField, Min(0f)] private float ghostDelay = .5f;
@@ -72,10 +76,10 @@ namespace DoctorHelp
         [SerializeField, Min(.5f)] private float ghostSpacing = 2.9f;
         [SerializeField, Min(0f)] private float ghostEnterInterval = .7f;
 
-        [Header("Heart icon after the thanks")]
-        [SerializeField] private Sprite heartIcon;
-        [Tooltip("Icon height relative to the text line.")]
-        [SerializeField, Min(.1f)] private float heartScale = 1.1f;
+        [Header("Happy patients")]
+        [SerializeField] private GameObject eyeHappy;
+        [SerializeField] private GameObject mouthHappy;
+        [SerializeField] private ParticleSystem happyEffect;
 
         [Header("Timing")]
         [SerializeField, Min(0f)] private float textFadeSeconds = 1f;
@@ -99,17 +103,22 @@ namespace DoctorHelp
         [SerializeField] private string ghostLeaderEnd = "Let's go to his place!";
 
         private readonly List<GameObject> spawned = new List<GameObject>();
+        private readonly List<Material> skinMaterials = new List<Material>();
         private Dictionary<string, GameObject> worldByName;
         private bool playing;
 
         public bool IsConfigured => sceneCamera != null && blackCover != null && laterThatNightText != null &&
             playerStart != null && playerStop != null && patientSpots != null && patientSpots.Length > 0 &&
-            patientSpots[0] != null && ghostDoor != null && player != null && playerDialogue != null && ghostPrefab != null;
+            patientSpots[0] != null && ghostDoor != null && player != null && playerDialogue != null && ghostPrefab != null &&
+            eyeHappy != null && mouthHappy != null && happyEffect != null && angryEffect != null;
 
         private void Awake()
         {
             foreach (var target in hideDuringCutscene)
                 if (target != null) target.SetActive(false);
+            // The cutscene room is always fully lit: no electricity dimming/flicker and no power warning.
+            foreach (var lights in FindObjectsByType<HomePowerLights>(FindObjectsInactive.Include, FindObjectsSortMode.None))
+                if (lights.gameObject.scene == gameObject.scene) lights.IgnoreElectricity();
             SetCover(1f);
             if (laterThatNightText != null) { laterThatNightText.alpha = 0f; laterThatNightText.gameObject.SetActive(false); }
             if (player != null && player.TryGetComponent<Rigidbody2D>(out var body)) body.simulated = false;
@@ -224,7 +233,7 @@ namespace DoctorHelp
             yield return MoveX(player.transform, playerStop.position.x, playerSpeed);
             yield return null; // Let the run cycle settle to Idle.
 
-            playerDialogue.SpeakFor(Wrap(playerQuestion), lineHoldSeconds);
+            playerDialogue.SpeakFor(Wrap(playerQuestion), lineHoldSeconds, worldLift: dialogueLift);
             yield return WaitWhile(() => playerDialogue.IsShowing);
 
             if (patients.Count > 0)
@@ -234,12 +243,12 @@ namespace DoctorHelp
                 {
                     // The speaker (and its bubble) draws over the other patient.
                     if (speaker.TryGetComponent<SortingGroup>(out var front)) front.sortingOrder = characterSortingOrder + 2;
-                    // Non-breaking spaces leave room for the heart at the end of the last line.
-                    speaker.SpeakFor(Wrap(patientThanks) + "\u00A0\u00A0\u00A0\u00A0", lineHoldSeconds);
+                    SetFace(speaker.gameObject, eyeHappy, mouthHappy);
+                    speaker.SpeakFor(Wrap(patientThanks), lineHoldSeconds, animateMouth: false, worldLift: dialogueLift);
                     yield return WaitWhile(() => speaker.IsShowing && !speaker.IsHolding);
-                    var heart = speaker.IsShowing ? ShowHeart(speaker.Text) : null;
+                    if (speaker.IsHolding)
+                        foreach (var patient in patients) ShowHappy(patient);
                     yield return WaitWhile(() => speaker.IsShowing);
-                    if (heart != null) Destroy(heart);
                 }
             }
             yield return Fade(0f, 1f, fadeOutSeconds);
@@ -263,8 +272,7 @@ namespace DoctorHelp
             int extra = Mathf.Min(dead.Count - 1, maxExtraGhosts);
             if (extra <= 0)
             {
-                leader.Say(Wrap(ghostAlone), lineHoldSeconds);
-                yield return WaitWhile(() => leader.IsSpeaking);
+                yield return SayAngry(leader, ghostAlone);
                 yield return MoveX(leader.transform, OffscreenX(), ghostSpeed);
             }
             else
@@ -286,13 +294,10 @@ namespace DoctorHelp
                 }
                 foreach (var arrival in arrivals) yield return arrival;
 
-                leader.Say(Wrap(ghostLeader), lineHoldSeconds);
-                yield return WaitWhile(() => leader.IsSpeaking);
+                yield return SayAngry(leader, ghostLeader);
                 var other = ghosts[Random.Range(1, ghosts.Count)];
-                other.Say(Wrap(ghostReply), lineHoldSeconds);
-                yield return WaitWhile(() => other.IsSpeaking);
-                leader.Say(Wrap(ghostLeaderEnd), lineHoldSeconds);
-                yield return WaitWhile(() => leader.IsSpeaking);
+                yield return SayAngry(other, ghostReply);
+                yield return SayAngry(leader, ghostLeaderEnd);
 
                 // The leader goes first, the others follow one after another.
                 var exits = new List<Coroutine>();
@@ -312,7 +317,7 @@ namespace DoctorHelp
         private IEnumerator DrinkAndDie(GameObject victim)
         {
             var animator = victim.GetComponentInChildren<Animator>();
-            var hand = victim.transform.Find("All/Hand");
+            var hand = animator != null ? animator.transform.Find("Hand") : null;
             if (animator == null) yield break;
             if (hand != null) hand.gameObject.SetActive(true);
             yield return PlayOnce(animator, DrinkState);
@@ -321,15 +326,43 @@ namespace DoctorHelp
             animator.Play(DieState, 0, 0f);
             yield return null;
             SetFace(victim, eyeHurt, mouthHurt);
+            var skin = new List<Material>();
+            var skinColors = new List<Color>();
+            foreach (var sprite in victim.GetComponentsInChildren<SpriteRenderer>(true))
+                if (sprite.name == "Head" || sprite.name == "Neck")
+                {
+                    if (sprite.sharedMaterial == null || !sprite.sharedMaterial.HasProperty("_Color")) continue;
+                    // The skin shader uses material color. Give each part its own
+                    // instance so the corpse tint cannot affect other patients.
+                    var material = new Material(sprite.sharedMaterial);
+                    sprite.sharedMaterial = material;
+                    skinMaterials.Add(material);
+                    skin.Add(material);
+                    skinColors.Add(material.color);
+                }
             float length = StateLength(animator, DieState);
             float elapsed = 0f;
             bool dying = false;
             // Stop just before the end: a looping clip would wrap back to its first frame at 1.0.
-            while (elapsed < length - .03f)
+            while (elapsed < Mathf.Max(length - .03f, dyingSkinSeconds))
             {
                 if (!dying && elapsed >= hurtFaceSeconds) { SetFace(victim, eyeDie, mouthDie); dying = true; }
+                for (int i = 0; i < skin.Count; i++)
+                {
+                    var target = dyingSkinColor;
+                    target.a = skinColors[i].a;
+                    skin[i].color = Color.Lerp(skinColors[i], target,
+                        dyingSkinSeconds > 0f ? Mathf.Clamp01(elapsed / dyingSkinSeconds) : 1f);
+                }
+                if (elapsed >= length - .03f) animator.speed = 0f;
                 yield return null;
                 elapsed += Time.deltaTime;
+            }
+            for (int i = 0; i < skin.Count; i++)
+            {
+                var target = dyingSkinColor;
+                target.a = skinColors[i].a;
+                skin[i].color = target;
             }
             if (!dying) SetFace(victim, eyeDie, mouthDie);
             // Hold the last frame (lying on the floor).
@@ -376,10 +409,12 @@ namespace DoctorHelp
                 animator.Play(IdleState, 0, Random.value);
                 if (patientsFaceRight)
                 {
-                    var art = animator.transform;
-                    var scale = art.localScale;
-                    scale.x = -Mathf.Abs(scale.x);
-                    art.localScale = scale;
+                    // Idle keys the animator root's scale every frame. Mirror a
+                    // separate parent so animation cannot turn the patient back.
+                    var facing = new GameObject("Cutscene Facing").transform;
+                    facing.SetParent(animator.transform.parent, false);
+                    animator.transform.SetParent(facing, false);
+                    facing.localScale = new Vector3(-1f, 1f, 1f);
                 }
             }
             return npc;
@@ -443,36 +478,45 @@ namespace DoctorHelp
             }
         }
 
-        // Heart sprite just after the last typed character, inside the space left at the end of the line.
-        private GameObject ShowHeart(TMP_Text text)
+        private void ShowHappy(GameObject patient)
         {
-            if (heartIcon == null || text == null) return null;
-            text.ForceMeshUpdate();
-            var info = text.textInfo;
-            int last = -1;
-            for (int i = info.characterCount - 1; i >= 0; i--)
-                if (info.characterInfo[i].isVisible) { last = i; break; }
-            if (last < 0) return null;
-            var character = info.characterInfo[last];
-            var line = info.lineInfo[character.lineNumber];
-            float height = (line.ascender - line.descender) * heartScale;
-            var heart = new GameObject("Heart Icon");
-            heart.transform.SetParent(text.transform, false);
-            var renderer = heart.AddComponent<SpriteRenderer>();
-            renderer.sprite = heartIcon;
-            float spriteHeight = Mathf.Max(.0001f, heartIcon.bounds.size.y);
-            float scale = height / spriteHeight;
-            heart.transform.localScale = new Vector3(scale, scale, 1f);
-            float x = character.topRight.x + height * .15f + heartIcon.bounds.size.x * scale * .5f;
-            float y = (line.ascender + line.descender) * .5f;
-            heart.transform.localPosition = new Vector3(x - heartIcon.bounds.center.x * scale, y - heartIcon.bounds.center.y * scale, 0f);
-            if (text.TryGetComponent<Renderer>(out var textRenderer))
+            if (happyEffect == null || patient == null) return;
+            var profile = patient.GetComponent<PatientExaminationProfile>();
+            var position = profile != null && profile.Heart != null ? profile.Heart.position : patient.transform.position;
+            PlayEmotion(happyEffect, position, transform);
+        }
+
+        private IEnumerator SayAngry(GhostDialogue ghost, string line)
+        {
+            ghost.Say(Wrap(line), lineHoldSeconds);
+            if (ghost.IsSpeaking)
             {
-                renderer.sortingLayerID = textRenderer.sortingLayerID;
-                renderer.sortingOrder = textRenderer.sortingOrder + 1;
+                // Use the visible body, excluding the speech bubble and any earlier effects.
+                var body = ghost.GetComponent<SpriteRenderer>();
+                if (body == null)
+                    foreach (var sprite in ghost.GetComponentsInChildren<SpriteRenderer>())
+                        if (ghost.ChatBox == null || !sprite.transform.IsChildOf(ghost.ChatBox.transform))
+                        { body = sprite; break; }
+                PlayEmotion(angryEffect, body != null ? body.bounds.center : ghost.transform.position, ghost.transform);
             }
-            spawned.Add(heart);
-            return heart;
+            yield return WaitWhile(() => ghost.IsSpeaking);
+        }
+
+        private void PlayEmotion(ParticleSystem prefab, Vector3 position, Transform parent)
+        {
+            if (prefab == null) return;
+            var effect = Instantiate(prefab, position, prefab.transform.rotation, transform);
+            effect.transform.SetParent(parent, true);
+            spawned.Add(effect.gameObject);
+            foreach (var system in effect.GetComponentsInChildren<ParticleSystem>(true))
+            {
+                var main = system.main;
+                main.loop = false;
+                main.ringBufferMode = ParticleSystemRingBufferMode.Disabled;
+            }
+            foreach (var renderer in effect.GetComponentsInChildren<ParticleSystemRenderer>(true))
+                renderer.sortingOrder = Mathf.Max(renderer.sortingOrder, characterSortingOrder + 3);
+            effect.Play(true);
         }
 
         // ---------------- Helpers ----------------
@@ -482,7 +526,7 @@ namespace DoctorHelp
         {
             if (string.IsNullOrEmpty(text)) return text;
             var result = new System.Text.StringBuilder();
-            var lines = text.Replace("\r\n", "\n").Split('\n');
+            var lines = text.Replace("\r\n", "\n").Replace('\r', '\n').Split('\n');
             for (int i = 0; i < lines.Length; i++)
             {
                 if (i > 0) result.Append('\n');
@@ -500,10 +544,10 @@ namespace DoctorHelp
                 if (middle + offset < line.Length && line[middle + offset] == ' ') { split = middle + offset; break; }
                 if (middle - offset > 0 && line[middle - offset] == ' ') { split = middle - offset; break; }
             }
-            if (split <= 0) { result.Append(line); return; }
+            if (split <= 0) split = maxCharactersPerLine;
             AppendWrapped(result, line.Substring(0, split).TrimEnd());
             result.Append('\n');
-            AppendWrapped(result, line.Substring(split + 1).TrimStart());
+            AppendWrapped(result, line.Substring(split + (line[split] == ' ' ? 1 : 0)).TrimStart());
         }
 
         private IEnumerator Narration()
@@ -581,11 +625,15 @@ namespace DoctorHelp
         {
             foreach (var go in spawned) if (go != null) Destroy(go);
             spawned.Clear();
+            foreach (var material in skinMaterials) if (material != null) Destroy(material);
+            skinMaterials.Clear();
         }
 
         private void OnDisable()
         {
             playing = false;
         }
+
+        private void OnDestroy() => Cleanup();
     }
 }

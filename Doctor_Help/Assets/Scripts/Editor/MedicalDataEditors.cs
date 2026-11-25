@@ -191,7 +191,7 @@ namespace DoctorHelp.Editor
                     {
                         for (int diff = 1; diff <= 4; diff++)
                             EditorGUILayout.PropertyField(entry.FindPropertyRelative("ghostSpeedDiff" + diff),
-                                new GUIContent($"Ghost speed · Diff {diff}", "Orbit cycles per second."));
+                                new GUIContent($"Fly speed · Diff {diff}", "Orbit cycles per second."));
                     }
                     if (treatment == SicknessTreatment.RequiredPills || pillIds.arraySize > 0)
                         MedicalDataInspector.References(pillIds, pills != null ? pills.Pills : null, "Pill");

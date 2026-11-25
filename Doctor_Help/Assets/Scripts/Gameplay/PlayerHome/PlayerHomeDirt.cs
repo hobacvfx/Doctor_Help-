@@ -139,6 +139,16 @@ namespace DoctorHelp
             return true;
         }
 
+        internal bool TryGetStainFocusPosition(ClinicWallStain stain, out Vector3 position)
+        {
+            position = default;
+            if (stain == null || !decals.TryGetValue(stain, out var decal) || decal == null) return false;
+            var visual = decal.GetComponentInChildren<SpriteRenderer>();
+            if (visual == null || !visual.enabled || !visual.gameObject.activeInHierarchy) return false;
+            position = visual.bounds.center;
+            return true;
+        }
+
         internal ClinicWallStain FindVisibleStain(Camera camera, int floor, float playerX)
         {
             ClinicWallStain nearest = null;

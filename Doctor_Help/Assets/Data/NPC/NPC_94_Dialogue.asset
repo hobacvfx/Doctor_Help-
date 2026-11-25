@@ -14,6 +14,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::DoctorHelp.NpcDialogueAsset
   content: 'Evening, doctor.
 
-    My speech keeps getting muddled and there are ghosts around me even here.
+    The moon follows me home every night. I think it wants my umbrella.
+
+    There are flies around me even here.
 
     Perhaps I spent too long awake waiting for it to go.'

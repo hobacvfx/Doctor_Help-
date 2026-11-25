@@ -53,9 +53,9 @@ namespace DoctorHelp
             // Every examined patient leaves the doctor half a point dirtier for the next day.
             nextDay.dirt = Math.Min(PlayerProfileData.MaxDirt,
                 nextDay.dirt + patientsExamined * PlayerProfileData.DirtPerPatient);
-            // The day's furniture electricity is paid, and the basement generator's output for the day added,
-            // when the next day starts. The balance never goes below zero.
-            nextDay.electricity = Math.Max(0, checked(nextDay.electricity + electricityProduced) - electricityUsed);
+            // Add generation BEFORE paying consumption; clamp only the final balance, so power can run out.
+            long electricityBalance = (long)nextDay.electricity + electricityProduced - electricityUsed;
+            nextDay.electricity = (int)Math.Min(int.MaxValue, Math.Max(0L, electricityBalance));
             DifficultyProfile.Advance(nextDay, incorrectPatients, hadConsultations, requiredStreakDays);
             nextDay.clinicDirtDays.RemoveAll(entry => entry.IsExpiredOn(nextDay.currentDay));
             nextDay.ghostNumber = checked(nextDay.ghostNumber + incorrectPatients);

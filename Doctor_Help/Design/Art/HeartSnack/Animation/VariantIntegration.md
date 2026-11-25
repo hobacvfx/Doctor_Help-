@@ -1,0 +1,9 @@
+# Heart symptom variants
+
+`Assets/Data/Medical/HeartAnimationVariants.asset` contains the original `Tim.prefab` (elderly heart) and `Heart_Snacking.prefab`, each with **50% probability per consultation**. All 118 NPC prefabs, including NPC_0 for future generation, reference this shared set on the existing Heart Abnormality binding. Their authored heart anchor, renderer materials, scales, disease IDs and dialogue are preserved.
+
+`SymptomAnimationVariants` is reusable for any symptom: create it through **Assets → Create → Doctor Help → Medical → Symptom Animation Variants**, add unique non-null prefabs, then assign it in that symptom's **Animation variants** field on `SymptomPrefabAppearance`. N entries automatically receive probability 1/N. The set overrides the old single-prefab field; a mapping without a set retains its single-prefab behavior. Empty, missing or duplicate entries are configuration errors rather than silently weighted alternatives.
+
+The chosen prefab is cached by `PatientExaminationProfile.ConsultationId` and symptom ID. Switching tools, hiding/revealing X-ray or rebuilding appearance during the same consultation does not choose again. A new consultation clears the choices. Only one variant is instantiated for each present symptom. Different symptoms sharing an anchor still alternate every second; separate anchors continue to display independently, with their original clue IDs.
+
+The isolated Unity fixture in `Design/Props/GeneratorUpgrades/Animation/Validate.cs.txt` checks two- and three-variant distributions, same-session reuse, new-session changes, transform anchors, legacy mappings, shared slots, clue IDs and healthy-patient cleanup. It uses no player save. Runtime and editor assemblies compile against the main project's normal Unity references. Full Office gameplay and Android device testing are not performed for this integration.

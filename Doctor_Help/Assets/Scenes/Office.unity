@@ -1745,10 +1745,7 @@ PrefabInstance:
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents:
-    - targetCorrespondingSourceObject: {fileID: 4232309763173535377, guid: 98fb00e8ddbd839498467c407e44bc5b, type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 351203154}
+    m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 98fb00e8ddbd839498467c407e44bc5b, type: 3}
 --- !u!224 &351203151 stripped
 RectTransform:
@@ -1766,28 +1763,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8124ad616bacc35499be934c19593737, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DoctorHelp.PoliceReportPopup
---- !u!1 &351203153 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 4232309763173535377, guid: 98fb00e8ddbd839498467c407e44bc5b, type: 3}
-  m_PrefabInstance: {fileID: 351203150}
-  m_PrefabAsset: {fileID: 0}
---- !u!114 &351203154
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 351203153}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: bc8ddbb6c58385a459b2abe748f7a8a0, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::DoctorHelp.PopupPanelFit
-  maximumSize: {x: 548.57983, y: 365.8985}
-  padding: 16
-  content: {fileID: 0}
-  contentPaddingHeight: 210
-  minimumHeight: 420
 --- !u!1 &363201062
 GameObject:
   m_ObjectHideFlags: 0
@@ -2037,7 +2012,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &452037071
 RectTransform:
   m_ObjectHideFlags: 0
@@ -2301,7 +2276,7 @@ MonoBehaviour:
   hauntedThrow:
     Action: 0
     Tool: 0
-    Instruction: Hold Throw Rock, drag to aim at a ghost, then release. Avoid hitting
+    Instruction: Hold Throw Rock, drag to aim at a fly, then release. Avoid hitting
       the patient.
     Padding: 6
     RequireWormInLens: 0
@@ -2976,8 +2951,8 @@ MonoBehaviour:
   treasurePrefab: {fileID: 3342197913089542085, guid: 7e646d6f8239d5a4f8779d29b1aa32b3, type: 3}
   puffPrefab: {fileID: 6380188943085063200, guid: 6b360a682d9c0ad40825e0a3b245bc2d, type: 3}
   chance: 0.7
-  fullSizeDistance: 0.1
-  minimumSizeDistance: 0.3
+  fullSizeDistance: 0.13
+  minimumSizeDistance: 0.39
 --- !u!114 &927320005
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3243,6 +3218,7 @@ MonoBehaviour:
   content: {fileID: 1802337191}
   contentPaddingHeight: 210
   minimumHeight: 420
+  aspectRatio: 0
 --- !u!1 &1064982658
 GameObject:
   m_ObjectHideFlags: 0
@@ -5790,6 +5766,7 @@ MonoBehaviour:
   pulseScale: 0.04
   pulseMinAlpha: 0.65
   pulseSpeed: 0.8
+  followElectricity: 1
 --- !u!1001 &1922790272
 PrefabInstance:
   m_ObjectHideFlags: 0

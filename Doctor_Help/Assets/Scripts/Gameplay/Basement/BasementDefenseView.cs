@@ -25,6 +25,7 @@ namespace DoctorHelp
         [Tooltip("Parent of spawned rat visuals.")]
         [SerializeField] private Transform ratLayer;
         [SerializeField] private GeneratorAnimationController generator;
+        [SerializeField] private GeneratorUpgradeView generatorUpgrades;
         [SerializeField] private GeneratorWiringAnimationController wiring;
         [Tooltip("Shelf button caption while the shelf is empty.")]
         [SerializeField] private string addProtectionLabel = "Add protection";
@@ -189,9 +190,13 @@ namespace DoctorHelp
             RefreshRats(data);
             RefreshShots(data, simulation);
             RefreshArcs(data, simulation);
-            if (generator != null) generator.SetOperating(simulation.GeneratorWorking);
+            if (generatorUpgrades != null) generatorUpgrades.SetOperating(simulation.GeneratorWorking);
+            else
+            {
+                if (generator != null) generator.SetOperating(simulation.GeneratorWorking);
+                if (repairButton != null) repairButton.gameObject.SetActive(simulation.GeneratorBroken);
+            }
             if (wiring != null) wiring.ShowSimulatedState(data.wire, data.wireSeconds);
-            if (repairButton != null) repairButton.gameObject.SetActive(simulation.GeneratorBroken);
             if (repairMessage != null && repairMessage.gameObject.activeSelf &&
                 (Time.unscaledTime >= messageUntil || !simulation.GeneratorBroken))
                 repairMessage.gameObject.SetActive(false);

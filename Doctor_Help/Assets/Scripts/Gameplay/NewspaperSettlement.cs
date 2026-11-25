@@ -16,8 +16,14 @@ namespace DoctorHelp
         [SerializeField] private Color gainBalanceColor = new Color(.59f, .94f, .48f);
         [SerializeField] private Color lossBalanceColor = new Color(1f, .42f, .4f);
         [SerializeField, Min(0)] private float revealDelay = .18f, countSeconds = .65f, flightSeconds = .42f, balanceSeconds = .7f;
+        [SerializeField, Min(0)] private float earnCountSeconds = 1.2f, earnReturnSeconds = .5f;
+        [SerializeField, Min(1)] private float earnCountingScale = 1.3f;
+        [SerializeField] private Color earnCountingColor = new Color(.25f, .85f, .12f);
 
         private Color neutralBalanceColor;
+        private Color neutralEarnColor;
+        private Vector3 neutralEarnScale;
+        private bool earnAppearanceCaptured;
         private bool paused, unfocused;
 
         public bool IsConfigured => summary != null && reportHeadbar != null && totalLoss != null && totalEarn != null &&
@@ -27,12 +33,13 @@ namespace DoctorHelp
 
         public void Configure(DayTreatmentResult result, bool showHeadbar)
         {
+            ResetEarnAppearance();
             summary.SetActive(result != null);
             reportHeadbar.SetActive(showHeadbar);
             if (result == null) return;
 
-            totalLoss.text = $"Total Loss  {result.TotalLoss}";
-            totalEarn.text = $"Total Earn  {result.TotalEarn}";
+            totalLoss.text = $"Total Loss  {-result.TotalLoss}";
+            totalEarn.text = showHeadbar && result.HasCompletedConsultations ? "0" : result.TotalEarn.ToString();
             if (showHeadbar)
             {
                 balance.text = result.GoldBefore.ToString();
@@ -132,6 +139,19 @@ namespace DoctorHelp
                     await AnimateAsync(balanceSeconds,
                         fraction => balance.text = Interpolate(from, result.GoldAfter, fraction).ToString(), token);
                 }
+                if (result.TotalEarn > 0)
+                {
+                    totalEarn.rectTransform.localScale = neutralEarnScale * earnCountingScale;
+                    totalEarn.color = earnCountingColor;
+                    await AnimateAsync(earnCountSeconds,
+                        fraction => totalEarn.text = Interpolate(0, result.TotalEarn, fraction).ToString(), token);
+                    await AnimateAsync(earnReturnSeconds, fraction =>
+                    {
+                        float eased = Mathf.SmoothStep(0, 1, fraction);
+                        totalEarn.rectTransform.localScale = Vector3.Lerp(neutralEarnScale * earnCountingScale, neutralEarnScale, eased);
+                        totalEarn.color = Color.Lerp(earnCountingColor, neutralEarnColor, eased);
+                    }, token);
+                }
             }
             finally
             {
@@ -141,7 +161,24 @@ namespace DoctorHelp
                 if (scroll != null) scroll.vertical = wasVertical;
                 if (scrollbar != null) scrollbar.interactable = scrollbarWasInteractable;
                 if (balance != null) balance.text = result.GoldAfter.ToString();
+                if (totalEarn != null)
+                {
+                    totalEarn.text = result.TotalEarn.ToString();
+                    ResetEarnAppearance();
+                }
             }
+        }
+
+        private void ResetEarnAppearance()
+        {
+            if (!earnAppearanceCaptured)
+            {
+                neutralEarnColor = totalEarn.color;
+                neutralEarnScale = totalEarn.rectTransform.localScale;
+                earnAppearanceCaptured = true;
+            }
+            totalEarn.color = neutralEarnColor;
+            totalEarn.rectTransform.localScale = neutralEarnScale;
         }
 
         private static void RevealAmount(ScrollRect scroll, Text amount)
@@ -161,7 +198,9 @@ namespace DoctorHelp
         {
             var rect = text.rectTransform;
             float width = Mathf.Min(text.preferredWidth, rect.rect.width);
-            return rect.TransformPoint(new Vector3(rect.rect.xMin + width * .5f, rect.rect.center.y));
+            int alignment = (int)text.alignment % 3;
+            float left = rect.rect.xMin + (rect.rect.width - width) * alignment * .5f;
+            return rect.TransformPoint(new Vector3(left + width * .5f, rect.rect.center.y));
         }
 
         private async Task AnimateAsync(float seconds, Action<float> draw, CancellationToken token)

@@ -28,6 +28,8 @@ namespace DoctorHelp
         [SerializeField, Range(0f, .2f)] private float pulseScale = .04f;
         [SerializeField, Range(0f, 1f)] private float pulseMinAlpha = .65f;
         [SerializeField, Min(.05f)] private float pulseSpeed = .8f;
+        [Tooltip("Off: lamps stay at their material Power and no power warning shows (e.g. the end-of-day cutscene).")]
+        [SerializeField] private bool followElectricity = true;
 
         private PlayerProfileService profile;
         private MaterialPropertyBlock block;
@@ -64,6 +66,7 @@ namespace DoctorHelp
 
         private void Update()
         {
+            if (!followElectricity) { ShowWarning(null); Apply(1f, full: true); return; }
             int electricity = profile != null && profile.IsLoaded ? profile.Electricity : LowElectricity;
             ShowWarning(electricity >= LowElectricity ? null : electricity <= 0 ? outMessage : lowMessage);
             if (electricity >= LowElectricity) { Apply(1f, full: true); return; }
@@ -75,6 +78,13 @@ namespace DoctorHelp
                 ScheduleFlicker();
             }
             Apply(lowPower * FlickerScale(Time.time - flickerStart), full: false);
+        }
+
+        // Cutscenes call this so the player's electricity never dims the lamps or shows a warning there.
+        public void IgnoreElectricity()
+        {
+            followElectricity = false;
+            if (warning != null) warning.SetActive(false);
         }
 
         // A short burst of uneven dips back to the dimmed level.

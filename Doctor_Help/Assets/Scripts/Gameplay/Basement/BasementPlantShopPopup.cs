@@ -37,7 +37,7 @@ namespace DoctorHelp
             title.text = swapMode ? swapTitle : shopTitle;
             shownKey = null;
             transform.SetAsLastSibling();
-            gameObject.SetActive(true);
+            PopupAnimation.Show(gameObject);
             openedFrame = Time.frameCount;
             message.text = flow != null && !flow.CanChangePlants ? flow.UnavailableMessage : "";
             Refresh();
@@ -47,7 +47,7 @@ namespace DoctorHelp
             scroll.verticalNormalizedPosition = 1f;
         }
 
-        internal void Close() => gameObject.SetActive(false);
+        internal void Close() => PopupAnimation.Hide(gameObject);
 
         private void OnEnable()
         {

@@ -35,8 +35,6 @@ namespace DoctorHelp
         [SerializeField, Min(.1f)] private float breakWireSeconds = 2.6f;
 
         [Header("Economy")]
-        [Tooltip("Electricity added at the end-of-day checkpoint while the generator works; 0 if it is broken.")]
-        [SerializeField, Min(0)] private int electricityPerDay = 50;
         [Tooltip("Gold paid for one repair. The player must have it; no debt.")]
         [SerializeField, Min(0)] private int repairCost = 50;
 
@@ -52,7 +50,6 @@ namespace DoctorHelp
         internal float BiteSeconds => Mathf.Min(biteSeconds, eatSeconds);
         internal float WireBreakSeconds => Mathf.Min(wireBreakSeconds, breakWireSeconds);
         internal float BreakWireSeconds => breakWireSeconds;
-        internal int ElectricityPerDay => electricityPerDay;
         internal int RepairCost => repairCost;
         internal float AutosaveDelaySeconds => autosaveDelaySeconds;
 

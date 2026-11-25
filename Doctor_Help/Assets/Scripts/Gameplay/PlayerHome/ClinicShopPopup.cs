@@ -16,6 +16,8 @@ namespace DoctorHelp
         [Tooltip("Drag item prefabs from Assets/Resources/ShopItems into this list.")]
         [SerializeField] private ClinicShopItem[] items = System.Array.Empty<ClinicShopItem>();
         [SerializeField] private string furnitureSlot;
+        [SerializeField] private bool showDefaultFurniture;
+        [SerializeField, Min(140f)] private float minimumRowHeight = 140f;
         [SerializeField] private string initialMessage;
 
         private readonly List<ClinicShopRow> rows = new();
@@ -34,10 +36,10 @@ namespace DoctorHelp
             if (!CanInteract(FindFirstObjectByType<DailyGameLoop>()) ||
                 (!inventory && PlayerProfileService.Instance?.ShopsOpen != true)) return;
             transform.SetAsLastSibling();
-            gameObject.SetActive(true);
+            PopupAnimation.Show(gameObject);
         }
 
-        internal void Close() => gameObject.SetActive(false);
+        internal void Close() => PopupAnimation.Hide(gameObject);
 
         private void OnEnable()
         {
@@ -93,7 +95,7 @@ namespace DoctorHelp
         {
             if (rowLayout == null || rows.Count == 0) return;
             float height = (scroll.viewport.rect.height - rowLayout.spacing - rowLayout.padding.vertical - 2f) / 2f;
-            height = Mathf.Clamp(height, 140f, rowPrefab.PreferredHeight);
+            height = Mathf.Clamp(height, minimumRowHeight, Mathf.Max(minimumRowHeight, rowPrefab.PreferredHeight));
             if (Mathf.Approximately(height, fittedRowHeight)) return;
             fittedRowHeight = height;
             foreach (var row in rows) row.PreferredHeight = height;
@@ -136,7 +138,7 @@ namespace DoctorHelp
                     if (item == null || !item.IsConfigured || !seen.Add(item.Id)) continue;
                     int count = profile.ShopItemQuantity(item.Id);
                     if (inventory ? (!showAllItems && item.IsEquippable) || (count == 0 && !item.IsDefaultFurniture)
-                        : item.IsDefaultFurniture || item.IsEquippable != !string.IsNullOrEmpty(furnitureSlot) ||
+                        : (!showDefaultFurniture && item.IsDefaultFurniture) || item.IsEquippable != !string.IsNullOrEmpty(furnitureSlot) ||
                           (item.IsEquippable && item.FurnitureSlot != furnitureSlot))
                         continue;
 
@@ -159,10 +161,11 @@ namespace DoctorHelp
                     }
                     else
                     {
-                        string label = item.IsEquippable && count > 0
+                        bool owned = count > 0 || item.IsDefaultFurniture;
+                        string label = item.IsEquippable && owned
                             ? (equipped ? "Equipped" : "Owned")
                             : $"Buy · {item.Price:N0}";
-                        row.Show(item, label, (!item.IsEquippable || count == 0) && profile.IsUpgradeUnlocked(item),
+                        row.Show(item, label, (!item.IsEquippable || !owned) && profile.IsUpgradeUnlocked(item),
                             item.IsEquippable ? "" : $"Owned: {count:N0}", Buy);
                     }
                 }

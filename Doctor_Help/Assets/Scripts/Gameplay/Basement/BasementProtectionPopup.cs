@@ -40,13 +40,13 @@ namespace DoctorHelp
             flow = owner;
             shownKey = null;
             transform.SetAsLastSibling();
-            gameObject.SetActive(true);
+            PopupAnimation.Show(gameObject);
             openedFrame = Time.frameCount;
             SetMessage(flow != null && !flow.CanChangePlants ? flow.UnavailableMessage : "");
             Refresh();
         }
 
-        internal void Close() => gameObject.SetActive(false);
+        internal void Close() => PopupAnimation.Hide(gameObject);
 
         internal void SetMessage(string text)
         {

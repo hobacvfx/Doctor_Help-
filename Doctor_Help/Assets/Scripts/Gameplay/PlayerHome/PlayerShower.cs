@@ -4,7 +4,7 @@ using UnityEngine;
 namespace DoctorHelp
 {
     // Player Home shower. Walking into the zone pays clean water, closes the curtain, pours water for a while,
-    // removes dirt and opens the curtain again. The player cannot act until the curtain is open.
+    // removes dirt and opens the curtain again. A clean player (0 dirt) cannot shower. The player cannot act until the curtain is open.
     [DisallowMultipleComponent]
     public sealed class PlayerShower : MonoBehaviour
     {
@@ -22,8 +22,6 @@ namespace DoctorHelp
         [SerializeField, Min(0f)] private float pourSeconds = 2f;
         [SerializeField, Min(0f)] private float pourFadeSeconds = 1f;
         [SerializeField, Min(0)] private int waterCost = 50;
-        [Tooltip("Cost when the player is already clean.")]
-        [SerializeField, Min(0)] private int cleanWaterCost = 25;
         [SerializeField, Min(0f)] private float dirtRemoved = 3f;
         [Header("Not enough water")]
         [SerializeField] private GameObject warning;
@@ -84,7 +82,8 @@ namespace DoctorHelp
         private void TryShower()
         {
             if (profile == null || !profile.IsLoaded) return;
-            int cost = profile.Dirt > 0f ? waterCost : cleanWaterCost;
+            if (profile.Dirt <= 0f) return; // Already clean: nothing to wash off, so the shower stays off.
+            int cost = waterCost;
             if (profile.Water < cost)
             {
                 ShowWarning();

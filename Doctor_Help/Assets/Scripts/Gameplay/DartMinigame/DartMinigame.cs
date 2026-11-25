@@ -126,13 +126,13 @@ namespace DoctorHelp
         private int pendingReward = -1;
         private DartReward shownReward;
         private Headbar headbar;
-        private bool aiming, missPending, started, sceneCameraHidden;
+        private bool aiming, missPending, started, sceneCameraHidden, closingGame;
         private Vector2Int screenSize;
         private int[] lanes = Array.Empty<int>();
         private readonly List<Canvas> hiddenCanvases = new List<Canvas>();
 
         private bool PopupOpen => rewardPopup.activeSelf || missPopup.activeSelf;
-        private bool Busy => adBusy || flyingDart != null || pendingReward >= 0 || missPending || PopupOpen;
+        private bool Busy => closingGame || adBusy || flyingDart != null || pendingReward >= 0 || missPending || PopupOpen;
         private int DartsLeft => profile != null ? profile.DartsLeft : 0;
         private bool CanAim => !Busy && DartsLeft > 0 && AnyBalloonLeft && Time.time >= readyAt;
         private float BoardDepth => -gameCamera.transform.localPosition.z;
@@ -218,7 +218,7 @@ namespace DoctorHelp
             if (missPending && Time.time >= popupAt)
             {
                 missPending = false;
-                missPopup.SetActive(true);
+                PopupAnimation.Show(missPopup);
             }
             RefreshThrowButton();
         }
@@ -451,7 +451,7 @@ namespace DoctorHelp
             rewardCard.sprite = reward.card;
             rewardText.text = reward.Description;
             shownReward = reward;
-            rewardPopup.SetActive(true);
+            PopupAnimation.Show(rewardPopup);
         }
 
         // Confirming the reward: VFX_Puff on the card, then the reward's icons fly into the minigame's Headbar.
@@ -466,7 +466,7 @@ namespace DoctorHelp
                 Bar.PlayRewardPuff(origin, gameCamera);
                 Bar.FlyReward(reward.Currency, reward.amount, origin, alreadyHeld: true);
             }
-            rewardPopup.SetActive(false);
+            PopupAnimation.Hide(rewardPopup);
         }
 
         private Headbar Bar => headbar != null ? headbar : headbar = GetComponentInChildren<Headbar>(true);
@@ -503,7 +503,7 @@ namespace DoctorHelp
                 presentation.alpha = 0;
                 presentation.blocksRaycasts = false;
                 if (await ad.ShowAsync(RewardedPlacement.DartRefill, lifetime.Token))
-                { missPopup.SetActive(false); adMessage.text = "+2 darts"; }
+                { PopupAnimation.Hide(missPopup); adMessage.text = "+2 darts"; }
                 else adMessage.text = "No reward earned. Please complete the ad.";
             }
             catch (OperationCanceledException) { }
@@ -521,16 +521,18 @@ namespace DoctorHelp
         }
 
         // A dart already in the air still lands and pays out when the player leaves.
-        internal void Close()
+        internal async void Close()
         {
-            if (adBusy) return;
+            if (adBusy || closingGame) return;
+            closingGame = true;
             CancelAim();
             if (flyingDart != null)
             {
                 PlaceDart(1f);
                 LandDart(showFeedback: false);
             }
-            Destroy(gameObject);
+            await System.Threading.Tasks.Task.WhenAll(PopupAnimation.HideAsync(missPopup), PopupAnimation.HideAsync(rewardPopup));
+            if (this != null) Destroy(gameObject);
         }
 
         private void OnApplicationFocus(bool focused) { if (!focused) CancelAim(); }

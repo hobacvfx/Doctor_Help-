@@ -10,6 +10,8 @@ namespace DoctorHelp
         [SerializeField] private PlayerHomeDirt dirt;
         [SerializeField] private PlayerHomeCleaning cleaning;
         [SerializeField] private Camera sceneCamera;
+        [SerializeField] private PlayerHomeCameraFollow cameraFollow;
+        [SerializeField, Min(.01f)] private float cameraFocusSeconds = 1f;
         [SerializeField] private TutorialOverlay overlay;
         [SerializeField] private TutorialStep explanation = new TutorialStep
         {
@@ -25,11 +27,14 @@ namespace DoctorHelp
 
         private ClinicWallStain stain;
         private bool waitingForClean;
+        private bool focusingCamera, holdingCamera;
         private PlayerProfileService profile;
         private DailyGameLoop loop;
 
         private void Awake()
         {
+            if (cameraFollow == null && sceneCamera != null)
+                cameraFollow = sceneCamera.GetComponent<PlayerHomeCameraFollow>();
             profile = PlayerProfileService.Instance;
             loop = profile != null ? profile.GetComponent<DailyGameLoop>() : null;
         }
@@ -42,7 +47,7 @@ namespace DoctorHelp
         private void LateUpdate()
         {
             if (overlay == null || player == null || elevator == null || dirt == null || cleaning == null ||
-                profile == null || !profile.IsLoaded || profile.CurrentDay < 3 ||
+                sceneCamera == null || cameraFollow == null || profile == null || !profile.IsLoaded || profile.CurrentDay < 3 ||
                 !ClinicShopPopup.CanInteract(loop))
             {
                 Finish();
@@ -55,6 +60,12 @@ namespace DoctorHelp
             {
                 Finish();
                 return;
+            }
+            if (!cameraFollow.HasTutorialFocus) { Finish(); return; }
+            if (focusingCamera)
+            {
+                if (!cameraFollow.TutorialFocusComplete) return;
+                focusingCamera = false;
             }
 
             if (!waitingForClean && overlay.ReviewConfirmed)
@@ -81,7 +92,12 @@ namespace DoctorHelp
         {
             if (profile.Clean || !player.IsWalkingManually) return;
             stain = dirt.FindVisibleStain(sceneCamera, elevator.PlayerFloor(), player.Position.x);
-            if (stain != null) player.SetTutorialLocked(true);
+            if (stain == null) return;
+            player.SetTutorialLocked(true);
+            if (!dirt.TryGetStainFocusPosition(stain, out var position)) { Finish(); return; }
+            if (overlay != null) overlay.gameObject.SetActive(false);
+            cameraFollow.BeginTutorialFocus(position, cameraFocusSeconds);
+            focusingCamera = holdingCamera = true;
         }
 
         private void OnCleaningStarted(ClinicWallStain target)
@@ -91,9 +107,12 @@ namespace DoctorHelp
 
         private void Finish()
         {
-            if (stain == null) return;
+            if (stain == null && !holdingCamera) return;
             stain = null;
             waitingForClean = false;
+            focusingCamera = false;
+            if (holdingCamera && cameraFollow != null) cameraFollow.EndTutorialFocus();
+            holdingCamera = false;
             if (cleaning != null) cleaning.GuidedStain = null;
             if (overlay != null) overlay.gameObject.SetActive(false);
             if (player != null) player.SetTutorialLocked(false);

@@ -19,7 +19,7 @@ namespace DoctorHelp
             var request = pending = new TaskCompletionSource<bool>();
             yes.onClick.AddListener(Accept);
             no.onClick.AddListener(Decline);
-            gameObject.SetActive(true);
+            PopupAnimation.Show(gameObject);
             EventSystem.current?.SetSelectedGameObject(null);
             try
             {
@@ -32,8 +32,8 @@ namespace DoctorHelp
                 {
                     yes.onClick.RemoveListener(Accept);
                     no.onClick.RemoveListener(Decline);
+                    await PopupAnimation.HideAsync(gameObject);
                     pending = null;
-                    gameObject.SetActive(false);
                 }
             }
         }

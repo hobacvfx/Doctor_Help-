@@ -14,6 +14,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::DoctorHelp.NpcDialogueAsset
   content: 'Afternoon, doctor.
 
-    Something is not right, but I cannot put my finger on it.
+    I think there are flies around me.
 
     Perhaps I have been working too many hours at the shop.'

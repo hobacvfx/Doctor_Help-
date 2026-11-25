@@ -122,6 +122,8 @@ namespace DoctorHelp
                 organAppearance.Initialize(definition, source.AllSickness);
             if (TryGetComponent<SymptomPrefabAppearance>(out var symptomAppearance))
                 symptomAppearance.Initialize(definition, source.AllSickness);
+            if (TryGetComponent<DirtyPatientAppearance>(out var dirtyAppearance))
+                dirtyAppearance.Initialize(Haunting != null);
             if (TryGetComponent<NpcDialogue>(out var dialogue))
                 dialogue.Initialize(definition.Dialogue, definition.HasBrainRot);
         }

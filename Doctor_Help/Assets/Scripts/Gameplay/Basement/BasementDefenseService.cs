@@ -282,8 +282,10 @@ namespace DoctorHelp
         {
             var data = Simulation.Data;
             if (data.productionDay == day) return data.productionAmount;
+            if (!ConnectProfile() || !profile.IsLoaded)
+                throw new InvalidOperationException("Generator production requires a loaded player profile.");
             data.productionDay = day;
-            data.productionAmount = Simulation.GeneratorWorking ? settings.ElectricityPerDay : 0;
+            data.productionAmount = Simulation.GeneratorWorking ? profile.DailyGeneratorProduction : 0;
             SaveNow();
             return data.productionAmount;
         }

@@ -144,16 +144,20 @@ namespace DoctorHelp
         internal void ThankForMedicine() => SpeakPatientComplaint(medicineThanks);
 
         // Scripted line (end-of-day cutscene): types the line, holds it for `holdSeconds`, then closes.
-        internal void SpeakFor(string line, float holdSeconds)
+        internal void SpeakFor(string line, float holdSeconds, bool animateMouth = true, float worldLift = 0f)
         {
             HideBox();
             customHold = Mathf.Max(0f, holdSeconds);
+            staticMouth = !animateMouth;
+            scriptedWorldLift = Mathf.Max(0f, worldLift);
             BeginAmbient(line, false);
             if (!IsShowing) customHold = null;
         }
         internal bool IsHolding => phase == Phase.Holding;
         internal TMP_Text Text => dialogueText;
         private float? customHold;
+        private bool staticMouth;
+        private float scriptedWorldLift;
         private bool patientComplaint;
 
         private void BeginAmbient(string line, bool outburst)
@@ -203,7 +207,7 @@ namespace DoctorHelp
             revealed = 0;
             phase = Phase.Typing;
             if (characterCount > 0)
-                lips.SetTalking(true);
+                lips.SetTalking(!staticMouth);
             else
                 CompleteLine();
         }
@@ -252,8 +256,17 @@ namespace DoctorHelp
             bool examination = IsExamination;
             Vector3 anchor = streetOutburst ? layout.TailAnchor + Vector3.up * StreetOutburstLift : layout.TailAnchor;
             float rightLimit = examination ? SpeakerLeftEdge(camera) : float.PositiveInfinity;
+            if (customHold != null && scriptedWorldLift > 0f)
+            {
+                var parent = chatBox.transform.parent;
+                anchor = parent.InverseTransformPoint(parent.TransformPoint(anchor) + Vector3.up * scriptedWorldLift);
+            }
+            Vector3 anchorWorld = chatBox.transform.parent.TransformPoint(anchor);
+            float cutsceneWidth = customHold != null
+                ? Mathf.Max(1f, camera.WorldToScreenPoint(anchorWorld).x - Mathf.Max(camera.pixelRect.xMin, ScreenSafeArea.Current.xMin) - screenPadding)
+                : float.PositiveInfinity;
             if (!layout.Apply(camera, anchor,
-                    examination ? DialogueTextSize.Examination : DialogueTextSize.Walking, rightLimit, screenPadding)) return;
+                    examination ? DialogueTextSize.Examination : DialogueTextSize.Walking, rightLimit, screenPadding, cutsceneWidth)) return;
             // Scripted cutscene lines (customHold) are kept on screen like outbursts and complaints.
             if ((ambientLine != null && !streetOutburst && !patientComplaint && customHold == null) || !fitInViewport) return;
 
@@ -270,6 +283,21 @@ namespace DoctorHelp
             Vector3 min = camera.WorldToScreenPoint(bounds.min), max = camera.WorldToScreenPoint(bounds.max);
             float width = max.x - min.x, height = max.y - min.y;
             if (width <= .01f || height <= .01f) return;
+            if (customHold != null)
+            {
+                // Fit around the tail instead of translating the entire bubble
+                // away from the speaker when a long cutscene line reaches an edge.
+                Vector3 tip = camera.WorldToScreenPoint(anchorWorld);
+                float fit = 1f;
+                if (min.x < left && tip.x > min.x) fit = Mathf.Min(fit, (tip.x - left) / (tip.x - min.x));
+                if (max.x > right && max.x > tip.x) fit = Mathf.Min(fit, (right - tip.x) / (max.x - tip.x));
+                if (min.y < bottom && tip.y > min.y) fit = Mathf.Min(fit, (tip.y - bottom) / (tip.y - min.y));
+                if (max.y > top && max.y > tip.y) fit = Mathf.Min(fit, (top - tip.y) / (max.y - tip.y));
+                fit = Mathf.Clamp(fit, .01f, 1f);
+                box.localScale *= fit;
+                box.position = anchorWorld + (box.position - anchorWorld) * fit;
+                return;
+            }
             // Shrinking is only a last resort for very long turns.
             float factor = Mathf.Min(1, (right - left) / width, (top - bottom) / height);
             if (factor < 1) box.localScale *= factor;
@@ -372,6 +400,8 @@ namespace DoctorHelp
         {
             phase = Phase.Hidden;
             customHold = null;
+            staticMouth = false;
+            scriptedWorldLift = 0f;
             ambientLine = null;
             streetOutburst = false;
             patientComplaint = false;

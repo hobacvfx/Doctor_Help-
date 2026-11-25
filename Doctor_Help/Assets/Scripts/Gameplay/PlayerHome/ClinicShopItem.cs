@@ -35,7 +35,9 @@ namespace DoctorHelp
         // Electricity used per day while equipped, paid at the start of the next day: 5, plus 2.5 per upgrade level.
         internal const float BaseElectricityPerDay = 5f;
         internal const float ElectricityPerLevel = 2.5f;
-        internal float ElectricityPerDay => BaseElectricityPerDay + ElectricityPerLevel * FurnitureLevel;
+        internal bool IsGenerator => furnitureSlot == GeneratorUpgrades.Slot;
+        internal int GeneratedElectricityPerDay => IsGenerator ? GeneratorUpgrades.EnergyPerDay(FurnitureLevel) : 0;
+        internal float ElectricityPerDay => IsGenerator ? 0f : BaseElectricityPerDay + ElectricityPerLevel * FurnitureLevel;
         internal bool IsConfigured => !string.IsNullOrWhiteSpace(itemId) &&
             !string.IsNullOrWhiteSpace(displayName) && price >= 0 && (!defaultFurniture || IsEquippable);
     }

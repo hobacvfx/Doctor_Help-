@@ -1,0 +1,10 @@
+Generator_LV1.png
+size:1272,715
+filter:Linear,Linear
+body
+bounds:2,2,711,732
+offsets:4,4,719,740
+rotate:90
+rotor
+bounds:736,170,534,543
+offsets:4,4,542,551

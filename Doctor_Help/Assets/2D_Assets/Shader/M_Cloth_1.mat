@@ -50,7 +50,9 @@ Material:
     - _Hold: 0
     - _QueueControl: 0
     - _QueueOffset: 0
+    - _XRMotionVectorsPass: 1
     m_Colors:
+    - _Color: {r: 1, g: 1, b: 1, a: 1}
     - _Cutout_Offset: {r: -0.043, g: 0.04, b: 0, a: 0}
     - _Cutout_Position: {r: 0, g: 0, b: 0, a: 0}
   m_BuildTextureStacks: []

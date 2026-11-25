@@ -256,7 +256,7 @@ namespace DoctorHelp
                 string.IsNullOrWhiteSpace(patient.ConsultationId) || ids == null)
             { error = "Patient or medicine catalogue unavailable."; return false; }
             if (patient.Haunting != null && !patient.HauntingCleared && !patient.Definition.RequiresPoliceReport)
-            { error = "Remove all ghosts before giving medicine."; return false; }
+            { error = "Remove all flies before giving medicine."; return false; }
             if (journal.Contains(patient.ConsultationId))
             {
                 if (journal.MatchesMedication(patient.ConsultationId, ids)) return true;
@@ -464,6 +464,8 @@ namespace DoctorHelp
         internal int ReceptionTableLevel => FurnitureLevel(ClinicDemand.ReceptionSlot);
         internal int ReceptionistLevel => FurnitureLevel(ClinicDemand.ReceptionistSlot);
         internal int ElevatorLevel => FurnitureLevel(ClinicDemand.ElevatorSlot);
+        internal int GeneratorLevel => Mathf.Clamp(FurnitureLevel(GeneratorUpgrades.Slot), 1, 5);
+        internal int DailyGeneratorProduction => GeneratorUpgrades.EnergyPerDay(GeneratorLevel);
         internal float ReceptionRatingBonus => ClinicUpgrades.StarBonus(ReceptionTableLevel, ReceptionistLevel);
         internal float BusinessGoldMultiplier => ClinicUpgrades.GoldMultiplier(ReceptionTableLevel, ReceptionistLevel);
         internal float PatienceMultiplier => ClinicUpgrades.PatienceMultiplier(ElevatorLevel, ReceptionTableLevel, ReceptionistLevel);

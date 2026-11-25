@@ -16,7 +16,15 @@ namespace DoctorHelp.Editor
                 using (new EditorGUILayout.VerticalScope("box"))
                 {
                     var entry = bindings.GetArrayElementAtIndex(i);
-                    EditorGUILayout.PropertyField(entry.FindPropertyRelative("prefab"));
+                    var variants = entry.FindPropertyRelative("variants");
+                    EditorGUILayout.PropertyField(variants, new GUIContent("Animation variants"));
+                    if (variants.objectReferenceValue == null)
+                        EditorGUILayout.PropertyField(entry.FindPropertyRelative("prefab"));
+                    else
+                    {
+                        var set = (SymptomAnimationVariants)variants.objectReferenceValue;
+                        EditorGUILayout.HelpBox(set.Count + " phiên bản, xác suất chia đều. Chọn một lần mỗi phiên khám.", MessageType.Info);
+                    }
                     EditorGUILayout.PropertyField(entry.FindPropertyRelative("position"));
                     var mapping = entry.FindPropertyRelative("symptomId");
                     if (source == null) { EditorGUILayout.PropertyField(mapping); continue; }

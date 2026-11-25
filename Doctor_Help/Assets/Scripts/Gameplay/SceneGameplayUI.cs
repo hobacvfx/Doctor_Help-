@@ -123,8 +123,8 @@ namespace DoctorHelp
                 givePillsButton.gameObject.SetActive(true);
                 givePillsButton.Interactable = false;
             }
-            if (pillPopup != null) pillPopup.gameObject.SetActive(false);
-            if (policePopup != null) policePopup.gameObject.SetActive(false);
+            if (pillPopup != null) PopupAnimation.Hide(pillPopup.gameObject);
+            if (policePopup != null) PopupAnimation.Hide(policePopup.gameObject);
             if (resultsVideo != null) { resultsVideo.StopPlayback(); resultsVideo.gameObject.SetActive(false); }
             if (errorText != null) errorText.gameObject.SetActive(false);
             if (statusText != null) statusText.gameObject.SetActive(false);
@@ -166,13 +166,13 @@ namespace DoctorHelp
             {
                 if (policePopup == null) throw new InvalidOperationException("Police reporting requires a scene-owned popup.");
                 HideAll(); ShowClock(); Status("Báo cảnh sát");
-                policePopup.ResetSelection(); policePopup.gameObject.SetActive(true);
+                policePopup.ResetSelection(); PopupAnimation.Show(policePopup.gameObject);
                 return;
             }
             if (pillPopup == null) throw new InvalidOperationException("Treatment requires SelectPillPopup.");
             HideAll(); ShowClock();
             pillPopup.PrepareForPatient();
-            pillPopup.gameObject.SetActive(true);
+            PopupAnimation.Show(pillPopup.gameObject);
         }
         private void ShowClock()
         {

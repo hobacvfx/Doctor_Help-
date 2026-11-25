@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace DoctorHelp
 {
-    public enum SicknessTreatment { RequiredPills = 0, ReportToPolice = 1, RemoveGhosts = 2 }
+    public enum SicknessTreatment { RequiredPills = 0, ReportToPolice = 1, [InspectorName("Remove Flies")] RemoveGhosts = 2 }
 
     [Serializable]
     public sealed class SicknessDefinition

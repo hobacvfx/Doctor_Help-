@@ -8,11 +8,13 @@ namespace DoctorHelp
     {
         [SerializeField] private Button vampireButton, zombieButton, reportButton, outsideButton, closeButton;
         [SerializeField] private GameObject vampireCheck, zombieCheck;
+        [SerializeField] private PoliceReportCard vampireCard, zombieCard;
         [SerializeField] private Text errorText;
         public event Action ReportRequested, CloseRequested;
         public PoliceReportReason SelectedReason { get; private set; }
         public bool IsConfigured => IsButton(vampireButton) && IsButton(zombieButton) && IsButton(reportButton) &&
-            IsButton(outsideButton) && IsButton(closeButton) && vampireCheck != null && zombieCheck != null && errorText != null;
+            IsButton(outsideButton) && IsButton(closeButton) && vampireCheck != null && zombieCheck != null && errorText != null &&
+            vampireCard != null && vampireCard.IsConfigured && zombieCard != null && zombieCard.IsConfigured;
         private bool initialized;
         private bool IsButton(Button button) => button != null && button.targetGraphic != null && button.transform.IsChildOf(transform);
         private void Awake() => Initialize();
@@ -41,6 +43,8 @@ namespace DoctorHelp
         {
             vampireCheck.SetActive(SelectedReason == PoliceReportReason.VampireInfected);
             zombieCheck.SetActive(SelectedReason == PoliceReportReason.ZombieInfected);
+            vampireCard.SetSelected(SelectedReason == PoliceReportReason.VampireInfected);
+            zombieCard.SetSelected(SelectedReason == PoliceReportReason.ZombieInfected);
             reportButton.interactable = SelectedReason != PoliceReportReason.None;
         }
         private void Report() { if (SelectedReason != PoliceReportReason.None) ReportRequested?.Invoke(); }

@@ -68,10 +68,10 @@ namespace DoctorHelp
 
         public void Open()
         {
-            if (gameObject.activeSelf) Refresh();
-            else gameObject.SetActive(true);
+            if (gameObject.activeSelf) { PopupAnimation.Show(gameObject); Refresh(); }
+            else PopupAnimation.Show(gameObject);
         }
-        public void Close() => gameObject.SetActive(false);
+        public void Close() => PopupAnimation.Hide(gameObject);
         private void OnEnable()
         {
             if (clues != null) { clues.Changed += RefreshClues; clues.Acknowledge(); }

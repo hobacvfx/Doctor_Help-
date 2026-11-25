@@ -15,7 +15,7 @@ namespace DoctorHelp
         [SerializeField] private PatientSpawnPoint patients;
         [SerializeField] private TutorialStep hauntedThrow = new TutorialStep
         {
-            Instruction = "Hold Throw Rock, drag to aim at a ghost, then release. Avoid hitting the patient."
+            Instruction = "Hold Throw Rock, drag to aim at a fly, then release. Avoid hitting the patient."
         };
         private DiseaseReferencePopup book;
         private MagnifierLens lens;

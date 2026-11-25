@@ -8,15 +8,15 @@ namespace DoctorHelp
     public sealed class DifficultyProfile : ScriptableObject
     {
         public const int MaxDifficulty = 4;
-        public const float DefaultSuccessStreak = 3f;
+        public const float DefaultSuccessStreak = 2f;
 
         [SerializeField, Min(1), Tooltip("Consecutive clinic days with at most one incorrect consultation in total. Rounded up to whole days.")]
         private float successStreak = DefaultSuccessStreak;
 
         [SerializeField] private SpawnWeights progress1 = new(0, 0, 0);
-        [SerializeField] private SpawnWeights progress2 = new(30, 0, 0);
-        [SerializeField] private SpawnWeights progress3 = new(40, 25, 0);
-        [SerializeField] private SpawnWeights progress4 = new(20, 30, 20);
+        [SerializeField] private SpawnWeights progress2 = new(50, 0, 0);
+        [SerializeField] private SpawnWeights progress3 = new(50, 30, 0);
+        [SerializeField] private SpawnWeights progress4 = new(35, 35, 30);
 
         public float SuccessStreak => successStreak;
 

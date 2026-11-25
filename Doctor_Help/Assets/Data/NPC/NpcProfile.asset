@@ -36,6 +36,7 @@ MonoBehaviour:
     npcName: Sherlock Holmes
     sicknessIds:
     - 42ee7a9a38694d838b495736ea12cb20
+    - 420888271cbf4de8947e7ef841c5e315
     dialogueAsset: {fileID: 11400000, guid: 097be4947248f8c4d8da75f5553631d2, type: 2}
     difficulty: 1
   - id: ba5cf1d152462254c80190e1cb0d3b32
@@ -66,6 +67,7 @@ MonoBehaviour:
     npcName: Victorian Noblewoman
     sicknessIds:
     - e5c336e89c4145a7a647c6813adbbb2e
+    - 420888271cbf4de8947e7ef841c5e315
     dialogueAsset: {fileID: 11400000, guid: 2c98c16f5dfe0274fadfd8dc329f89a0, type: 2}
     difficulty: 1
   - id: a71b8e0265ebc424a9eca9bce3cb5408
@@ -73,6 +75,7 @@ MonoBehaviour:
     npcName: Victorian Courtesan
     sicknessIds:
     - 779507f7a91843d8bbe143a5a2400021
+    - 420888271cbf4de8947e7ef841c5e315
     dialogueAsset: {fileID: 11400000, guid: 6fa89eca69301e4498b1078ffcc09d1a, type: 2}
     difficulty: 1
   - id: 44d4ac39e19b9f0468fb9aa3a4e518f6
@@ -108,6 +111,7 @@ MonoBehaviour:
     npcName: NPC_6
     sicknessIds:
     - 42ee7a9a38694d838b495736ea12cb20
+    - 420888271cbf4de8947e7ef841c5e315
     dialogueAsset: {fileID: 11400000, guid: 2bdd964f20a844ac9ffeee6b0d3c3037, type: 2}
     difficulty: 1
   - id: 94be04e47cbecd74dabab61673c4d390
@@ -218,6 +222,7 @@ MonoBehaviour:
     sicknessIds:
     - 43e85a3e33844988b968395fcb46a51e
     - 051fba9345c84e7488e692592100bb6d
+    - 420888271cbf4de8947e7ef841c5e315
     dialogueAsset: {fileID: 11400000, guid: e7f78e79911847f4bc94ffc7e1f53a63, type: 2}
     difficulty: 1
   - id: 8fe4518acc27b8744b1743c9b7721ea2
@@ -269,6 +274,7 @@ MonoBehaviour:
     sicknessIds:
     - 42ee7a9a38694d838b495736ea12cb20
     - 7f12a9d40bea47f5b5284f48762375b1
+    - 420888271cbf4de8947e7ef841c5e315
     dialogueAsset: {fileID: 11400000, guid: 869be10e38c147e884602844a76f5e1c, type: 2}
     difficulty: 1
   - id: d453ddb91789c0c4f9e6e1810be72b24
@@ -283,6 +289,7 @@ MonoBehaviour:
     npcName: NPC_30
     sicknessIds:
     - e659156e77fa4a84b852a36f23090055
+    - 420888271cbf4de8947e7ef841c5e315
     dialogueAsset: {fileID: 11400000, guid: 045a95df05be4a7c8565f8acfef0a71d, type: 2}
     difficulty: 1
   - id: 686ccb1d46a39334e9e69dbb3eddf0e9
@@ -312,6 +319,7 @@ MonoBehaviour:
     sicknessIds:
     - 811bcfba402245e7b53ea5c5a6938fc9
     - 779507f7a91843d8bbe143a5a2400021
+    - 420888271cbf4de8947e7ef841c5e315
     dialogueAsset: {fileID: 11400000, guid: 02de21b446ec4da084e7f4887c844253, type: 2}
     difficulty: 1
   - id: 3c1b1bd6da8df2342b5f1d21cd4eaa33
@@ -518,6 +526,7 @@ MonoBehaviour:
     sicknessIds:
     - ab5cf45d3497440c8483faf8d964c7af
     - 811bcfba402245e7b53ea5c5a6938fc9
+    - 420888271cbf4de8947e7ef841c5e315
     dialogueAsset: {fileID: 11400000, guid: 63ef19fafc96490f84a284b910a97e31, type: 2}
     difficulty: 1
   - id: 608c109cd23ccc240974ea62cd93c733
@@ -526,6 +535,7 @@ MonoBehaviour:
     sicknessIds:
     - b5e06d1d7b2e459380ace3a0fe06b3d3
     - b09d50f81fe14efab382c302f5b19ef0
+    - 420888271cbf4de8947e7ef841c5e315
     dialogueAsset: {fileID: 11400000, guid: d0caecd58fa24d5aa6945570d37deed7, type: 2}
     difficulty: 1
   - id: f8a49129a6361404f8efaf8f0260d2be

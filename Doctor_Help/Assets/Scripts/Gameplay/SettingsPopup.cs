@@ -13,7 +13,7 @@ namespace DoctorHelp
 
         private DailyGameLoop loop;
         private string warning;
-        private bool resetting;
+        private bool resetting, switchingPanel;
 
         private void Awake() => warning = confirmationMessage.text;
 
@@ -30,7 +30,7 @@ namespace DoctorHelp
 
         public void Open()
         {
-            gameObject.SetActive(true);
+            PopupAnimation.Show(gameObject);
             if (loop == null) loop = FindFirstObjectByType<DailyGameLoop>();
             var audio = GameAudio.Instance;
             music.SetValueWithoutNotify(audio != null ? audio.MusicVolume : 1);
@@ -38,10 +38,11 @@ namespace DoctorHelp
             music.interactable = effects.interactable = audio != null;
             musicPercent.text = Percent(music.value);
             effectsPercent.text = Percent(effects.value);
-            ShowSettings();
+            confirmation.SetActive(false);
+            panel.SetActive(true);
         }
 
-        public void Close() => gameObject.SetActive(false);
+        public void Close() => PopupAnimation.Hide(gameObject);
 
         private void OnDisable()
         {
@@ -75,17 +76,23 @@ namespace DoctorHelp
             effectsPercent.text = Percent(value);
         }
 
-        private void ShowSettings()
-        {
-            confirmation.SetActive(false);
-            panel.SetActive(true);
-        }
+        private void ShowSettings() => SwitchPanel(false);
+        private void ShowConfirmation() => SwitchPanel(true);
 
-        private void ShowConfirmation()
+        private async void SwitchPanel(bool confirm)
         {
-            confirmationMessage.text = warning;
-            panel.SetActive(false);
-            confirmation.SetActive(true);
+            if (switchingPanel) return;
+            switchingPanel = true;
+            try
+            {
+                await PopupAnimation.HideAsync(gameObject);
+                if (this == null) return;
+                if (confirm) confirmationMessage.text = warning;
+                panel.SetActive(!confirm);
+                confirmation.SetActive(confirm);
+                PopupAnimation.Show(gameObject);
+            }
+            finally { switchingPanel = false; }
         }
 
         private async void ResetProfile()

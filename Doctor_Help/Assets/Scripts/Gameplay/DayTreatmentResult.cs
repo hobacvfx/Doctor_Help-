@@ -157,8 +157,8 @@ namespace DoctorHelp
                         }
             if (!police && entry.sicknesses.Exists(x => medical.Find(x.id).Treatment == SicknessTreatment.RemoveGhosts))
             {
-                required.Insert(0, new TreatmentTextPart("Remove all ghosts"));
-                action.Add(new TreatmentTextPart(entry.hauntingCleared ? "Removed all ghosts" : "Ghosts remaining",
+                required.Insert(0, new TreatmentTextPart("Remove all flies"));
+                action.Add(new TreatmentTextPart(entry.hauntingCleared ? "Removed all flies" : "Flies remaining",
                     entry.hauntingCleared ? TreatmentTextTone.Correct : TreatmentTextTone.Incorrect));
             }
             if (entry.decisionKind == TreatmentDecisionKind.HitPatientWithRock)

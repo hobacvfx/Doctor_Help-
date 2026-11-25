@@ -41,7 +41,7 @@ namespace DoctorHelp
                 if (id == Vampire || id == Zombie) prioritySymptoms = own;
             }
             if (diseases.Count > DifficultyProfile.MaxDifficulty)
-                throw new InvalidOperationException("An NPC can have at most four diseases, including Haunted.");
+                throw new InvalidOperationException("An NPC can have at most four diseases, including Dirty.");
             if (diseases.Contains(Vampire) && diseases.Contains(Zombie))
                 throw new InvalidOperationException("Vampire Infection and Zombie Infection cannot coexist.");
             if (prioritySymptoms != null)

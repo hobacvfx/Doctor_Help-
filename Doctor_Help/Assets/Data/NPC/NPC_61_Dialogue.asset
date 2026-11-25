@@ -14,6 +14,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::DoctorHelp.NpcDialogueAsset
   content: 'Morning, doctor.
 
-    I feel rather unwell today.
+    Flies keep buzzing around me.
 
     Maybe I took on too much work this week.'

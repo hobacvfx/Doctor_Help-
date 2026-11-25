@@ -37,7 +37,7 @@ namespace DoctorHelp
             var service = PlayerProfileService.Instance;
             if (gameObject.activeSelf || !IsConfigured || service == null || !service.CanCommitImmediately ||
                 DeskActionButton.WorldBlockers != 0) return;
-            gameObject.SetActive(true);
+            PopupAnimation.Show(gameObject);
         }
 
         private void OnEnable()
@@ -174,7 +174,7 @@ namespace DoctorHelp
         private void OnApplicationFocus(bool focused) { unfocused = !focused; skipFrame = true; }
         public void Close()
         {
-            if (!IsBusy) gameObject.SetActive(false);
+            if (!IsBusy) PopupAnimation.Hide(gameObject);
         }
 
         private void OnDisable()

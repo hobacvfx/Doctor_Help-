@@ -14,6 +14,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::DoctorHelp.NpcDialogueAsset
   content: 'Evening, doctor.
 
-    My words keep getting mixed up.
+    The moon follows me home every night. I think it wants my umbrella.
+
+    The flies around me will not leave.
 
     Maybe I took on too much work this week.'

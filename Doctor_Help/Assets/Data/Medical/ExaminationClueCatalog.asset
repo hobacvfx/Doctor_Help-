@@ -150,16 +150,16 @@ MonoBehaviour:
   - symptomId: 8439037532414cfe808eec0c66b75c5e
     measurement: 0
     dialoguePhrases:
-    - ghosts haunt
-    - ghosts around me
-    - there are ghosts around me
-    - I keep seeing ghosts around me
-    - the ghosts around me will not leave
-    - I can feel ghosts around me
-    - I think there are ghosts around me
-    - there are ghosts around me even here
+    - flies buzzing
+    - flies around me
+    - there are flies around me
+    - I keep seeing flies around me
+    - the flies around me will not leave
+    - I can feel flies around me
+    - I think there are flies around me
+    - there are flies around me even here
     referencePhrases:
-    - ghosts
+    - flies
   - symptomId: 22e04f4290ee46c9b4bacad833c5b7d3
     measurement: 0
     dialoguePhrases:

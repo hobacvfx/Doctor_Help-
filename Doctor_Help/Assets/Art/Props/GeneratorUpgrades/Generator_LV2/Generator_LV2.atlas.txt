@@ -1,0 +1,9 @@
+Generator_LV2.png
+size:1207,719
+filter:Linear,Linear
+body
+bounds:2,2,757,715
+offsets:4,4,765,723
+rotor
+bounds:761,250,444,467
+offsets:4,4,452,475
